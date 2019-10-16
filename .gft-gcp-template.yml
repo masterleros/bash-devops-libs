@@ -4,4 +4,4 @@ include:
 # GCP Run template
 .gcp-template:
   before_script:
-    - echo "GFT libs folder:${GFT_LIBS_DIR}"
+    - ${GFT_LIBS_GET_CMD}
