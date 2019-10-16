@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello from '${BASH_SOURCE[0]}'"
+#echo "Hello from '${BASH_SOURCE[0]}'"
 
 ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd )"
 
