@@ -106,22 +106,24 @@ function bindRole {
 }
 
 ### Function to deploy a gae app ###
-# usage: gae_deploy <service> <>
+# usage: gae_deploy <gae_yaml>
 function gae_deploy {
 
-    getArgs "APP_YAML" ${@}
+    getArgs "GAE_YAML" ${@}
     GAE_VERSION=${2} # optional argument
-    DESTOKENIZED_APP_YAML="DESTOKENIZED_${APP_YAML}"
+    DESTOKENIZED_GAE_YAML="DESTOKENIZED_${GAE_YAML}"
+
+    echo $DESTOKENIZED_GAE_YAML
     
     # Check if file exists
-    [ -f ${APP_YAML} ] || exitOnError "File '${APP_YAML}' not found"
+    [ -f ${GAE_YAML} ] || exitOnError "File '${GAE_YAML}' not found"
 
     # Get service name
-    GAE_SERVICE=$(cat ${APP_YAML} | grep -e ^service: | awk '{print $NF}')
+    GAE_SERVICE=$(cat ${GAE_YAML} | grep -e ^service: | awk '{print $NF}')
     [ ${GAE_SERVICE} ] || GAE_SERVICE="default"
 
     # Replace tokens, if not present, fail
-    tokenReplaceFromFile ${APP_YAML} > ${DESTOKENIZED_APP_YAML}
+    tokenReplaceFromFile ${GAE_YAML} > ${DESTOKENIZED_GAE_YAML}
 
     # If it is requesting a specific version
     if [ "${GAE_VERSION}" ]; then
@@ -138,10 +140,10 @@ function gae_deploy {
         fi
 
         # Deploy version
-        gcloud --quiet app deploy ${GAE_YAML} --version ${GAE_VERSION}
-    # No version defined
-    else
-        gcloud --quiet app deploy ${GAE_YAML}
+        gcloud --quiet app deploy ${DESTOKENIZED_GAE_YAML} --version ${GAE_VERSION}
+    
+    else # No version defined
+        gcloud --quiet app deploy ${DESTOKENIZED_GAE_YAML}
     fi
     exitOnError "Failed to deploy the application"
 }
