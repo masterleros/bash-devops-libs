@@ -37,6 +37,7 @@ function tokenReplaceFromFile {
             content=${content//$token/${!var}}
         else
             echo "Variable '${var}' is not defined!" >&2
+            ((retval+=1))
         fi
     done
 
