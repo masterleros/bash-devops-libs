@@ -65,6 +65,7 @@ function verifyDeps {
 function map-vars {
 
     # Environment regarding branch
+    branch=${CI_COMMIT_REF_NAME}
     if [[ "${branch}" == "feature/"* ]] || [[ "${branch}" == "fix/"* ]]; then env="DEV";
     elif [[ "${branch}" == "develop" ]]; then env="INT"; 
     elif [[ "${branch}" == "release/"* ]] || [[ "${branch}" == "bugfix/"* ]]; then env="UAT";
@@ -81,7 +82,8 @@ function map-vars {
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
-        export $new_var=\$$var;$exports
+        export $new_var=\$$var
+        unset ${var}
     done
 }
 
