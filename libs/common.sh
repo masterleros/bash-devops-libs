@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "Hello from '${BASH_SOURCE[0]}'"
+
 ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd )"
 
 ### Exit program with text when last exit code is non-zero ###
@@ -41,4 +43,4 @@ if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
 fi
 
 # Validate if OS is supported
-[ "${OSTYPE}" != "linux-gnu" ] || exitOnError "OS '${OSTYPE}' is not supported" -1
+[[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
