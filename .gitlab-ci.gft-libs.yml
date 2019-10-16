@@ -1,0 +1,57 @@
+#######################################
+# GFT libraries for .gitlab-ci.yml #
+#
+# Usage: (in your .gitlab-ci.yml)
+#
+# include:
+#  - project: 'devops-br/banking-gft-scripts'
+#    file: '/.gitlab-ci.devops-lib.yml' 
+#
+# test_module:
+#  extends: .gft-libs
+#  ...
+#  before_script:
+#   - source ${GFT_LIB_DEVOPS}
+#   - source ${GFT_LIB_GCP}
+#
+#######################################
+
+.gft-libs:
+  variables:
+    GFT_LIBS_REPO: "devops-br/gitlab-gft-libs"
+    GFT_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@git.gft.com/${GFT_LIBS_REPO}.git"
+    GFT_LIBS_DIR: "/tmp/${CI_PIPELINE_ID}"
+
+    ########## LIB CATALOG ############
+    GFT_LIB_GCP: "libs/gcp.sh"
+    ###################################
+
+  before_script:
+    - |
+      set_e_enabled=${-//[^x]/}
+      [ $set_e_enabled ] || set +e
+      echo "Importing GFT libs..."
+      test -f ${GFT_LIBS_DIR} || rm -rf ${GFT_LIBS_DIR}
+      git clone ${GFT_LIBS_URL} ${GFT_LIBS_DIR}    
+      echo "****************************************************"
+      echo "Available libraries:"
+      export | grep -o -e ' GFT_LIB_[_A-Z0-9]*'
+      echo ""
+      echo "Import using: import_gft_libs <LIB1> <LIB2> <LIBN>"
+      echo "****************************************************"
+      function import_gft_libs {
+        while [ "$1" ]; do          
+          lib="GFT_LIB_$1"
+          # Check if lib exists
+          if [ ! "${!lib}" ]; then
+            echo "GFT Library ${lib} not found!"
+            exit -1
+          fi
+          echo "Importing GFT Library: ${lib}..."
+          source "${GFT_LIBS_DIR}/${!lib}"
+          shift
+        done
+      }
+      echo "GFT libs were imported!"
+      [ $set_e_enabled ] || set -e
+    
