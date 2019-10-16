@@ -62,7 +62,7 @@ function verifyDeps {
 ### This funciton will map environment          ###
 ### variables to the final name                 ###
 ### Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ###
-function map-vars {
+function mapVars {
 
     # Environment regarding branch
     branch=${CI_COMMIT_REF_NAME}
