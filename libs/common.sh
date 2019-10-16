@@ -76,7 +76,7 @@ function mapVars {
     fi
 
     # Get vars to be renamed    
-    vars=($(export | egrep -o "${env}_CI_.*"))
+    vars=($(printenv | egrep -o "${env}_CI_.*" | awk -F= '{print $1}'))
     echo "Found vars (${env}):"
     echo "${vars}"
 
