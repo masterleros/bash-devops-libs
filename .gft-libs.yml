@@ -5,15 +5,16 @@
 #
 #######################################
 
-.gft-libs:
-  variables:
-    GFT_LIBS_REPO: "devops-br/gitlab-gft-libs"
-    GFT_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@git.gft.com/${GFT_LIBS_REPO}.git"
-    GFT_LIBS_DIR: "/tmp/${CI_PIPELINE_ID}"
+variables:
+  GFT_LIBS_REPO: "devops-br/gitlab-gft-libs"
+  GFT_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@git.gft.com/${GFT_LIBS_REPO}.git"
+  GFT_LIBS_DIR: "/tmp/${CI_PIPELINE_ID}"
 
-    ########## LIB CATALOG ############
-    GFT_LIB_GCP: "libs/gcp.sh"
-    ###################################
+  ########## LIB CATALOG ############
+  GFT_LIB_GCP: "libs/gcp.sh"
+  ###################################
+
+.gft-libs:
 
   before_script:
     - |

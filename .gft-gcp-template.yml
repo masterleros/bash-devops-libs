@@ -1,0 +1,7 @@
+include:
+  - local: .git-libs.yml
+
+# GCP Run template
+.gcp_run:
+  before_script:
+    - echo "GFT libs folder: ${GFT_LIBS_DIR}"
