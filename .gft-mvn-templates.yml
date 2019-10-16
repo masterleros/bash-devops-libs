@@ -1,5 +1,5 @@
 # Maven Run template
-.mvn_run: &mvn_run_template
+.mvn_run:
   image: maven:latest
   cache:
     key: ${CI_JOB_NAME}
