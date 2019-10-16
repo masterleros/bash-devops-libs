@@ -15,7 +15,7 @@ function exitOnError {
     fi
 }
 
-# Execute a command until success within a retries
+### Execute a command until success within a retries ###
 function retryExecution {
     retries=${1}
     shift
@@ -34,7 +34,8 @@ function retryExecution {
     exitOnError "The command '${cmd}' could not be executed successfuly after ${retries} retry(s)" -1
 }
 
-### Validate declarations ###
+### Validate defined variables ###
+# usage: validateVars <var1> <var2> ... <varN>
 function validateVars {
     retval=0
     for var in $@; do       
@@ -47,6 +48,7 @@ function validateVars {
 }
 
 ### dependencies verification ###
+# usage: verifyDeps <dep1> <dep2> ... <depN>
 function verifyDeps {
     retval=0
     for dep in $@; do
@@ -57,6 +59,23 @@ function verifyDeps {
         fi
     done
     exitOnError "Some dependencies were not found" ${retval}
+}
+
+### get arguments ###
+# usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
+function getArgs {
+    retval=0
+    args=(${1})
+    for arg in ${args[@]}; do
+        shift
+        if [ ! ${1} ]; then
+            echo "Argument '${arg}' not found!"
+            ((retval+=1))
+        else
+            eval ${arg}=${1}
+        fi
+    done
+    exitOnError "Some arguments are missing" ${retval}
 }
 
 ### This funciton will map environment          ###

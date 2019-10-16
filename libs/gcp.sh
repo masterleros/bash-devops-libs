@@ -5,10 +5,10 @@ source $(dirname ${BASH_SOURCE[0]})/common.sh
 # Use the service account from file
 function useSA {
 
-    credential_path=$1
+    getArgs "credential_path" ${@}
 
     # Verify if SA credential file exist
-    [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${1}'"
+    [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
 
     # Get SA user
     client_mail=$(cat ${credential_path} | grep client_email | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')
