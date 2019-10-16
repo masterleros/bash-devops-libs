@@ -13,9 +13,9 @@ function useSA {
     # Get SA user
     client_mail=$(cat ${credential_path} | grep client_email | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')
 
-    echo "Activating Service Account ${client_mail}..."
+    echo "Activating Service Account '${client_mail}'..."
     gcloud auth activate-service-account --key-file=${credential_path}
-    exitOnError "Could not activate ${client_mail} SA"
+    exitOnError "Could not activate '${client_mail}' SA"
 }
 
 ### Remove the service account from system ###
@@ -24,25 +24,15 @@ function revokeSA {
     
     getArgs "credential_path" ${@}
 
-    # Check if account is already created
-    if [ -f ${credential_path} ]; then
-        # get values from file
-        private_key_id=$(cat ${credential_path} | grep private_key_id | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')
-        client_email=$(cat ${credential_path} | grep client_email | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')
-        echo "Deleting '${client_email}' credential..."
+    # Verify if SA credential file exist
+    [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
 
-        # Revoke account locally
-        gcloud auth revoke ${client_email} &> /dev/null
+    # Get SA user
+    client_mail=$(cat ${credential_path} | grep client_email | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')    
 
-        # Delete local file
-        rm ${credential_path} &> /dev/null
-
-        # Delete key on SA
-        gcloud --quiet iam service-accounts keys delete ${private_key_id} --iam-account ${client_email}
-        exitOnError "Failed to delete the key"
-    else
-        exitOnError "Credential file ${credential_path} not found", -1
-    fi
+    echo "Revoking Service Account '${client_mail}'..."
+    gcloud auth revoke ${client_email}
+    exitOnError "Could not revoke '${client_mail}' SA"
 }
 
 ### Validate and set the requested project ###
