@@ -1,18 +1,7 @@
 #######################################
 # GFT libraries for .gitlab-ci.yml #
 #
-# Usage: (in your .gitlab-ci.yml)
-#
-# include:
-#  - project: 'devops-br/banking-gft-scripts'
-#    file: '/.gitlab-ci.devops-lib.yml' 
-#
-# test_module:
-#  extends: .gft-libs
-#  ...
-#  before_script:
-#   - source ${GFT_LIB_DEVOPS}
-#   - source ${GFT_LIB_GCP}
+# Usage: Refer to README.md
 #
 #######################################
 
