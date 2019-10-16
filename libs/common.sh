@@ -86,7 +86,6 @@ function printEnvMappedVarsExports {
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
-        echo "exporting ${new_var}"
         exports="export $new_var=\${$var};${exports}"
     done
 
