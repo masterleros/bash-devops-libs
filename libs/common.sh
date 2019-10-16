@@ -79,8 +79,6 @@ function printEnvMappedVarsExports {
 
     # Get vars to be renamed    
     vars=($(printenv | egrep -o "${env}_CI_.*" | awk -F= '{print $1}'))
-    echo "Found vars (${env}):"
-    echo "${vars}"
 
     # Set same variable with the final name
     for var in "${vars[@]}"; do
@@ -90,7 +88,7 @@ function printEnvMappedVarsExports {
     done
 
     # print the exports required
-    echo $exports
+    echo ${exports}
 }
 
 # Validate if OS is supported
