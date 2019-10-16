@@ -41,8 +41,9 @@
       echo "****************************************************"
       function import_gft_libs {
         while [ "$1" ]; do
-          lib=${1}   
-          lib_file=${!GFT_LIB_${lib}}
+          lib=${1}
+          lib_var=${1}
+          lib_file=${!lib_var}
           # Check if lib exists
           if [ ! "${lib_file}" ]; then
             echo "GFT Library ${lib} not found!"
