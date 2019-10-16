@@ -59,12 +59,38 @@ function verifyDeps {
     exitOnError "Some dependencies were not found" ${retval}
 }
 
+### This funciton will map environment          ###
+### variables to the final name                 ###
+### Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ###
+function map-vars {
+
+    # Environment regarding branch
+    if [[ "${branch}" == "feature/"* ]] || [[ "${branch}" == "fix/"* ]]; then env="DEV";
+    elif [[ "${branch}" == "develop" ]]; then env="INT"; 
+    elif [[ "${branch}" == "release/"* ]] || [[ "${branch}" == "bugfix/"* ]]; then env="UAT";
+    elif [[ "${branch}" == "master" ]] || [[ "${branch}" == "hotfix/"* ]]; then env="PRD";
+    else
+        echo "'${branch}' branch naming is not supported!" >&2
+        exit -1
+    fi
+
+    # Get vars to be renamed
+    vars=($(export | egrep -o "${env}_CI_.*"))
+
+    # Set same variable with the final name
+    for var in "${vars[@]}"; do
+        var=$(echo ${var} | awk -F '=' '{print $1}')
+        new_var=$(echo ${var} | cut -d'_' -f3-)
+        export $new_var=\$$var;$exports
+    done
+}
+
+# Validate if OS is supported
+[[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
+
 # Call the desired function when script is invoked directly instead of included
 if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
     function=${1}
     shift
     $function "${@}"
-fi
-
-# Validate if OS is supported
-[[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
+fi    

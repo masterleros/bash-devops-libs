@@ -4,6 +4,7 @@ include:
 # GCP Run template
 .gcp-template:
   before_script:
-    - "${GFT_LIBS_GET_CMD}"
+    - eval "${GFT_LIBS_GET_CMD}"
+    - ${GFT_LIB_COMMON} map-vars    
     - ${GFT_LIB_COMMON} validateVars GOOGLE_APPLICATION_CREDENTIALS
-    - ${GFT_LIB_COMMON} verifyDeps gcloud    
+    - ${GFT_LIB_COMMON} verifyDeps gcloud
