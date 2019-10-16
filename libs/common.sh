@@ -77,6 +77,8 @@ function map-vars {
 
     # Get vars to be renamed
     vars=($(export | egrep -o "${env}_CI_.*"))
+    echo "Found vars:"
+    echo "${vars}"
 
     # Set same variable with the final name
     for var in "${vars[@]}"; do
