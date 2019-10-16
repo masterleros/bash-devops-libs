@@ -1,7 +1,7 @@
 # GCP Run template
 .gcp-template:
   before_script:
-    - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include .gft-libs.yml before use this template!"; exit -1; fi
+    - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - eval "${GFT_LIBS_GET_CMD}"
     - exports="$(${GFT_LIB_COMMON} printEnvMappedVarsExports)";
     - eval "${exports}"
