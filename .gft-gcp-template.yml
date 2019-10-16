@@ -5,6 +5,7 @@ include:
 .gcp-template:
   before_script:
     - eval "${GFT_LIBS_GET_CMD}"
+    - echo "$(${GFT_LIB_COMMON} printEnvMappedVarsExports)"
     - eval "$(${GFT_LIB_COMMON} printEnvMappedVarsExports)"
     - ${GFT_LIB_COMMON} validateVars GOOGLE_APPLICATION_CREDENTIALS
     - ${GFT_LIB_COMMON} verifyDeps gcloud
