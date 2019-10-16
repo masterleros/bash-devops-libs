@@ -23,8 +23,7 @@ variables:
       set_e_enabled=${-//[^x]/}
       [ $set_e_enabled ] || set +e
       echo "Downloading GFT libs..."
-      test -f ${GFT_LIBS_DIR} || rm -rf ${GFT_LIBS_DIR}
-      git clone ${GFT_LIBS_URL} ${GFT_LIBS_DIR}    
+      eval "${GFT_LIBS_GET_CMD}"
       echo "GFT libs are available now!"
       echo "****************************************************"
       echo "Available libraries:"
