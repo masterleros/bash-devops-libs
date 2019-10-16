@@ -1,12 +1,10 @@
 #!/bin/bash
-#echo "Hello from '${BASH_SOURCE[0]}'"
 GFT_LIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd )"
 
 ### Exit program with text when last exit code is non-zero ###
 # usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
-###########################################
 function exitOnError {
-    text=$1
+    text=${1}
     code=${2:-$?}
     if [ "${code}" -ne 0 ]; then
         if [ ! -z "${text}" ]; then echo -e "ERROR: ${text}" >&2 ; fi
@@ -15,30 +13,28 @@ function exitOnError {
     fi
 }
 
-### Execute a command until success within a retries ###
-function retryExecution {
-    retries=${1}
-    shift
-    cmd=${@}
-
-    for retry in $(seq $((${retries}+1))); do
-        eval "${cmd}"
-        if [ ${?} -eq 0 ]; then
-            return 0
-        elif [ ${retry} -ne $((${retries}+1)) ]; then
-            echo "Retying(${retry}) execution of '${cmd}'..."
+### get arguments ###
+# usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
+function getArgs {
+    retval=0
+    args=(${1})
+    for arg in ${args[@]}; do
+        shift
+        if [ ! "${1}" ]; then
+            echo "Argument '${arg}' not found!"
+            ((retval+=1))
+        else
+            eval "${arg}='${1}'"
         fi        
     done
-
-    # if could not be sucess after retries
-    exitOnError "The command '${cmd}' could not be executed successfuly after ${retries} retry(s)" -1
+    exitOnError "Some arguments are missing" ${retval}
 }
 
 ### Validate defined variables ###
 # usage: validateVars <var1> <var2> ... <varN>
 function validateVars {
     retval=0
-    for var in $@; do       
+    for var in ${@}; do       
         if [ -z "${!var}" ]; then
             echo "Environment varirable '${var}' is not declared!"
             ((retval+=1))
@@ -51,7 +47,7 @@ function validateVars {
 # usage: verifyDeps <dep1> <dep2> ... <depN>
 function verifyDeps {
     retval=0
-    for dep in $@; do
+    for dep in ${@}; do
         which ${dep} &> /dev/null
         if [[ $? -ne 0 ]]; then
             echo "Binary dependency '${dep}' not found!"
@@ -61,38 +57,20 @@ function verifyDeps {
     exitOnError "Some dependencies were not found" ${retval}
 }
 
-### get arguments ###
-# usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
-function getArgs {
-    retval=0
-    args=(${1})
-    for arg in ${args[@]}; do
-        shift
-        if [ ! ${1} ]; then
-            echo "Argument '${arg}' not found!"
-            ((retval+=1))
-        else
-            eval ${arg}=${1}
-        fi
-    done
-    exitOnError "Some arguments are missing" ${retval}
-}
-
-### This funciton will map environment          ###
-### variables to the final name                 ###
-### Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ###
+### This funciton will map environment variables to the final name ###
+# Usage: printEnvMappedVarsExports
+# Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ### 
 function printEnvMappedVarsExports {
 
-    branch=${CI_COMMIT_REF_NAME}
-    exports=""    
+    validateVars ${CI_COMMIT_REF_NAME}    
 
     # Environment regarding branch    
-    if [[ "${branch}" == "feature/"* ]] || [[ "${branch}" == "fix/"* ]]; then env="DEV";
-    elif [[ "${branch}" == "develop" ]]; then env="INT"; 
-    elif [[ "${branch}" == "release/"* ]] || [[ "${branch}" == "bugfix/"* ]]; then env="UAT";
-    elif [[ "${branch}" == "master" ]] || [[ "${branch}" == "hotfix/"* ]]; then env="PRD";
+    if [[ "${CI_COMMIT_REF_NAME}" == "feature/"* ]] || [[ "${CI_COMMIT_REF_NAME}" == "fix/"* ]]; then env="DEV";
+    elif [[ "${CI_COMMIT_REF_NAME}" == "develop" ]]; then env="INT"; 
+    elif [[ "${CI_COMMIT_REF_NAME}" == "release/"* ]] || [[ "${CI_COMMIT_REF_NAME}" == "bugfix/"* ]]; then env="UAT";
+    elif [[ "${CI_COMMIT_REF_NAME}" == "master" ]] || [[ "${CI_COMMIT_REF_NAME}" == "hotfix/"* ]]; then env="PRD";
     else
-        echo "'${branch}' branch naming is not supported!" >&2
+        echo "'${CI_COMMIT_REF_NAME}' branch naming is not supported!" >&2
         exit -1
     fi
 
@@ -100,6 +78,7 @@ function printEnvMappedVarsExports {
     vars=($(printenv | egrep -o "${env}_CI_.*" | awk -F= '{print $1}'))
 
     # Set same variable with the final name
+    exports=""
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
