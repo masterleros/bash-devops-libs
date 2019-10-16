@@ -43,7 +43,7 @@ function validateVars {
             ((retval+=1))
         fi    
     done
-    return ${retval}
+    exitOnError "Some variables were not found" ${retval}
 }
 
 ### dependencies verification ###
@@ -56,7 +56,7 @@ function verifyDeps {
             ((retval+=1))
         fi
     done
-    return ${retval}
+    exitOnError "Some dependencies were not found" ${retval}
 }
 
 # Call the desired function when script is invoked directly instead of included
