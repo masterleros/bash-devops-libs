@@ -4,8 +4,8 @@ Usage: (in your .gitlab-ci.yml)
 
 ``` yaml
 include:
-  - project: 'devops-br/banking-gft-scripts'
-    file: '/.gitlab-ci.devops-lib.yml' 
+  - project: 'devops-br/gitlab-gft-libs'
+    file: '/.gft-libs.yml' 
 
 test_module:
   extends: .gft-libs
