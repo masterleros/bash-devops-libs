@@ -42,9 +42,9 @@
       echo "****************************************************"
       function import_gft_libs {
         while [ "$1" ]; do
-          lib=${1}
-          lib_var=${1}
-          lib_file=${GFT_LIBS_DIR}/${!lib_var}
+          lib="${1}"
+          lib_var="GFT_LIB_${1}"
+          lib_file="${GFT_LIBS_DIR}/${!lib_var}"
           echo ${lib_file}
           cat ${lib_file}
           # Check if lib exists
