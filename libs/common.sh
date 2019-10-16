@@ -62,10 +62,12 @@ function verifyDeps {
 ### This funciton will map environment          ###
 ### variables to the final name                 ###
 ### Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ###
-function mapVars {
+function printEnvMappedVarsExports {
 
-    # Environment regarding branch
     branch=${CI_COMMIT_REF_NAME}
+    exports=""    
+
+    # Environment regarding branch    
     if [[ "${branch}" == "feature/"* ]] || [[ "${branch}" == "fix/"* ]]; then env="DEV";
     elif [[ "${branch}" == "develop" ]]; then env="INT"; 
     elif [[ "${branch}" == "release/"* ]] || [[ "${branch}" == "bugfix/"* ]]; then env="UAT";
@@ -85,8 +87,11 @@ function mapVars {
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
         echo "exporting ${new_var}"
-        export ${new_var}=\$$var
+        exports="export $new_var=\$$var;$exports"
     done
+
+    # print the exports required
+    echo $exports
 }
 
 # Validate if OS is supported
