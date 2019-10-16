@@ -82,8 +82,8 @@ function map-vars {
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
-        export $new_var=\$$var
-        unset ${var}
+        echo "exporting ${new_var}"
+        export ${new_var}=\$$var
     done
 }
 
