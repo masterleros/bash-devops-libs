@@ -44,14 +44,14 @@
         while [ "$1" ]; do
           lib=${1}
           lib_var=${1}
-          lib_file=${!lib_var}
+          lib_file=${GFT_LIBS_DIR}/${!lib_var}
           # Check if lib exists
-          if [ ! "${lib_file}" ]; then
-            echo "GFT Library ${lib} not found!"
+          if [ ! -f "${lib_file}" ]; then
+            echo "GFT Library '${lib}' not found!"
             exit -1
           fi
           echo "Importing GFT Library: ${lib}..."
-          source "${GFT_LIBS_DIR}/${lib_file}"
+          source ${lib_file}
           shift
         done
       }      
