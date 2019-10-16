@@ -30,9 +30,10 @@
     - |
       set_e_enabled=${-//[^x]/}
       [ $set_e_enabled ] || set +e
-      echo "Importing GFT libs..."
+      echo "Downloading GFT libs..."
       test -f ${GFT_LIBS_DIR} || rm -rf ${GFT_LIBS_DIR}
       git clone ${GFT_LIBS_URL} ${GFT_LIBS_DIR}    
+      echo "GFT libs are available now!"
       echo "****************************************************"
       echo "Available libraries:"
       export | grep -o -e ' GFT_LIB_[_A-Z0-9]*' | sed 's/GFT_LIB_//'
@@ -53,7 +54,6 @@
           source "${GFT_LIBS_DIR}/${lib_file}"
           shift
         done
-      }
-      echo "GFT libs were imported!"
+      }      
       [ $set_e_enabled ] || set -e
     
