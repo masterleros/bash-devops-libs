@@ -6,8 +6,7 @@ include:
   before_script:
     - eval "${GFT_LIBS_GET_CMD}"
     - exports="$(${GFT_LIB_COMMON} printEnvMappedVarsExports)";
-    - echo "${exports}"
-    - eval "${exports}"
+    - eval "'${exports}'"
     - ${GFT_LIB_COMMON} validateVars GOOGLE_APPLICATION_CREDENTIALS
     - ${GFT_LIB_COMMON} verifyDeps gcloud
     - echo ${GCLOUD_CREDENTIAL} > ${GOOGLE_APPLICATION_CREDENTIALS}
