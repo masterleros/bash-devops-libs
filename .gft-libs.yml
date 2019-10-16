@@ -9,7 +9,7 @@ variables:
   GFT_LIBS_REPO: "devops-br/gitlab-gft-libs"
   GFT_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@git.gft.com/${GFT_LIBS_REPO}.git"
   GFT_LIBS_DIR: "/tmp/${CI_PIPELINE_ID}"
-  GFT_LIBS_GET_CMD: "test -f ${GFT_LIBS_DIR} || git clone ${GFT_LIBS_URL} ${GFT_LIBS_DIR}"
+  GFT_LIBS_GET_CMD: "test -f ${GFT_LIBS_DIR} || git clone ${GFT_LIBS_URL} ${GFT_LIBS_DIR}; chmod +x /tmp/${CI_PIPELINE_ID}/libs/*.sh"
 
   ########## LIB CATALOG ############
   GFT_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp.sh"
