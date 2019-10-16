@@ -34,6 +34,31 @@ function retryExecution {
     exitOnError "The command '${cmd}' could not be executed successfuly after ${retries} retry(s)" -1
 }
 
+### Validate declarations ###
+function validateVars {
+    retval=0
+    for var in $@; do       
+        if [ -z "${!var}" ]; then
+            echo "Environment var '${var}' is not declared!"
+            ((retval+=1))
+        fi    
+    done
+    return ${retval}
+}
+
+### dependencies verification ###
+function verifyDeps {
+    retval=0
+    for dep in $@; do
+        which ${dep} &> /dev/null
+        if [[ $? -ne 0 ]]; then
+            echo "Dependency '${dep}' not found!"
+            ((retval+=1))
+        fi
+    done
+    return ${retval}
+}
+
 # Call the desired function when script is invoked directly instead of included
 if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
     function=${1}

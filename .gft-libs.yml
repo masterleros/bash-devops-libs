@@ -13,6 +13,7 @@ variables:
 
   ########## LIB CATALOG ############
   GFT_LIB_GCP: "libs/gcp.sh"
+  GFT_LIB_COMMON: "libs/common.sh"
   ###################################
 
 .gft-libs:
