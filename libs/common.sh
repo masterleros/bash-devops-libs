@@ -39,7 +39,7 @@ function validateVars {
     retval=0
     for var in $@; do       
         if [ -z "${!var}" ]; then
-            echo "Environment var '${var}' is not declared!"
+            echo "Environment varirable '${var}' is not declared!"
             ((retval+=1))
         fi    
     done
@@ -52,7 +52,7 @@ function verifyDeps {
     for dep in $@; do
         which ${dep} &> /dev/null
         if [[ $? -ne 0 ]]; then
-            echo "Dependency '${dep}' not found!"
+            echo "Binary dependency '${dep}' not found!"
             ((retval+=1))
         fi
     done
