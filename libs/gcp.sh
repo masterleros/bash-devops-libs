@@ -18,6 +18,33 @@ function useSA {
     exitOnError "Could not activate ${client_mail} SA"
 }
 
+### Remove the service account from system ###
+# usage: revokeSA <credential_file>
+function revokeSA {
+    
+    getArgs "credential_path" ${@}
+
+    # Check if account is already created
+    if [ -f ${credential_path} ]; then
+        # get values from file
+        private_key_id=$(cat ${credential_path} | grep private_key_id | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')
+        client_email=$(cat ${credential_path} | grep client_email | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')
+        echo "Deleting '${client_email}' credential..."
+
+        # Revoke account locally
+        gcloud auth revoke ${client_email} &> /dev/null
+
+        # Delete local file
+        rm ${credential_path} &> /dev/null
+
+        # Delete key on SA
+        gcloud --quiet iam service-accounts keys delete ${private_key_id} --iam-account ${client_email}
+        exitOnError "Failed to delete the key"
+    else
+        exitOnError "Credential file ${credential_path} not found", -1
+    fi
+}
+
 ### Validate and set the requested project ###
 # usage: useProject <project_id>
 function useProject {
