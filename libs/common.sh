@@ -21,7 +21,7 @@ function getArgs {
     for arg in ${args[@]}; do
         shift
         if [ ! "${1}" ]; then
-            echo "Argument '${arg}' not found!"
+            echo "Argument '${arg}' not found!" >&2
             ((retval+=1))
         else
             eval "${arg}='${1}'"
@@ -36,7 +36,7 @@ function validateVars {
     retval=0
     for var in ${@}; do       
         if [ -z "${!var}" ]; then
-            echo "Environment varirable '${var}' is not declared!"
+            echo "Environment varirable '${var}' is not declared!" >&2
             ((retval+=1))
         fi    
     done
@@ -50,7 +50,7 @@ function verifyDeps {
     for dep in ${@}; do
         which ${dep} &> /dev/null
         if [[ $? -ne 0 ]]; then
-            echo "Binary dependency '${dep}' not found!"
+            echo "Binary dependency '${dep}' not found!" >&2
             ((retval+=1))
         fi
     done

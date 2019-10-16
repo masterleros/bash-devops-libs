@@ -23,21 +23,27 @@ function tokenReplaceFromFile {
     
     # Check if file exists
     [ -f ${file} ] || exitOnError "File '${file}' not found"
-    content=$(cat ${file})    
+    content=$(cat ${file})
 
     # Get tokens
     tokens=($(echo ${content} | egrep -o '\$\{([a-zA-Z0-9_]+)\}'))
 
     # Replace each var if exists
+    retval=0
     for token in ${tokens[@]}; do
         # If variable is defined, replace
         var=$(echo ${token} | egrep -o '([a-zA-Z0-9_]+)')
         if [ "${!var}" ]; then
             content=${content//$token/${!var}}
-        elif [[ "${continue}" != "true" ]]; then
-            exitOnError "Token '${token}' value not defined!" -1
+        else
+            echo "Varuable '${var}' is not defined!" >&2
         fi
     done
+
+    # If is not set to continue
+    if [[ "${continue}" != "true" ]]; then
+        exitOnError "Some tokens could not be replaced" ${retval} 
+    fi
 
     echo "${content}"
 }

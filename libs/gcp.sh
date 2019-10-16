@@ -68,7 +68,7 @@ function validateRole {
     # If user role was not found
     echo ${foundRoles} | grep ${user} > /dev/null
     if [ $? -ne 0 ]; then
-        echo "Could not find role '${role}' for user '${user}'"
+        echo "Could not find role '${role}' for user '${user}'" >&2
         return 1
     fi
     return 0
@@ -109,10 +109,19 @@ function bindRole {
 # usage: gae_deploy <service> <>
 function gae_deploy {
 
-    getArgs "GAE_SERVICE" ${@}
-    GAE_VERSION=$2 # optional argument
+    getArgs "APP_YAML" ${@}
+    GAE_VERSION=${2} # optional argument
+    DESTOKENIZED_APP_YAML="DESTOKENIZED_${APP_YAML}"
+    
+    # Check if file exists
+    [ -f ${APP_YAML} ] || exitOnError "File '${APP_YAML}' not found"
 
-    exitOnError "TODO: get GAE_SERVICE from yaml file!" -1    
+    # Get service name
+    GAE_SERVICE=$(cat ${APP_YAML} | grep -e ^service: | awk '{print $NF}')
+    [ ${GAE_SERVICE} ] || GAE_SERVICE="default"
+
+    # Replace tokens, if not present, fail
+    tokenReplaceFromFile ${APP_YAML} > ${DESTOKENIZED_APP_YAML}
 
     # If it is requesting a specific version
     if [ "${GAE_VERSION}" ]; then

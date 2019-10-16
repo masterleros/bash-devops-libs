@@ -14,6 +14,7 @@ variables:
   ########## LIB CATALOG ############
   GFT_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp.sh"
   GFT_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
+  GFT_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils.sh"
   ###################################
 
 .gft-libs:
