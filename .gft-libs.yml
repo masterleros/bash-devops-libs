@@ -12,8 +12,8 @@ variables:
   GFT_LIBS_GET_CMD: "test -f ${GFT_LIBS_DIR} || git clone ${GFT_LIBS_URL} ${GFT_LIBS_DIR}"
 
   ########## LIB CATALOG ############
-  GFT_LIB_GCP: "libs/gcp.sh"
-  GFT_LIB_COMMON: "libs/common.sh"
+  GFT_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp.sh"
+  GFT_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
   ###################################
 
 .gft-libs:
@@ -36,7 +36,7 @@ variables:
         while [ "$1" ]; do
           lib="${1}"
           lib_var="GFT_LIB_${1}"
-          lib_file="${GFT_LIBS_DIR}/${!lib_var}"
+          lib_file="${!lib_var}"
           # Check if lib exists
           if [ ! -f "${lib_file}" ]; then
             echo "GFT Library '${lib}' not found!"
