@@ -45,6 +45,8 @@
           lib=${1}
           lib_var=${1}
           lib_file=${GFT_LIBS_DIR}/${!lib_var}
+          echo ${lib_file}
+          cat ${lib_file}
           # Check if lib exists
           if [ ! -f "${lib_file}" ]; then
             echo "GFT Library '${lib}' not found!"
