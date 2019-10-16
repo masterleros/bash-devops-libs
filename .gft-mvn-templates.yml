@@ -6,7 +6,7 @@
     paths:
       - ${CI_PROJECT_DIR}/.m2/repository
   variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
+    MAVEN_OPTS: "--batch-mode -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   before_script:
     # Check defined variables
     - if [ ! "${APP_PATH}" ]; then echo "APP_PATH variable not defined!"; exit -1; fi
