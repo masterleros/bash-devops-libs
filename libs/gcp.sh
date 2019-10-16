@@ -1,9 +1,11 @@
 #!/bin/bash
-#echo "Hello from '${BASH_SOURCE[0]}'"
+echo "Hello from '${BASH_SOURCE[0]}'"
 source $(dirname ${BASH_SOURCE[0]})/common.sh
 
 # Use the service account from file
 function useSA {
+
+    echo "Hello from useSA!"
 
     credential_path=$1
 
