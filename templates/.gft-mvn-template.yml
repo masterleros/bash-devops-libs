@@ -1,6 +1,5 @@
 include:
-  - project: 'devops-br/gitlab-gft-libs'
-    file: '/.gft-libs.yml'
+  - local: '/.gft-libs.yml'
 
 stages:
   - Build
