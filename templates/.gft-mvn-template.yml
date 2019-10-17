@@ -1,5 +1,4 @@
-include:
-  - local: '/.gft-libs.yml'
+include: '/.gft-libs.yml'
 
 stages:
   - Build
