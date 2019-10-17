@@ -10,11 +10,8 @@
   before_script:
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - eval "${GFT_LIBS_GET_CMD}"
-    - echo "${GFT_LIBS_ENV_VAR}"
-    - eval "${GFT_LIBS_ENV_VAR}"
-    # Get Variable related to the branch name
+    - eval "${GFT_LIBS_CONVERT_VARS}"
     - cd ${APP_PATH}
-    - pwd
   artifacts:
     paths:
       - ${APP_PATH}/target/**/*

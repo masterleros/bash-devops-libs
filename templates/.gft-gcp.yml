@@ -3,7 +3,7 @@
   before_script:
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - eval "${GFT_LIBS_GET_CMD}"
-    - eval "${GFT_LIBS_ENV_VAR}"
+    - eval "${GFT_LIBS_CONVERT_VARS}"
     - ${GFT_LIB_COMMON} validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
     - ${GFT_LIB_COMMON} verifyDeps gcloud
     - echo ${GCLOUD_CREDENTIAL} > ${GOOGLE_APPLICATION_CREDENTIALS}

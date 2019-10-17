@@ -74,22 +74,32 @@ function verifyDeps {
 ### This funciton will map environment variables to the final name ###
 # Usage: printEnvMappedVarsExports
 # Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ### 
+#
+# CI_BRANCHES_DEFINITION: "<def1> <def2> ... <defN>"
+# Definition: <branch>:<env> (example: feature/*:DEV)
+# CI_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
+#
 function printEnvMappedVarsExports {
+    
+    validateVars CI_COMMIT_REF_NAME CI_BRANCHES_DEFINITION
 
-    validateVars CI_COMMIT_REF_NAME
+    # Set environment depending on branches definition    
+    for _definition in ${CI_BRANCHES_DEFINITION}; do
+        _branch=${_definition%:*}
+        _environment=${_definition#*:}
 
-    # Environment regarding branch    
-    if [[ "${CI_COMMIT_REF_NAME}" == "feature/"* ]] || [[ "${CI_COMMIT_REF_NAME}" == "fix/"* ]]; then env="DEV";
-    elif [[ "${CI_COMMIT_REF_NAME}" == "develop" ]]; then env="INT"; 
-    elif [[ "${CI_COMMIT_REF_NAME}" == "release/"* ]] || [[ "${CI_COMMIT_REF_NAME}" == "bugfix/"* ]]; then env="UAT";
-    elif [[ "${CI_COMMIT_REF_NAME}" == "master" ]] || [[ "${CI_COMMIT_REF_NAME}" == "hotfix/"* ]]; then env="PRD";
-    else
-        echo "'${CI_COMMIT_REF_NAME}' branch naming is not supported!" >&2
-        exit -1
-    fi
+        # Check if matched current definition
+        if [[ ${CI_COMMIT_REF_NAME} == ${_branch} ]]; then
+            CI_BRANCH_ENVIRONMENT=${_environment};            
+            break
+        fi
+    done
+    
+    # Check if found an environment
+    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported!" -1
 
     # Get vars to be renamed    
-    vars=($(printenv | egrep -o "${env}_CI_.*" | awk -F= '{print $1}'))
+    vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*" | awk -F= '{print $1}'))
 
     # Set same variable with the final name
     exports=""
