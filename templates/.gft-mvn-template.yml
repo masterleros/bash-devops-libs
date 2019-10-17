@@ -1,3 +1,7 @@
+include:
+  - project: 'devops-br/gitlab-gft-libs'
+    file: '/.gft-libs.yml'
+
 stages:
   - Build
   - Sonar
