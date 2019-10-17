@@ -15,7 +15,7 @@ stages:
     paths:
       #- ${CI_PROJECT_DIR}/.m2/repository
       - ~/.m2/repository
-  extends: .gft-libs
+  
   before_script:
     # Check defined variables
     - if [ ! "${APP_PATH}" ]; then echo "APP_PATH variable not defined!"; exit -1; fi
@@ -36,6 +36,7 @@ stages:
 ############## Maven Build template ##############
 .mvn_build:
   stage: Build
+  extends: .gft-libs
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} clean install
