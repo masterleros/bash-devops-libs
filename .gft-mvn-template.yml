@@ -1,3 +1,10 @@
+stages:
+  - Build
+  - Sonar
+  - Nexus
+  - Deploy
+  
+############## Default definitions ##############
 .defaults: &use_defaults
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=~/.m2/repository"
@@ -20,6 +27,8 @@
     - printenv
     - echo "---------"
     - cd ${CI_PROJECT_DIR}/${APP_PATH}
+  before_script:
+    - echo "after script!"
   artifacts:
     paths:
       - ${APP_PATH}/target/**/*
@@ -27,26 +36,32 @@
   tags:
     - devops-runner-wsl
 
-# Maven Build template
+############## Maven Build template ##############
 .mvn_build:
+  stage: Build
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} clean install
 
-# Maven Sonar template
+############## Maven Sonar template ##############
 .mvn_sonar:
+  stage: Sonar
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} sonar:sonar
 
-# Maven Nexus template
+############## Maven Nexus template ##############
 .mvn_nexus:
+  stage: Nexus
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} package
 
-# Maven Deploy template
+############## Maven Deploy template ##############
 .mvn_deploy:
+  stage: Deploy
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} deploy
+
+############## ##############
