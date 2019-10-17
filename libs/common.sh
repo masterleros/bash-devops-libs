@@ -62,7 +62,7 @@ function verifyDeps {
 # Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ### 
 function printEnvMappedVarsExports {
 
-    validateVars "${CI_COMMIT_REF_NAME}"
+    validateVars CI_COMMIT_REF_NAME
 
     # Environment regarding branch    
     if [[ "${CI_COMMIT_REF_NAME}" == "feature/"* ]] || [[ "${CI_COMMIT_REF_NAME}" == "fix/"* ]]; then env="DEV";
