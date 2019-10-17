@@ -33,12 +33,9 @@ stages:
 ############## Maven Build template ##############
 .mvn_build:
   stage: Build
-  image: maven
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} clean install
-  tags:
-    - devops-runner-wsl-docker
 
 ############## Maven Sonar template ##############
 .mvn_sonar:
