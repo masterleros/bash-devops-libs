@@ -12,7 +12,7 @@
       - ~/.m2/repository
   before_script:
     # Check defined variables
-    - printenv | grep HOST_NAME
+    - printenv
     - echo "---------"
     - if [ ! "${APP_PATH}" ]; then echo "APP_PATH variable not defined!"; exit -1; fi
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
@@ -21,7 +21,7 @@
     - eval "${exports}"
     - ${GFT_LIB_COMMON} validateVars HOST_EXAMPLE
     - ${GFT_LIB_COMMON} verifyDeps mvn
-    - printenv | grep HOST_NAME
+    - printenv
     - echo "---------"
     - cd ${CI_PROJECT_DIR}/${APP_PATH}
   script:
