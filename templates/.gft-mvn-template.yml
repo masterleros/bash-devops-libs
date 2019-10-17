@@ -20,7 +20,6 @@ stages:
     - eval "${GFT_LIBS_GET_CMD}"
     - exports="$(${GFT_LIB_COMMON} printEnvMappedVarsExports)";
     - eval "${exports}"
-    - ${GFT_LIB_COMMON} validateVars HOST_EXAMPLE
     - ${GFT_LIB_COMMON} verifyDeps mvn
     - cd ${CI_PROJECT_DIR}/${APP_PATH}
   after_script:
