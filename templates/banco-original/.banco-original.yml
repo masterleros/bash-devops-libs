@@ -9,4 +9,5 @@ stages:
   extends: .mvn-template
   stage: Build
   script:
-    mvn ${MAVEN_OPTS} clean install
+    - export
+    - mvn ${MAVEN_OPTS} clean install
