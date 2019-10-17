@@ -17,8 +17,8 @@
     - eval "${GFT_LIBS_GET_CMD}"
     - exports="$(${GFT_LIB_COMMON} printEnvMappedVarsExports)";
     - eval "${exports}"
-    - ${GFT_LIB_COMMON} validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
-    - ${GFT_LIB_COMMON} verifyDeps gcloud
+    - ${GFT_LIB_COMMON} validateVars EXAMPLE
+    - ${GFT_LIB_COMMON} verifyDeps mvn
 
     - cd ${CI_PROJECT_DIR}/${APP_PATH}
   script:
