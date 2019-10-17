@@ -15,8 +15,6 @@ stages:
       - ~/.m2/repository
   before_script:
     # Check defined variables
-    - printenv
-    - echo "---------"
     - if [ ! "${APP_PATH}" ]; then echo "APP_PATH variable not defined!"; exit -1; fi
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - eval "${GFT_LIBS_GET_CMD}"
@@ -24,10 +22,8 @@ stages:
     - eval "${exports}"
     - ${GFT_LIB_COMMON} validateVars HOST_EXAMPLE
     - ${GFT_LIB_COMMON} verifyDeps mvn
-    - printenv
-    - echo "---------"
     - cd ${CI_PROJECT_DIR}/${APP_PATH}
-  before_script:
+  after_script:
     - echo "after script!"
   artifacts:
     paths:
@@ -63,5 +59,3 @@ stages:
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} deploy
-
-############## ##############
