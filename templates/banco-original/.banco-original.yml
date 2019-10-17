@@ -10,7 +10,7 @@ stages:
 
 ############## Maven Build template ##############
 .banco-original-mvn-build:
-  extends: .mvn-template
+  #extends: .mvn-template
   stage: Build  
   script:
     mvn ${MAVEN_OPTS} clean install
