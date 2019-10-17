@@ -16,6 +16,9 @@ stages:
   
   before_script:
     # Check defined variables
+    - echo "------------------------------------------------------------------------------------------------------------------"
+    - printenv
+    - echo "------------------------------------------------------------------------------------------------------------------"
     - if [ ! "${APP_PATH}" ]; then echo "APP_PATH variable not defined!"; exit -1; fi
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - exports="$(${GFT_LIB_COMMON} printEnvMappedVarsExports)";
