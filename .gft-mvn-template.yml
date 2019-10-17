@@ -15,7 +15,7 @@
     - if [ ! "${MAVEN_CMD}" ]; then echo "MAVEN_CMD variable not defined!"; exit -1; fi
     - cd ${CI_PROJECT_DIR}/${APP_PATH}
   script:
-    echo "mvn ${MAVEN_OPTS} ${MAVEN_CMD}"
+    mvn ${MAVEN_OPTS} ${MAVEN_CMD}
   artifacts:
     paths:
       - ${APP_PATH}/target/**/*
