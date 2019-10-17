@@ -177,7 +177,7 @@ function iam_project_addrole {
 ###############################################################################
 # Call the desired function when script is invoked directly instead of included
 if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
-    getArgs "function @args" ${@}
-    $function "${args[@]}"
+    getArgs "function &@args" ${@}
+    ${function} "${args[@]}"
 fi
 ###############################################################################

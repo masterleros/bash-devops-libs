@@ -20,25 +20,26 @@ function exitOnError {
 function getArgs {
     retval=0
     _args=(${1})
+
     for _arg in ${_args[@]}; do
-        shift
-        # if has # the argument is optional
+        shift        
+        # if has # the argument is optional        
         if [[ ${_arg} == "&"* ]]; then
             _arg=$(echo ${_arg}| sed 's/&//')
-            declare -n _ref=${_arg}; _ref=${1}
         elif [ ! "${1}" ]; then
-            echo "Argument '${_arg}' not found!"
+            echo "Values for argument '${_arg}' not found!"
+            _arg=""
             ((retval+=1))
-        else
-            # if has @ will get all the rest of args
-            if [[ ${_arg} == "@"* ]]; then
-                _arg=$(echo ${_arg}| sed 's/@//')
-                declare -n _ref=${_arg}; _ref=("${@}")
-                return        
-            else
-                declare -n _ref=${_arg}; _ref=${1}
-            fi
-        fi        
+        fi
+
+        # if has @ will get all the rest of args
+        if [[ "${_arg}" == "@"* ]]; then
+            _arg=$(echo ${_arg}| sed 's/@//')
+            declare -n _ref=${_arg}; _ref=("${@}")
+            return        
+        elif [ "${_arg}" ]; then
+            declare -n _ref=${_arg}; _ref=${1}
+        fi
     done
     exitOnError "Some arguments are missing" ${retval}
 }
@@ -105,9 +106,10 @@ function printEnvMappedVarsExports {
 # Validate if OS is supported
 [[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
 
+###############################################################################
 # Call the desired function when script is invoked directly instead of included
 if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
-    function=${1}
-    shift
-    $function "${@}"
-fi    
+    getArgs "function &@args" ${@}
+    ${function} "${args[@]}"
+fi
+###############################################################################
