@@ -8,7 +8,10 @@
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   before_script:
-    # Get Variable related to the branch name    
+    - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
+    - eval "${GFT_LIBS_GET_CMD}"
+    - eval "${GFT_LIBS_ENV_VAR}"      
+    # Get Variable related to the branch name
     - cd ${APP_PATH}
     - pwd
   artifacts:
