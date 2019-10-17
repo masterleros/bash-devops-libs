@@ -1,5 +1,3 @@
-include: '/.gft-libs.yml'
-
 stages:
   - Build
   - Sonar
@@ -36,7 +34,6 @@ stages:
 ############## Maven Build template ##############
 .mvn_build:
   stage: Build
-  extends: .gft-libs
   <<: *use_defaults
   script:
     mvn ${MAVEN_OPTS} clean install
