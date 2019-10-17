@@ -15,16 +15,29 @@ function exitOnError {
 
 ### get arguments ###
 # usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
+# when a variable name starts with @<var> it will take the rest of values
+# when a variable name starts with &<var> it is optional and script will not fail case there is no value for it
 function getArgs {
     retval=0
-    args=(${1})
-    for arg in ${args[@]}; do
+    _args=(${1})
+    for _arg in ${_args[@]}; do
         shift
-        if [ ! "${1}" ]; then
-            echo "Argument '${arg}' not found!" >&2
+        # if has # the argument is optional
+        if [[ ${_arg} == "&"* ]]; then
+            _arg=$(echo ${_arg}| sed 's/&//')
+            declare -n _ref=${_arg}; _ref=${1}
+        elif [ ! "${1}" ]; then
+            echo "Argument '${_arg}' not found!"
             ((retval+=1))
         else
-            eval "${arg}='${1}'"
+            # if has @ will get all the rest of args
+            if [[ ${_arg} == "@"* ]]; then
+                _arg=$(echo ${_arg}| sed 's/@//')
+                declare -n _ref=${_arg}; _ref=("${@}")
+                return        
+            else
+                declare -n _ref=${_arg}; _ref=${1}
+            fi
         fi        
     done
     exitOnError "Some arguments are missing" ${retval}

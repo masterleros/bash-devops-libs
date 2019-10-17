@@ -126,11 +126,8 @@ function bindRole {
 # usage: gae_deploy <gae_yaml>
 function gae_deploy {
 
-    getArgs "GAE_YAML" ${@}
-    GAE_VERSION=${2} # optional argument
+    getArgs "GAE_YAML &GAE_VERSION" ${@}
     DESTOKENIZED_GAE_YAML="DESTOKENIZED_${GAE_YAML}"
-
-    echo $DESTOKENIZED_GAE_YAML
     
     # Check if file exists
     [ -f ${GAE_YAML} ] || exitOnError "File '${GAE_YAML}' not found"
@@ -165,11 +162,22 @@ function gae_deploy {
     exitOnError "Failed to deploy the application"
 }
 
+### Function to deploy a gae app ###
+# usage: iam_project_addrole <role> <project> <email1> <email2> ... <emailN>
+function iam_project_addrole {
+    
+    getArgs "role project @emails" ${@}
+
+    # For each user
+    for email in ${emails[@]}; do
+        bindRole project ${project} ${role} ${email}
+    done
+}
+
 ###############################################################################
 # Call the desired function when script is invoked directly instead of included
 if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
-    function=${1}
-    shift
-    $function "${@}"
+    getArgs "function @args" ${@}
+    $function "${args[@]}"
 fi
 ###############################################################################

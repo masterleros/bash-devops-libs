@@ -15,11 +15,10 @@ function showTitle {
 }
 
 ### This function will echo the content of a file with tokens updated to values ###
-# usage: tokenReplaceFromFile <path_to_file>
+# usage: tokenReplaceFromFile <path_to_file> [continue<true>]
 function tokenReplaceFromFile {
 
-    getArgs "file" ${@}
-    continue=$2 # optional argument
+    getArgs "file &continue" ${@}
     
     # Check if file exists
     [ -f ${file} ] || exitOnError "File '${file}' not found"
@@ -52,8 +51,8 @@ function tokenReplaceFromFile {
 ### Execute a command until success within a retries ###
 # usage: retryExecution "command"
 function retryExecution {
-    getArgs "retries" ${@}; shift    
-    getArgs "cmd" "${@}"
+    
+    getArgs "retries @cmd" ${@}
 
     for retry in $(seq $((${retries}+1))); do
         eval "${cmd}"
