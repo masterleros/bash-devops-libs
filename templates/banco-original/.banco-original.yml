@@ -1,0 +1,16 @@
+include:
+  - project: 'devops-br/gitlab-gft-libs'
+    file: '/templates/.gft-mvn.yml'
+
+stages:
+  - Build
+
+############## Default definitions ##############
+.defaults: &use_defaults
+
+############## Maven Build template ##############
+.banco-original-mvn-build:
+  extends: .mvn-template
+  stage: Build  
+  script:
+    mvn ${MAVEN_OPTS} clean install
