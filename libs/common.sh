@@ -96,7 +96,7 @@ function printEnvMappedVarsExports {
     done
     
     # Check if found an environment
-    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported!" -1
+    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your CI_BRANCHES_DEFINITION!" -1
 
     # Get vars to be renamed    
     vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*" | awk -F= '{print $1}'))
