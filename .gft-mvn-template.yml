@@ -24,7 +24,6 @@
     paths:
       - ${APP_PATH}/target/**/*
     expire_in: 6 hour
-
   tags:
     - devops-runner-wsl
 
