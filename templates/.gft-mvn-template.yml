@@ -7,23 +7,22 @@ stages:
 ############## Default definitions ##############
 .defaults: &use_defaults
   variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=~/.m2/repository"
+    MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   cache:
     key: ${CI_JOB_NAME}
     paths:
-      #- ${CI_PROJECT_DIR}/.m2/repository
-      - ~/.m2/repository
+      - ${CI_PROJECT_DIR}/.m2/repository
   
   before_script:
     # Check defined variables
-    - echo "------------------------------------------------------------------------------------------------------------------"
-    - printenv
-    - echo "------------------------------------------------------------------------------------------------------------------"
     - if [ ! "${APP_PATH}" ]; then echo "APP_PATH variable not defined!"; exit -1; fi
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
+    # Clone lib repository to tmp folder
     - eval ${GFT_LIBS_GET_CMD}
+    # Map environment variables and parse names
     - exports="$(${GFT_LIB_COMMON} printEnvMappedVarsExports)";
     - eval "${exports}"
+
     - ${GFT_LIB_COMMON} verifyDeps mvn
     - cd ${CI_PROJECT_DIR}/${APP_PATH}
   after_script:
