@@ -14,7 +14,14 @@ GitLab Libs is a set of common functionatilities and templates to speed up DevOp
 │   └── common.sh           (Common/base functions library)
 ├── templates               (Templates folders)
 │   └── .gcp-template.yml   (Example: GCP templates)
-└── .gitlab-libs.yml        (Main GitLab Libs include)
+├── .gitlab-libs.yml        (Main GitLab Libs include)
+└── gitlab-libs.sh          (External GitLab Libs management)
+```
+
+### Using Libraries externally
+In order to use this library externally (i.e: local execution outside GitLab) you can import the libraries in your project:
+``` yaml
+wget https://<repository>
 ```
 
 ### Requirements
