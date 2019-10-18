@@ -7,11 +7,11 @@
       set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
       # Check and import gitlab-lib
-      if [ ! "${GITLAB_LIBS_GET_CMD}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
-      eval "${GITLAB_LIBS_GET_CMD}"
+      if [ ! "${GITLAB_LIBS_CMD_CLONE}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
+      eval "${GITLAB_LIBS_CMD_CLONE}"
 
       # Convert environment variables
-      eval "${GITLAB_LIBS_CONVERT_VARS}"
+      eval "${GITLAB_LIBS_CMD_CONVERT_VARS}"
 
       # Import GCP lib
       source ${GITLAB_LIB_GCP}      
