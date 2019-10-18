@@ -2,8 +2,9 @@ stages:
   - Build
 
 # Maven Run template
-.banco-original.mvn-build:
+.banco-original.mvn-build:  
   extends: .common-template
+  stage: Build
   image: maven:latest
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"  
