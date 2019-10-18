@@ -2,8 +2,8 @@
 source $(dirname ${BASH_SOURCE[0]})/common.sh
 
 ### Get a value from the credential json file ###
-# usage: getValueFromCredential <credential_file> <key>
-function getValueFromCredential {
+# usage: _gcplib_getValueFromCredential <credential_file> <key>
+function _gcplib_getValueFromCredential {
     getArgs "credential_path key" ${@}
 
     # Verify if SA credential file exist
@@ -13,13 +13,13 @@ function getValueFromCredential {
 }
 
 ### Use the service account from file ###
-# usage: useSA <credential_file>
-function useSA {
+# usage: gcplib_useSA <credential_file>
+function gcplib_useSA {
 
     getArgs "credential_path" ${@}
 
     # Get SA user email
-    _client_mail=$(getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(_gcplib_getValueFromCredential ${credential_path} client_email)
 
     echo "Activating Service Account '${_client_mail}'..."
     gcloud auth activate-service-account --key-file=${credential_path}
@@ -27,13 +27,13 @@ function useSA {
 }
 
 ### Remove the service account from system ###
-# usage: revokeSA <credential_file>
-function revokeSA {
+# usage: gcplib_revokeSA <credential_file>
+function gcplib_revokeSA {
     
     getArgs "credential_path" ${@}
 
     # Get SA user email
-    _client_mail=$(getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(_gcplib_getValueFromCredential ${credential_path} client_email)
 
     echo "Revoking Service Account '${_client_mail}'..."
     gcloud auth revoke ${_client_mail}
@@ -41,8 +41,8 @@ function revokeSA {
 }
 
 ### Validate and set the requested project ###
-# usage: useProject <project_id>
-function useProject {
+# usage: gcplib_useProject <project_id>
+function gcplib_useProject {
 
     getArgs "project" ${@}
     
@@ -57,8 +57,8 @@ function useProject {
 }
 
 ### Validate a role of current user ###
-# usage: enableAPI <api_domain>
-function enableAPI {
+# usage: gcplib_enableAPI <api_domain>
+function gcplib_enableAPI {
 
     getArgs "project api" ${@}
 
@@ -66,12 +66,15 @@ function enableAPI {
     exitOnError "Failing enabling API: ${api}"
 }
 
-### Validate a role of current user ###
-# usage: validateRole <domain> <domain_id> <member> <role>
+### Validate a role of a email ###
+# usage: gcplib_validateRole <domain> <domain_id> <role> <email>
 # domains: project folder billing
-function validateRole {
+function gcplib_validateRole {
     
-    getArgs "domain domain_id member role" ${@}
+    getArgs "domain domain_id role email" ${@}
+
+    # Validate role format
+    [[ ${role} == "roles/"* ]] || exitOnError "Role must use format roles/<role>" -1    
 
     if [ ${domain} == "project" ]; then
         cmd="gcloud projects get-iam-policy ${domain_id}"
@@ -84,52 +87,52 @@ function validateRole {
     fi
 
     # Execute the validation
-    foundRoles=$(${cmd} --flatten="bindings[].members" --filter "bindings.role:${role}" --format="table(bindings.members)")
+    foundRoles=$(${cmd} --flatten="bindings[].members" --filter "bindings.role=${role}" --format="table(bindings.members)")
     exitOnError "Check your IAM permissions (for get-iam-policy) at ${domain}: ${domain_id}"
 
-    # If user role was not found
-    echo ${foundRoles} | grep ${user} > /dev/null
-    if [ $? -ne 0 ]; then
-        echo "Could not find role '${role}' for user '${user}'" >&2
-        return 1
-    fi
-    return 0
+    # If email role was not found
+    echo ${foundRoles} | grep ${email} > /dev/null
+    return $?
 }
 
-### Bind Role to current user ###
-# usage: bindRole <domain> <domain_id> <member> <role>
+### Bind Role to a list of emails ###
+# usage: gcplib_bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
 # domains: project folder
-function bindRole {
+function gcplib_bindRole {
 
-    getArgs "domain domain_id member role" ${@}
+    getArgs "domain domain_id role @emails" ${@}
 
-    # First validate if the role is already provided
-    validateRole $domain $domain_id $member $role
-    if [ $? -ne 0 ]; then
+    # For each user
+    for email in ${emails[@]}; do
 
-        # Concat the domain
-        if [ ${domain} == "project" ]; then
-            cmd="gcloud projects add-iam-policy-binding ${domain_id}"
-        elif [ ${domain} == "folder" ]; then
-            cmd="gcloud alpha resource-manager folders add-iam-policy-binding ${domain_id}"
-        else
-            exitOnError "Unsupported add-iam-policy-binding to '${domain}' domain" -1
+        # Validate if the role is already provided
+        gcplib_validateRole ${domain} ${domain_id} ${role} ${email}
+        if [ $? -ne 0 ]; then
+
+            # Concat the domain
+            if [ ${domain} == "project" ]; then
+                cmd="gcloud projects add-iam-policy-binding ${domain_id}"
+            elif [ ${domain} == "folder" ]; then
+                cmd="gcloud alpha resource-manager folders add-iam-policy-binding ${domain_id}"
+            else
+                exitOnError "Unsupported add-iam-policy-binding to '${domain}' domain" -1
+            fi
+
+            echo "Binding '${email}' role '${role}' to ${domain}: ${domain_id}..."
+            if [[ "${email}" == *".iam.gserviceaccount.com" ]]; then
+                ${cmd} --member serviceAccount:${email} --role ${role} > /dev/null
+            else
+                ${cmd} --member user:${email} --role ${role} > /dev/null
+            fi
+
+            exitOnError "Failed to bind role: '${role}' to ${domain}: ${domain_id}"    
         fi
-
-        echo "Binding '${member}' role '${role}' to ${domain}: ${domain_id}..."
-        if [[ "${member}" == *".iam.gserviceaccount.com" ]]; then
-            ${cmd} --member serviceAccount:${member} --role ${role} > /dev/null
-        else
-            ${cmd} --member user:${member} --role ${role} > /dev/null
-        fi
-
-        exitOnError "Failed to bind role: '${role}' to ${domain}: ${domain_id}"    
-    fi
+    done
 }
 
 ### Function to deploy a gae app ###
-# usage: gae_deploy <gae_yaml>
-function gae_deploy {
+# usage: gcplib_gae_deploy <gae_yaml>
+function gcplib_gae_deploy {
 
     getArgs "GAE_YAML &GAE_VERSION" ${@}
     DESTOKENIZED_GAE_YAML="DESTOKENIZED_${GAE_YAML}"
@@ -165,18 +168,6 @@ function gae_deploy {
         gcloud --quiet app deploy ${DESTOKENIZED_GAE_YAML}
     fi
     exitOnError "Failed to deploy the application"
-}
-
-### Function to deploy a gae app ###
-# usage: iam_project_addrole <role> <project> <email1> <email2> ... <emailN>
-function iam_project_addrole {
-    
-    getArgs "role project @emails" ${@}
-
-    # For each user
-    for email in ${emails[@]}; do
-        bindRole project ${project} ${role} ${email}
-    done
 }
 
 ###############################################################################

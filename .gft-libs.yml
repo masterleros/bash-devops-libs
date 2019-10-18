@@ -13,9 +13,11 @@ variables:
   GFT_LIBS_CONVERT_VARS: "exports=$$(${GFT_LIB_COMMON} printEnvMappedVarsExports); eval \"$${exports}\""
 
   ########## LIB CATALOG ############
-  GFT_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp.sh"
   GFT_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
-  GFT_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils.sh"
+
+  GFT_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp.sh"  
+  GFT_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils.sh"  
+  GFT_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/libs/gitsync.sh"  
   ###################################
 
 .gft-libs:
