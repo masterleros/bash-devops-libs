@@ -116,9 +116,6 @@ function printEnvMappedVarsExports {
 # Validate if OS is supported
 [[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
 
-# Show import
-echo "Imported Libs!"
-
 ###############################################################################
 # Call the desired function when script is invoked directly instead of included
 if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
