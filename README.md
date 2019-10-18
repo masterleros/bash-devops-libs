@@ -18,10 +18,14 @@ GitLab Libs is a set of common functionatilities and templates to speed up DevOp
 └── gitlab-libs.sh          (External GitLab Libs management)
 ```
 
+[./gitlab-libs.sh](./gitlab-libs.sh)
+
 ### Using Libraries externally
 In order to use this library externally (i.e: local execution outside GitLab) you can import the libraries in your project:
-``` yaml
-wget https://<repository>
+``` sh
+wget https://<repository>/gitlab-libs.sh
+chmod +x gitlab-libs.sh
+gitlab-libs.sh
 ```
 
 ### Requirements
