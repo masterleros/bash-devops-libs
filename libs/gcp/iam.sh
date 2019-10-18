@@ -23,9 +23,7 @@ function gcplib.validateRole {
     exitOnError "Check your IAM permissions (for get-iam-policy) at ${domain}: ${domain_id}"
 
     # If email role was not found
-    echo "ACA!"
-    echo "${foundRoles}" | grep "${email}" # > /dev/null
-    echo "TAMBIEN!"
+    echo "${foundRoles}" | grep "${email}" > /dev/null
     return $?
 }
 
