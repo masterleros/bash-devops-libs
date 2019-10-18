@@ -16,11 +16,10 @@
       # Import GCP lib
       # source ${GITLAB_LIB_GCP}
       alias gcplib=${GITLAB_LIB_GCP}
-      alias
 
       # Validate required vars and dependencies
-      gcplib validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
-      gcplib verifyDeps gcloud
+      ${GITLAB_LIB_GCP} validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
+      ${GITLAB_LIB_GCP} verifyDeps gcloud
 
       # Install credential
       echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
