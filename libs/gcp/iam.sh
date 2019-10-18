@@ -38,7 +38,8 @@ function gcplib.bindRole {
     for email in ${emails[@]}; do
 
         # Validate if the role is already provided
-        gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
+        echo "gcplib.validateRole ${domain} ${domain_id} ${role} ${email}"
+        gcplib.validateRole ${domain} ${domain_id} ${role} ${email}        
         if [ $? -ne 0 ]; then
 
             # Concat the domain
