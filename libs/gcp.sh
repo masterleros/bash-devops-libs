@@ -9,7 +9,6 @@ function getValueFromCredential {
     # Verify if SA credential file exist
     [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
 
-    cat ${credential_path} >&2
     cat ${credential_path} | grep ${key} | awk '{print $2}' | grep -o '".*"' | sed 's/"//g'    
 }
 
