@@ -23,7 +23,9 @@ function gcplib.validateRole {
     exitOnError "Check your IAM permissions (for get-iam-policy) at ${domain}: ${domain_id}"
 
     # If email role was not found
+    echo "ACA!"
     echo "${foundRoles}" | grep "${email}" # > /dev/null
+    echo "TAMBIEN!"
     return $?
 }
 
@@ -40,7 +42,6 @@ function gcplib.bindRole {
         # Validate if the role is already provided
         echo "gcplib.validateRole ${domain} ${domain_id} ${role} ${email}"
         gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
-        echo "TERMINEI!" 
         if [ $? -ne 0 ]; then
 
             # Concat the domain
