@@ -10,7 +10,7 @@ variables:
   GITLAB_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@$(echo ${CI_PROJECT_URL} | cut -d'/' -f3)/${GITLAB_LIBS_REPO}.git"
   
   ########## LIB CATALOG ############
-  GITLAB_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common/common.sh"
+  GITLAB_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
   GITLAB_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils/utils.sh"  
   GITLAB_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp/gcp.sh"  
   GITLAB_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/libs/gitsync/gitsync.sh"  
