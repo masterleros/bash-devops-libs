@@ -1,5 +1,5 @@
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/common.sh
+source $(dirname ${BASH_SOURCE[0]})../libs/common.sh
 
 ### Get a value from the credential json file ###
 # usage: _gcplib.getValueFromCredential <credential_file> <key>

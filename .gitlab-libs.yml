@@ -13,9 +13,9 @@ variables:
 
   ########## LIB CATALOG ############
   GITLAB_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
-  GITLAB_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp.sh"  
   GITLAB_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils.sh"  
-  GITLAB_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/libs/gitsync.sh"  
+  GITLAB_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/gcp/gcp.sh"  
+  GITLAB_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/gitsync/gitsync.sh"  
   ###################################
 
 # Common lib template
