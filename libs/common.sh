@@ -75,16 +75,16 @@ function verifyDeps {
 # Usage: printEnvMappedVarsExports
 # Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ### 
 #
-# CI_BRANCHES_DEFINITION: "<def1> <def2> ... <defN>"
+# GITLAB_BRANCHES_DEFINITION: "<def1> <def2> ... <defN>"
 # Definition: <branch>:<env> (example: feature/*:DEV)
-# CI_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
+# GITLAB_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
 #
 function printEnvMappedVarsExports {
     
-    validateVars CI_COMMIT_REF_NAME CI_BRANCHES_DEFINITION
+    validateVars CI_COMMIT_REF_NAME GITLAB_BRANCHES_DEFINITION
 
     # Set environment depending on branches definition    
-    for _definition in ${CI_BRANCHES_DEFINITION}; do
+    for _definition in ${GITLAB_BRANCHES_DEFINITION}; do
         _branch=${_definition%:*}
         _environment=${_definition#*:}
 
@@ -96,7 +96,7 @@ function printEnvMappedVarsExports {
     done
     
     # Check if found an environment
-    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your CI_BRANCHES_DEFINITION!" -1
+    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your GITLAB_BRANCHES_DEFINITION!" -1
 
     # Get vars to be renamed    
     vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*" | awk -F= '{print $1}'))
