@@ -1,15 +1,14 @@
 # GCP Run template
 .gcp-template:
-  variables:
-    CI_VAR_TEST="olá!"
   before_script:
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - eval "${GFT_LIBS_GET_CMD}"
     - eval "${GFT_LIBS_CONVERT_VARS}"
-    - ${GFT_LIB_COMMON} validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
-    - ${GFT_LIB_COMMON} verifyDeps gcloud
+    - source ${GFT_LIB_GCP}
+    - validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
+    - verifyDeps gcloud
     - echo ${GCLOUD_CREDENTIAL} > ${GOOGLE_APPLICATION_CREDENTIALS}
-    - ${GFT_LIB_GCP} useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+    - useSA ${GOOGLE_APPLICATION_CREDENTIALS}
   after_script:
-    - ${GFT_LIB_GCP} revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+    - revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
     - rm -f ${GOOGLE_APPLICATION_CREDENTIALS}

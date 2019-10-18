@@ -1,17 +1,25 @@
 #!/bin/bash
 source $(dirname ${BASH_SOURCE[0]})/common.sh
 
+### Get a value from the credential json file ###
+# usage: getValueFromCredential <credential_file> <key>
+function getValueFromCredential {
+    getArgs "credential_path key" ${@}
+
+    # Verify if SA credential file exist
+    [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
+
+    cat ${credential_path} | grep ${key} | awk '{print $2}' | grep -o '".*"' | sed 's/"//g'
+}
+
 ### Use the service account from file ###
 # usage: useSA <credential_file>
 function useSA {
 
     getArgs "credential_path" ${@}
 
-    # Verify if SA credential file exist
-    [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
-
-    # Get SA user
-    client_mail=$(cat ${credential_path} | grep client_email | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')
+    # Get SA user email
+    client_mail=$(getValueFromCredential ${credential_path} client_email)
 
     echo "Activating Service Account '${client_mail}'..."
     gcloud auth activate-service-account --key-file=${credential_path}
@@ -24,11 +32,8 @@ function revokeSA {
     
     getArgs "credential_path" ${@}
 
-    # Verify if SA credential file exist
-    [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
-
-    # Get SA user
-    client_mail=$(cat ${credential_path} | grep client_email | awk '{print $2}' | grep -o '".*"' | sed 's/"//g')    
+    # Get SA user email
+    client_mail=$(getValueFromCredential ${credential_path} client_email)
 
     echo "Revoking Service Account '${client_mail}'..."
     gcloud auth revoke ${client_email}
