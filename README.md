@@ -21,9 +21,12 @@ GitLab Libs is a set of common functionatilities and templates to speed up DevOp
 ### Using Libraries externally
 In order to use this library externally (i.e: local execution outside GitLab) you can import the libraries in your project:
 ``` sh
-git clone git@git.gft.com:devops-br/gitlab-gft-libs.git
-chmod +x gitlab-gft-libs/gitlab-libs.sh
-gitlab-gft-libs/gitlab-libs.sh <MY_PROJECT_FOLDER>
+GITLAB_LIB_REPO=gitlab-gft-libs
+GITLAB_TMP_DIR=/tmp/${GITLAB_LIB_REPO}
+test -d ${GITLAB_TMP_DIR} && rm -rf ${GITLAB_TMP_DIR}
+git clone git@git.gft.com:devops-br/${GITLAB_LIB_REPO}.git ${GITLAB_TMP_DIR}
+chmod +x ${GITLAB_TMP_DIR}/gitlab-libs.sh
+${GITLAB_TMP_DIR}/gitlab-libs.sh <MY_PROJECT_FOLDER>
 ```
 
 ### Requirements

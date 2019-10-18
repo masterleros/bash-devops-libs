@@ -5,7 +5,7 @@ getArgs "PROJECT_FOLDER" ${@}
 
 # Check if folder exists
 [ -d ${PROJECT_FOLDER} ]
-existOnError "${PROJECT_FOLDER} folder does not exist!"
+exitOnError "${PROJECT_FOLDER} folder does not exist!"
 
 # Create folder and install libs to project
 echo "mkdir -p ${PROJECT_FOLDER}/scripts"
