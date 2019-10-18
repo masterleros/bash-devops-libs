@@ -3,7 +3,7 @@ stages:
 
 # Maven Run template
 .banco-original.mvn-build:  
-  extends: .common-template
+  extends: .gitlab-common-template
   stage: Build
   image: maven:latest
   variables:
