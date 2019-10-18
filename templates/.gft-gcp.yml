@@ -1,5 +1,7 @@
 # GCP Run template
 .gcp-template:
+  variables:
+    CI_VAR_TEST="olá!"
   before_script:
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - eval "${GFT_LIBS_GET_CMD}"
