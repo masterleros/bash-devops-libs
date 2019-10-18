@@ -1,8 +1,8 @@
 # GCP Run template
 .gcp-template:
   before_script:
-    - |
-    
+    - |    
+      # .gcp-template before_script
       # Disable script call ouput in case if enabled
       set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
@@ -29,7 +29,7 @@
 
   after_script:
     - |
-
+      # .gcp-template after_script
       # Disable script call ouput in case if enabled
       set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
