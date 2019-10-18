@@ -1,6 +1,8 @@
 # GCP Run template
 .gcp-template:
   before_script:
+    # disable script call ouput in case if enabled
+    - set_e_enabled=${-//[^x]/}; [ $set_e_enabled ] || set +e
     - if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
     - eval "${GFT_LIBS_GET_CMD}"
     - eval "${GFT_LIBS_CONVERT_VARS}"
@@ -9,6 +11,8 @@
     - verifyDeps gcloud
     - echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
     - useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+    # re-enable script call ouput in case was enabled
+    - [ $set_e_enabled ] || set -e
   after_script:
     - ${GFT_LIB_GCP} revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
     - rm -f ${GOOGLE_APPLICATION_CREDENTIALS}
