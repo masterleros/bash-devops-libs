@@ -14,15 +14,16 @@
       eval "${GITLAB_LIBS_CMD_CONVERT_VARS}"
 
       # Import GCP lib
-      source ${GITLAB_LIB_GCP}      
+      # source ${GITLAB_LIB_GCP}
+      alias gcplib ${GITLAB_LIB_GCP}
 
       # Validate required vars and dependencies
-      validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
-      verifyDeps gcloud
+      gcplib validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
+      gcplib verifyDeps gcloud
 
       # Install credential
       echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
-      gcplib.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gcplib gcplib.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Re-enable script call ouput in case was enabled
       [ ${set_e_enabled} ] || set -e
