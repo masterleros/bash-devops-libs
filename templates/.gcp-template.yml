@@ -15,7 +15,7 @@
 
       # Import GCP lib
       # source ${GITLAB_LIB_GCP}
-      alias gcplib ${GITLAB_LIB_GCP}
+      alias gcplib=${GITLAB_LIB_GCP}
 
       # Validate required vars and dependencies
       gcplib validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
