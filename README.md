@@ -5,6 +5,18 @@ GitLab Libs is a set of common functionatilities and templates to speed up DevOp
 
 > **Obs:** Templates are definitions of `before_script` and in some cases `after_script`, please be sure you don't need to implement your own mentioned sections as GitLab does not support both (template and custom) section to be merged and only one will be executed.
 
+## Folder Structure
+``` sh
+├── libs              	    (Libraries folder)
+│   ├── utils               (Additional utils library)
+│   ├── gcp                 (Example: GCP library)
+│   ...
+│   └── common.sh           (Common/base functions library)
+├── templates               (Templates folders)
+│   └── .gcp-template.yml   (Example: GCP templates)
+└── .gitlab-libs.yml        (Main GitLab Libs include)
+```
+
 ### Requirements
 Before you use this GitLab library you need to include and define repository and branch mappings
 
