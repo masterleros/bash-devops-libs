@@ -9,7 +9,8 @@ function getValueFromCredential {
     # Verify if SA credential file exist
     [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
 
-    cat ${credential_path} | grep ${key} | awk '{print $2}' | grep -o '".*"' | sed 's/"//g'
+    cat ${credential_path} &2
+    cat ${credential_path} | grep ${key} | awk '{print $2}' | grep -o '".*"' | sed 's/"//g'    
 }
 
 ### Use the service account from file ###
@@ -19,11 +20,11 @@ function useSA {
     getArgs "credential_path" ${@}
 
     # Get SA user email
-    client_mail=$(getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(getValueFromCredential ${credential_path} client_email)
 
-    echo "Activating Service Account '${client_mail}'..."
+    echo "Activating Service Account '${_client_mail}'..."
     gcloud auth activate-service-account --key-file=${credential_path}
-    exitOnError "Could not activate '${client_mail}' SA"
+    exitOnError "Could not activate '${_client_mail}' SA"
 }
 
 ### Remove the service account from system ###
@@ -33,11 +34,11 @@ function revokeSA {
     getArgs "credential_path" ${@}
 
     # Get SA user email
-    client_mail=$(getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(getValueFromCredential ${credential_path} client_email)
 
-    echo "Revoking Service Account '${client_mail}'..."
-    gcloud auth revoke ${client_email}
-    exitOnError "Could not revoke '${client_mail}' SA"
+    echo "Revoking Service Account '${_client_mail}'..."
+    gcloud auth revoke ${_client_mail}
+    exitOnError "Could not revoke '${_client_mail}' SA"
 }
 
 ### Validate and set the requested project ###
