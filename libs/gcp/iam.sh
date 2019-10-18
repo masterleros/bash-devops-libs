@@ -39,7 +39,8 @@ function gcplib.bindRole {
 
         # Validate if the role is already provided
         echo "gcplib.validateRole ${domain} ${domain_id} ${role} ${email}"
-        gcplib.validateRole ${domain} ${domain_id} ${role} ${email}        
+        gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
+        echo "TERMINEI!" 
         if [ $? -ne 0 ]; then
 
             # Concat the domain
