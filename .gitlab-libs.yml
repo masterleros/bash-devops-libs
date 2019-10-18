@@ -27,6 +27,8 @@ variables:
       # Disable script call ouput in case if enabled
       set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
+      export
+
       # Check and import gitlab-lib
       eval "${GITLAB_LIBS_GET_CMD}"
 
