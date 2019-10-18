@@ -2,8 +2,25 @@ stages:
   - Build
 
 ### Templates ###
-.banco-original-mvn-build:
+.banco-original.mvn:
   extends: .mvn-template
   stage: Build
   script:
     - mvn ${MAVEN_OPTS} clean install
+
+# Maven Run template
+.banco-original.mvn-build:
+  extends: .common-template
+  image: maven:latest
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"  
+  cache:
+    key: ${CI_JOB_NAME}
+    paths:
+      - ${CI_PROJECT_DIR}/.m2/repository
+  script:
+    - mvn ${MAVEN_OPTS} clean install
+  artifacts:
+    paths:
+      - ${APP_ARTIFACTS}
+    expire_in: 6 hour

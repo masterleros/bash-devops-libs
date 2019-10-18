@@ -6,15 +6,15 @@
       # Disable script call ouput in case if enabled
       set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
-      # Check and import gft-lib
-      if [ ! "${GFT_LIBS_GET_CMD}" ]; then echo "You must include '.gft-libs.yml' before use this template!"; exit -1; fi
-      eval "${GFT_LIBS_GET_CMD}"
+      # Check and import gitlab-lib
+      if [ ! "${GITLAB_LIBS_GET_CMD}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
+      eval "${GITLAB_LIBS_GET_CMD}"
 
       # Convert environment variables
-      eval "${GFT_LIBS_CONVERT_VARS}"
+      eval "${GITLAB_LIBS_CONVERT_VARS}"
 
       # Import GCP lib
-      source ${GFT_LIB_GCP}      
+      source ${GITLAB_LIB_GCP}      
 
       # Validate required vars and dependencies
       validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
@@ -34,7 +34,7 @@
       set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
       # Revoke service account    
-      ${GFT_LIB_GCP} revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      ${GITLAB_LIB_GCP} revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Delete installed credential
       rm -f ${GOOGLE_APPLICATION_CREDENTIALS}
