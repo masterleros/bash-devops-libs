@@ -13,6 +13,7 @@ stages:
     paths:
       - ${CI_PROJECT_DIR}/.m2/repository
   script:
+    - export
     - cd ${APP_PATH}
     - mvn ${MAVEN_OPTS} clean install
   artifacts:
