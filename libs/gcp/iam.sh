@@ -19,11 +19,11 @@ function gcplib.validateRole {
     fi
 
     # Execute the validation
-    foundRoles=$(${cmd} --flatten="bindings[].members" --filter "bindings.role=${role}" --format="table(bindings.members)")
+    foundRoles=$(${cmd} --flatten="bindings[].members" --filter "bindings.role=${role} AND bindings.members:${email}" --format="table(bindings.members)")
     exitOnError "Check your IAM permissions (for get-iam-policy) at ${domain}: ${domain_id}"
 
     # If email role was not found
-    echo ${foundRoles} | grep ${email} > /dev/null
+    echo "${foundRoles}" | grep ${email} > /dev/null
     return $?
 }
 
