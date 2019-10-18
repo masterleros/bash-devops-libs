@@ -6,14 +6,12 @@
 #######################################
 
 variables:
-  GITLAB_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${GITLAB_LIBS_REPO}.git"
   GITLAB_LIBS_DIR: "/tmp/${CI_PIPELINE_ID}"
   GITLAB_LIBS_GET_CMD: "test -f ${GITLAB_LIBS_DIR} || rm -rf ${GITLAB_LIBS_DIR}; git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; chmod +x /tmp/${CI_PIPELINE_ID}/libs/*.sh"
   GITLAB_LIBS_CONVERT_VARS: "exports=$$(${GITLAB_LIB_COMMON} printEnvMappedVarsExports); eval \"$${exports}\""
 
   ########## LIB CATALOG ############
   GITLAB_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
-
   GITLAB_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp.sh"  
   GITLAB_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils.sh"  
   GITLAB_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/libs/gitsync.sh"  
