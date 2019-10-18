@@ -32,7 +32,6 @@
       # .gcp-template after_script
       # Disable script call ouput in case if enabled
       set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
-      set -e
 
       # Revoke service account    
       ${GITLAB_LIB_GCP} gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
