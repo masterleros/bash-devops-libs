@@ -8,6 +8,6 @@ test -d ${PROJECT_FOLDER}
 exitOnError "${PROJECT_FOLDER} folder does not exist!"
 
 # Create folder and install libs to project
-echo "mkdir -p ${PROJECT_FOLDER}/scripts"
-echo "cp -R ${GITLAB_LIBS_ROOTDIR}/libs ${PROJECT_FOLDER}/scripts/libs"
+mkdir -p ${PROJECT_LIB_FOLDER}/scripts
+cp -R ${GITLAB_LIBS_ROOTDIR}/libs ${PROJECT_FOLDER}
 

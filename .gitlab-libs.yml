@@ -11,9 +11,9 @@ variables:
   
   ########## LIB CATALOG ############
   GITLAB_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
-  GITLAB_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils/utils.sh"  
-  GITLAB_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp/gcp.sh"  
-  GITLAB_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/libs/gitsync/gitsync.sh"  
+  GITLAB_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils/main.sh"  
+  GITLAB_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp/main.sh"  
+  GITLAB_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/libs/gitsync/main.sh"  
   ########## LIB COMMANDS ############
   GITLAB_LIBS_CMD_CLONE: "test -d ${GITLAB_LIBS_DIR} && rm -rf ${GITLAB_LIBS_DIR}; git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find /tmp/${CI_PIPELINE_ID}/libs -name '*.sh' -exec chmod +x {} \\;"
   GITLAB_LIBS_CMD_CONVERT_VARS: "exports=$$(${GITLAB_LIB_COMMON} printEnvMappedVarsExports); eval \"$${exports}\""  
