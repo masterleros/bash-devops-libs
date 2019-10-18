@@ -2,8 +2,8 @@
 source $(dirname ${BASH_SOURCE[0]})/common.sh
 
 ### Get a value from the credential json file ###
-# usage: _gcplib_getValueFromCredential <credential_file> <key>
-function _gcplib_getValueFromCredential {
+# usage: _gcplib.getValueFromCredential <credential_file> <key>
+function _gcplib.getValueFromCredential {
     getArgs "credential_path key" ${@}
 
     # Verify if SA credential file exist
@@ -13,13 +13,13 @@ function _gcplib_getValueFromCredential {
 }
 
 ### Use the service account from file ###
-# usage: gcplib_useSA <credential_file>
-function gcplib_useSA {
+# usage: gcplib.useSA <credential_file>
+function gcplib.useSA {
 
     getArgs "credential_path" ${@}
 
     # Get SA user email
-    _client_mail=$(_gcplib_getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)
 
     echo "Activating Service Account '${_client_mail}'..."
     gcloud auth activate-service-account --key-file=${credential_path}
@@ -27,13 +27,13 @@ function gcplib_useSA {
 }
 
 ### Remove the service account from system ###
-# usage: gcplib_revokeSA <credential_file>
-function gcplib_revokeSA {
+# usage: gcplib.revokeSA <credential_file>
+function gcplib.revokeSA {
     
     getArgs "credential_path" ${@}
 
     # Get SA user email
-    _client_mail=$(_gcplib_getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)
 
     echo "Revoking Service Account '${_client_mail}'..."
     gcloud auth revoke ${_client_mail}
@@ -41,8 +41,8 @@ function gcplib_revokeSA {
 }
 
 ### Validate and set the requested project ###
-# usage: gcplib_useProject <project_id>
-function gcplib_useProject {
+# usage: gcplib.useProject <project_id>
+function gcplib.useProject {
 
     getArgs "project" ${@}
     
@@ -57,8 +57,8 @@ function gcplib_useProject {
 }
 
 ### Validate a role of current user ###
-# usage: gcplib_enableAPI <api_domain>
-function gcplib_enableAPI {
+# usage: gcplib.enableAPI <api_domain>
+function gcplib.enableAPI {
 
     getArgs "project api" ${@}
 
@@ -67,9 +67,9 @@ function gcplib_enableAPI {
 }
 
 ### Validate a role of a email ###
-# usage: gcplib_validateRole <domain> <domain_id> <role> <email>
+# usage: gcplib.validateRole <domain> <domain_id> <role> <email>
 # domains: project folder billing
-function gcplib_validateRole {
+function gcplib.validateRole {
     
     getArgs "domain domain_id role email" ${@}
 
@@ -96,9 +96,9 @@ function gcplib_validateRole {
 }
 
 ### Bind Role to a list of emails ###
-# usage: gcplib_bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
+# usage: gcplib.bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
 # domains: project folder
-function gcplib_bindRole {
+function gcplib.bindRole {
 
     getArgs "domain domain_id role @emails" ${@}
 
@@ -106,7 +106,7 @@ function gcplib_bindRole {
     for email in ${emails[@]}; do
 
         # Validate if the role is already provided
-        gcplib_validateRole ${domain} ${domain_id} ${role} ${email}
+        gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
         if [ $? -ne 0 ]; then
 
             # Concat the domain
@@ -131,8 +131,8 @@ function gcplib_bindRole {
 }
 
 ### Function to deploy a gae app ###
-# usage: gcplib_gae_deploy <gae_yaml>
-function gcplib_gae_deploy {
+# usage: gcplib.gae_deploy <gae_yaml>
+function gcplib.gae_deploy {
 
     getArgs "GAE_YAML &GAE_VERSION" ${@}
     DESTOKENIZED_GAE_YAML="DESTOKENIZED_${GAE_YAML}"
