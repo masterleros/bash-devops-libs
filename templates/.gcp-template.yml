@@ -15,12 +15,12 @@
 
       # Import GCP lib
       # source ${GITLAB_LIB_GCP}
-      shopt -s expand_aliases
+      shopt -s expand_aliases # **REQUIRED** expand aliases
       alias gcplib=${GITLAB_LIB_GCP}
 
       # Validate required vars and dependencies
-      ${GITLAB_LIB_GCP} validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
-      ${GITLAB_LIB_GCP} verifyDeps gcloud
+      gcplib validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
+      gcplib verifyDeps gcloud
 
       # Install credential
       echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
@@ -32,14 +32,10 @@
   after_script:
     - |
       # .gcp-template after_script
-      # Disable script call ouput in case if enabled
-      set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
       # Revoke service account    
-      ${GITLAB_LIB_GCP} gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      #${GITLAB_LIB_GCP} gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gcplib gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Delete installed credential
       rm -f ${GOOGLE_APPLICATION_CREDENTIALS}
-
-      # Re-enable script call ouput in case was enabled
-      [ ${set_e_enabled} ] || set -e
