@@ -9,7 +9,7 @@
       eval "${GITLAB_LIBS_CMD_IMPORT}"
 
       # Import GCP lib
-      gitlab-lib import GCP
+      gitlab-lib importLibs GCP
 
       # Convert environment variables
       # eval "${GITLAB_LIBS_CMD_CONVERT_VARS}"
