@@ -27,7 +27,7 @@
   after_script:
     - |
       # .gcp-template after_script
-
+      
       gitlab-lib import GCP # Reimport as after script process is other than before_script/script
 
       # Revoke service account
