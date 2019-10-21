@@ -1,6 +1,6 @@
 # Docker template
 .docker-template:
-  before:script:
+  before_script:
     - | 
       # .docker-template before_script      
 
