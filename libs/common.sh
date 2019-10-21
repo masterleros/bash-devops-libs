@@ -120,7 +120,7 @@ function importLibs {
         lib="${1}"
         lib_var="GITLAB_LIB_${1}"
         lib_alias=${lib,,}lib
-        lib_file=${!lib_var}
+        lib_file=$(eval "echo ${!lib_var}")
 
         # Check if lib exists
         echo ${lib_file}
