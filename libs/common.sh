@@ -123,7 +123,6 @@ function importLibs {
         lib_file=$(eval "echo ${!lib_var}")
 
         # Check if lib exists
-        echo ${lib_file}
         if [ ! -f "${lib_file}" ]; then
             echo "GITLAB Library '${lib}' not found!"
             exit -1
