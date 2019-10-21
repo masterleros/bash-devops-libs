@@ -1,7 +1,7 @@
 ### Validate a role of a email ###
-# usage: gcplib.validateRole <domain> <domain_id> <role> <email>
+# usage: validateRole <domain> <domain_id> <role> <email>
 # domains: project folder billing
-function gcplib.validateRole {
+function validateRole {
     
     getArgs "domain domain_id role email" ${@}
 
@@ -28,9 +28,9 @@ function gcplib.validateRole {
 }
 
 ### Bind Role to a list of emails ###
-# usage: gcplib.bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
+# usage: bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
 # domains: project folder
-function gcplib.bindRole {
+function bindRole {
 
     getArgs "domain domain_id role @emails" ${@}
 
@@ -38,8 +38,8 @@ function gcplib.bindRole {
     for email in ${emails[@]}; do
 
         # Validate if the role is already provided
-        echo "gcplib.validateRole ${domain} ${domain_id} ${role} ${email}"
-        gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
+        echo "validateRole ${domain} ${domain_id} ${role} ${email}"
+        validateRole ${domain} ${domain_id} ${role} ${email}
         if [ $? -ne 0 ]; then
 
             # Concat the domain

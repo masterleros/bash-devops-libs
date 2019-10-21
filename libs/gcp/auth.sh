@@ -10,8 +10,8 @@ function _gcplib.getValueFromCredential {
 }
 
 ### Use the service account from file ###
-# usage: gcplib.useSA <credential_file>
-function gcplib.useSA {
+# usage: useSA <credential_file>
+function useSA {
 
     getArgs "credential_path" ${@}
 
@@ -24,8 +24,8 @@ function gcplib.useSA {
 }
 
 ### Remove the service account from system ###
-# usage: gcplib.revokeSA <credential_file>
-function gcplib.revokeSA {
+# usage: revokeSA <credential_file>
+function revokeSA {
     
     getArgs "credential_path" ${@}
 

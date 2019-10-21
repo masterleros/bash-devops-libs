@@ -7,8 +7,8 @@ source ${CURRENT_DIR}/api.sh
 source ${CURRENT_DIR}/auth.sh
 
 ### Validate and set the requested project ###
-# usage: gcplib.useProject <project_id>
-function gcplib.useProject {
+# usage: useProject <project_id>
+function useProject {
 
     getArgs "project" ${@}
     

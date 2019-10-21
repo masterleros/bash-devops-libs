@@ -113,6 +113,27 @@ function printEnvMappedVarsExports {
     echo ${exports}
 }
 
+### Import GitLab Libs ###
+# Usage: importLibs <lib1> <lib2> ... <libN>
+function importLibs {
+    while [ "$1" ]; do
+        lib="${1}"
+        lib_var="GITLAB_LIB_${1}"
+        lib_alias=${lib,}lib
+        lib_file="${!lib_var}"
+
+        # Check if lib exists
+        if [ ! -f "${lib_file}" ]; then
+            echo "GITLAB Library '${lib}' not found!"
+            exit -1
+        fi
+
+        echo "Importing GITLAB Library: ${lib_alias}..."
+        alias ${lib_alias}=${lib_file}
+        shift
+    done
+}
+
 # Validate if OS is supported
 [[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
 

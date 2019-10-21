@@ -1,6 +1,6 @@
 ### Validate a role of current user ###
-# usage: gcplib.enableAPI <api_domain>
-function gcplib.enableAPI {
+# usage: enableAPI <api_domain>
+function enableAPI {
 
     getArgs "project api" ${@}
 
