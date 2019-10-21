@@ -1,6 +1,24 @@
 # Docker template
 .docker-template:
+  before:script:
+    - | 
+      # .docker-template before_script      
+
+      # Check and import gitlab-lib
+      if [ ! "${GITLAB_LIBS_CMD_IMPORT}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
+      eval "${GITLAB_LIBS_CMD_IMPORT}"
+
+      # Validate required vars and dependencies
+      validateVars DOCKERFILE_PATH IMAGE_TAG
+      verifyDeps docker
+
   script:
   - | 
-    echo ${DOCKERFILE_PATH}
-    docker ps
+    echo "-------------"
+    cat ${DOCKERFILE_PATH}
+    echo "-------------"
+    docker build ${DOCKERFILE_PATH} -t ${IMAGE_TAG}
+    docker images
+  only:
+    changes: 
+      - ${DOCKERFILE_PATH}
