@@ -119,7 +119,7 @@ function importLibs {
     while [ "$1" ]; do
         lib="${1}"
         lib_var="GITLAB_LIB_${1}"
-        lib_alias=${lib,}lib
+        lib_alias=${lib,,}lib
         lib_file="${!lib_var}"
 
         # Check if lib exists
