@@ -17,7 +17,7 @@ variables:
   #GITLAB_LIBS_CMD_IMPORT: "test -d ${GITLAB_LIBS_DIR} && rm -rf ${GITLAB_LIBS_DIR}; git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find /tmp/${CI_PIPELINE_ID}/libs -name '*.sh' -exec chmod +x {} \\;; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
 
   #GITLAB_LIBS_CMD_IMPORT: "if [ ! -d ${GITLAB_LIBS_DIR} ]; then echo 'Clonning GitLab Libs...'; git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; else echo 'Pulling GitLab Libs...'; git -C ${GITLAB_LIBS_DIR} pull; fi; find ${GITLAB_LIBS_DIR}/libs -name '*.sh' -exec chmod +x {} \\;; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
-  GITLAB_LIBS_CMD_IMPORT: "if [ ! -d ${GITLAB_LIBS_DIR} ]; git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find ${GITLAB_LIBS_DIR}/libs -name '*.sh' -exec chmod +x {} \\;; fi; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
+  GITLAB_LIBS_CMD_IMPORT: "if [ ! -d ${GITLAB_LIBS_DIR} ]; then git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find ${GITLAB_LIBS_DIR}/libs -name '*.sh' -exec chmod +x {} \\;; fi; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
   ###################################
 
 # Common lib template
