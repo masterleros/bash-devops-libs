@@ -15,6 +15,7 @@
 
       # Import GCP lib
       # source ${GITLAB_LIB_GCP}
+      shopt -s expand_aliases
       alias gcplib=${GITLAB_LIB_GCP}
 
       # Validate required vars and dependencies
