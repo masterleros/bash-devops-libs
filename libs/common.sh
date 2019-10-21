@@ -97,7 +97,6 @@ function convertEnvVars {
     
     # Check if found an environment
     [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your GITLAB_LIBS_BRANCHES_DEFINITION!" -1
-    echo "Using environment '${CI_BRANCH_ENVIRONMENT}'"
 
     # Get vars to be renamed    
     vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*=" | awk -F= '{print $1}'))
@@ -106,7 +105,7 @@ function convertEnvVars {
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
-        echo "Converting: '${var}' to '${new_var}'"
+        echo "${CI_BRANCH_ENVIRONMENT} - Setting: '${new_var}'"
         export ${new_var}="${!var}"
     done
 }
