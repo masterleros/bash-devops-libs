@@ -27,6 +27,7 @@
       # .gcp-template after_script
       
       # Reimport as after script process is other than before_script/script
+      eval "${GITLAB_LIBS_CMD_IMPORT}"
       importLibs GCP 
 
       # Revoke service account
