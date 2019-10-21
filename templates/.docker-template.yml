@@ -16,8 +16,8 @@
   - | 
     echo "-------------"
     cat ${DOCKERFILE_PATH}
-    echo "-------------"
-    docker build ${DOCKERFILE_PATH} -t ${IMAGE_TAG}
+    echo "-------------"    
+    docker build -t ${IMAGE_TAG} -f ${DOCKERFILE_PATH} $(dirname ${DOCKERFILE_PATH})
     docker images
 #  only:
 #    changes: 
