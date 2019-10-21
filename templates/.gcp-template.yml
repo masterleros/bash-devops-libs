@@ -3,40 +3,35 @@
   before_script:
     - |    
       # .gcp-template before_script
-      # Disable script call ouput in case if enabled
-      set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
 
       # Check and import gitlab-lib
       if [ ! "${GITLAB_LIBS_CMD_IMPORT}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
       eval "${GITLAB_LIBS_CMD_IMPORT}"
 
-      # Convert environment variables
-      eval "${GITLAB_LIBS_CMD_CONVERT_VARS}"
-
       # Import GCP lib
-      # source ${GITLAB_LIB_GCP}
-      # shopt -s expand_aliases # **REQUIRED** expand aliases
-      #alias gcplib=${GITLAB_LIB_GCP}
-      gitlab-lib import GCP      
+      gitlab-lib import GCP
+
+      # Convert environment variables
+      # eval "${GITLAB_LIBS_CMD_CONVERT_VARS}"
+      exports=$$(${GITLAB_LIB_COMMON} printEnvMappedVarsExports)
+      eval \"$${exports}\"
 
       # Validate required vars and dependencies
       gcplib validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
       gcplib verifyDeps gcloud
 
-      # Install credential
+      # Install credential and set SA as active
       echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
-      gcplib gcplib.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
-
-      # Re-enable script call ouput in case was enabled
-      [ ${set_e_enabled} ] || set -e
+      gcplib useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
   after_script:
     - |
       # .gcp-template after_script
 
-      # Revoke service account    
-      #${GITLAB_LIB_GCP} gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
-      gcplib gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gitlab-lib import GCP # Reimport as after script process is other than before_script/script
+
+      # Revoke service account
+      gcplib revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Delete installed credential
       rm -f ${GOOGLE_APPLICATION_CREDENTIALS}
