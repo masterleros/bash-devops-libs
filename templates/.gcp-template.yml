@@ -9,12 +9,10 @@
       eval "${GITLAB_LIBS_CMD_IMPORT}"
 
       # Import GCP lib
-      gitlab-lib importLibs GCP      
+      importLibs GCP      
 
       # Convert environment variables
-      # eval "${GITLAB_LIBS_CMD_CONVERT_VARS}"
-      exports=$$(${GITLAB_LIB_COMMON} printEnvMappedVarsExports)
-      eval \"$${exports}\"
+      convertEnvVars ${GITLAB_LIBS_BRANCHES_DEFINITION}
 
       # Validate required vars and dependencies
       gcplib validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS

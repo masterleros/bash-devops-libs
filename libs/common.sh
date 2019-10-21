@@ -72,24 +72,25 @@ function verifyDeps {
 }
 
 ### This funciton will map environment variables to the final name ###
-# Usage: printEnvMappedVarsExports
+# Usage: convertEnvVars <GITLAB_LIBS_BRANCHES_DEFINITION>
 # Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ### 
 #
 # GITLAB_LIBS_BRANCHES_DEFINITION: "<def1> <def2> ... <defN>"
 # Definition: <branch>:<env> (example: feature/*:DEV)
 # GITLAB_LIBS_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
 #
-function printEnvMappedVarsExports {
+function convertEnvVars {
     
-    validateVars CI_COMMIT_REF_NAME GITLAB_LIBS_BRANCHES_DEFINITION
+    getArgs "@GITLAB_LIBS_BRANCHES_DEFINITION" ${@}
+    validateVars CI_COMMIT_REF_NAME
 
     # Set environment depending on branches definition    
-    for _definition in ${GITLAB_LIBS_BRANCHES_DEFINITION}; do
+    for _definition in "${GITLAB_LIBS_BRANCHES_DEFINITION[@]}"; do
         _branch=${_definition%:*}
         _environment=${_definition#*:}
 
-        # Check if matched current definition
-        if [[ ${CI_COMMIT_REF_NAME} == ${_branch} ]]; then
+        # Check if matched current definition        
+        if [[ ${CI_COMMIT_REF_NAME} == ${_branch} ]]; then            
             CI_BRANCH_ENVIRONMENT=${_environment};            
             break
         fi
@@ -97,20 +98,18 @@ function printEnvMappedVarsExports {
     
     # Check if found an environment
     [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your GITLAB_LIBS_BRANCHES_DEFINITION!" -1
+    echo "Using environment '${CI_BRANCH_ENVIRONMENT}'"
 
     # Get vars to be renamed    
-    vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*" | awk -F= '{print $1}'))
+    vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*=" | awk -F= '{print $1}'))
 
     # Set same variable with the final name
-    exports=""
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
-        exports="export $new_var=\${$var};${exports}"
+        echo "Converting: '${var}' to '${new_var}'"
+        export ${new_var}="${!var}"
     done
-
-    # print the exports required
-    echo ${exports}
 }
 
 ### Import GitLab Libs ###
