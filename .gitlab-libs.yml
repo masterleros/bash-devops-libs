@@ -14,7 +14,7 @@ variables:
   GITLAB_LIB_GCP: "${GITLAB_LIBS_DIR}/libs/gcp/main.sh"  
   GITLAB_LIB_GITSYNC: "${GITLAB_LIBS_DIR}/libs/gitsync/main.sh"  
   ########## LIB COMMANDS ############
-  GITLAB_LIBS_CMD_IMPORT: "if [ $$(which git &&> /dev/null || echo $$?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi; if [ ! -d ${GITLAB_LIBS_DIR} ]; then git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find ${GITLAB_LIBS_DIR}/libs -name '*.sh' -exec chmod +x {} \\;; fi; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
+  GITLAB_LIBS_CMD_IMPORT: "if [ $$(which git &> /dev/null || echo $$?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi; if [ ! -d ${GITLAB_LIBS_DIR} ]; then git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find ${GITLAB_LIBS_DIR}/libs -name '*.sh' -exec chmod +x {} \\;; fi; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
   ###################################
 
 # Common lib template
