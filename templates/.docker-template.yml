@@ -14,11 +14,5 @@
 
   script:
   - | 
-    echo "-------------"
-    cat ${DOCKERFILE_PATH}
-    echo "-------------"    
+    # Build docker image
     docker build -t ${IMAGE_TAG} -f ${DOCKERFILE_PATH} $(dirname ${DOCKERFILE_PATH})
-    docker images
-#  only:
-#    changes: 
-#      - ${DOCKERFILE_PATH}
