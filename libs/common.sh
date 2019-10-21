@@ -115,8 +115,8 @@ function convertEnvVars {
 ### Import GitLab Libs ###
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
-    set -x
 
+    # For each lib
     while [ "$1" ]; do
         lib="${1}"
         lib_var="GITLAB_LIB_${1}"
