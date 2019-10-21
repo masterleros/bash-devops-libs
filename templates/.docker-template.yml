@@ -19,6 +19,6 @@
     echo "-------------"
     docker build ${DOCKERFILE_PATH} -t ${IMAGE_TAG}
     docker images
-  only:
-    changes: 
-      - ${DOCKERFILE_PATH}
+#  only:
+#    changes: 
+#      - ${DOCKERFILE_PATH}
