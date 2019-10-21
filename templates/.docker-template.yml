@@ -1,6 +1,6 @@
 # Docker template
 .docker-template:
-  before_script:
+  script:
   - | 
     echo ${DOCKERFILE_PATH}
     docker ps
