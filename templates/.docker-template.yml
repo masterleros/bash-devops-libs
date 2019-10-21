@@ -1,5 +1,5 @@
-# GCP Run template
-.gcp-template:
+# Docker template
+.docker-template:
   before_script:
   - | 
     echo ${DOCKERFILE_PATH}
