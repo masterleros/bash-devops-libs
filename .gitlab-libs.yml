@@ -10,69 +10,22 @@ variables:
   GITLAB_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@$(echo ${CI_PROJECT_URL} | cut -d'/' -f3)/${GITLAB_LIBS_REPO}.git"
   
   ########## LIB CATALOG ############
-  # GITLAB_LIB_COMMON: "/tmp/${CI_PIPELINE_ID}/libs/common.sh"
   GITLAB_LIB_UTILS: "/tmp/${CI_PIPELINE_ID}/libs/utils/main.sh"  
   GITLAB_LIB_GCP: "/tmp/${CI_PIPELINE_ID}/libs/gcp/main.sh"  
   GITLAB_LIB_GITSYNC: "/tmp/${CI_PIPELINE_ID}/libs/gitsync/main.sh"  
   ########## LIB COMMANDS ############
-  GITLAB_LIBS_CMD_IMPORT: "test -d ${GITLAB_LIBS_DIR} && rm -rf ${GITLAB_LIBS_DIR}; git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find /tmp/${CI_PIPELINE_ID}/libs -name '*.sh' -exec chmod +x {} \\;; shopt -s expand_aliases; source /tmp/${CI_PIPELINE_ID}/libs/common.sh"
-
-  #GITLAB_LIBS_CMD_CONVERT_VARS: "exports=$$(${GITLAB_LIB_COMMON} printEnvMappedVarsExports); eval \"$${exports}\""    
+  GITLAB_LIBS_CMD_IMPORT: "test -d ${GITLAB_LIBS_DIR} && rm -rf ${GITLAB_LIBS_DIR}; git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find /tmp/${CI_PIPELINE_ID}/libs -name '*.sh' -exec chmod +x {} \\;; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
   ###################################
 
 # Common lib template
 .gitlab-common-template:
   before_script:
-    - |    
-      # .common-template before_script
-      # Disable script call ouput in case if enabled
-      set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
+    - | 
+      # .gitlab-common-template
 
       # Check and import gitlab-lib
+      if [ ! "${GITLAB_LIBS_CMD_IMPORT}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
       eval "${GITLAB_LIBS_CMD_IMPORT}"
 
       # Convert environment variables
-      eval "${GITLAB_LIBS_CMD_CONVERT_VARS}"
-
-      # Re-enable script call ouput in case was enabled
-      [ ${set_e_enabled} ] || set -e      
-
-# GITLAB libs import
-.gitlab-libs-template:
-  before_script:
-    - | 
-      # .common-template before_script
-      # Disable script call ouput in case if enabled
-      set_e_enabled=${-//[^x]/}; [ ${set_e_enabled} ] || set +e
-
-      # Check and import gitlab-lib
-      eval "${GITLAB_LIBS_CMD_IMPORT}"
-
-      echo "GITLAB libs are available now!"
-      echo "****************************************************"
-      echo "Available libraries:"
-      export | grep -o -e ' GITLAB_LIB_[_A-Z0-9]*' | sed 's/GITLAB_LIB_//'
-      echo ""
-      echo "Import using: import_gitlab_libs <LIB1> <LIB2> <LIBN>"
-      echo "****************************************************"
-
-      # Function to import libs
-      function import_gitlab_libs {
-        while [ "$1" ]; do
-          lib="${1}"
-          lib_var="GITLAB_LIB_${1}"
-          lib_file="${!lib_var}"
-          # Check if lib exists
-          if [ ! -f "${lib_file}" ]; then
-            echo "GITLAB Library '${lib}' not found!"
-            exit -1
-          fi
-          echo "Importing GITLAB Library: ${lib}..."
-          source ${lib_file}
-          shift
-        done
-      }
-
-      # Re-enable script call ouput in case was enabled
-      [ ${set_e_enabled} ] || set -e    
-    
+      convertEnvVars ${GITLAB_LIBS_BRANCHES_DEFINITION}
