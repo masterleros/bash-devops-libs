@@ -9,7 +9,7 @@
       eval "${GITLAB_LIBS_CMD_IMPORT}"
 
       # Convert environment variables
-      convertEnvVars ${GITLAB_LIBS_BRANCHES_DEFINITION}
+      convertEnvVars ${CI_COMMIT_REF_NAME} ${GITLAB_LIBS_BRANCHES_DEFINITION}
 
       # Import GCP lib
       importLibs GCP

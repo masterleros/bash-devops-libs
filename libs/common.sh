@@ -81,8 +81,7 @@ function verifyDeps {
 #
 function convertEnvVars {
     
-    getArgs "@GITLAB_LIBS_BRANCHES_DEFINITION" ${@}
-    validateVars CI_COMMIT_REF_NAME
+    getArgs "CI_COMMIT_REF_NAME @GITLAB_LIBS_BRANCHES_DEFINITION" ${@}
 
     # Set environment depending on branches definition    
     for _definition in "${GITLAB_LIBS_BRANCHES_DEFINITION[@]}"; do
