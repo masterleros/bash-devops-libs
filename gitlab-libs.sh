@@ -5,6 +5,7 @@
 #
 
 ### GITLAB LIBS DEFINITIONS ###
+GITLAB_LIBS_REPO="git.gft.com:devops-br/gitlab-gft-libs.git"
 GITLAB_LIBS_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd)/libs"
 GITLAB_TMP_DIR="/tmp/gitlab-gft-libs"
 ### GITLAB LIBS DEFINITIONS ###
@@ -21,7 +22,11 @@ if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is re
 ### Clone / update the libraries ###
 set -e
 if [ ! -d ${GITLAB_TMP_DIR} ]; then
-    git clone git@git.gft.com:devops-br/gitlab-gft-libs.git ${GITLAB_TMP_DIR}
+    if [ ${CI_JOB_TOKEN} ]; then 
+        git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
+    else
+        git clone git@${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
+    fi
 else
     git -C ${GITLAB_TMP_DIR} pull 
 fi
