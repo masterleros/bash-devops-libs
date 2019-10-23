@@ -48,4 +48,4 @@ find ${GITLAB_LIBS_DIR} -name 'main.sh' -exec chmod +x {} \;
 [ ${set_e_enabled} ] || set +e # Disable set e
 
 ### Include GitLab Libs ###
-source ${GITLAB_LIBS_DIR}/common.sh
+source ${GITLAB_LIBS_DIR}/base.sh
