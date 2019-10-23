@@ -24,7 +24,9 @@ if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is re
 if [ "$CI" ]; then echo "---> Running on GitLab CI/CD <---"; fi
 
 ### Clone / update the libraries ###
-set -e
+set_e_enabled=${-//[^x]/}
+[ ${set_e_enabled} ] || set -e # Enable set e
+
 if [ ! -d ${GITLAB_TMP_DIR} ]; then
     if [ ${CI_JOB_TOKEN} ]; then 
         git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${GITLAB_LIBS_SERVER}/${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
@@ -39,7 +41,7 @@ fi
 mkdir -p ${GITLAB_LIBS_DIR}
 cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}
 
-set +e
+[ ${set_e_enabled} ] || set +e # Disable set e
 
 ### Include GitLab Libs ###
 source ${GITLAB_LIBS_DIR}/common.sh
