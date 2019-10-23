@@ -1,13 +1,32 @@
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/libs/common.sh
+#
+# This script provides the common definitions and funcions to execute
+# to help scripts contextualize the executions
+#
 
-getArgs "PROJECT_FOLDER" ${@}
+### GITLAB LIBS DEFINITIONS ###
+GITLAB_LIBS_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd)/libs"
+GITLAB_TMP_DIR="/tmp/gitlab-gft-libs"
+### GITLAB LIBS DEFINITIONS ###
 
-# Check if folder exists
-test -d ${PROJECT_FOLDER}
-exitOnError "${PROJECT_FOLDER} folder does not exist!"
+# Include project definitions case exists
+test -f $(dirname ${BASH_SOURCE[0]})/definitions.sh && source $(dirname ${BASH_SOURCE[0]})/definitions.sh
 
-# Create folder and install libs to project
-mkdir -p ${PROJECT_LIB_FOLDER}/scripts
-cp -R ${GITLAB_LIBS_ROOTDIR}/libs ${PROJECT_FOLDER}
+# Validate OS
+if [[ "${OSTYPE}" != "linux-gnu" ]]; then echo "OS '${OSTYPE}' is not supported" >&2; exit -1; fi
 
+# Check if git is present
+if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
+
+### Clone / update the libraries ###
+if [ ! -d ${GITLAB_TMP_DIR} ]; then
+    git clone git@git.gft.com:devops-br/gitlab-gft-libs.git ${GITLAB_TMP_DIR}
+else
+    git -C ${GITLAB_TMP_DIR} pull 
+fi
+
+### Copy the libs inside the project ###
+cp -r ${GITLAB_TMP_DIR}/libs ${GITLAB_LIBS_DIR}
+
+### Include GitLab Libs ###
+source ${GITLAB_LIBS_DIR}/common.sh

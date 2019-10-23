@@ -1,5 +1,4 @@
 #!/bin/bash
-GITLAB_LIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd )"
 
 ### Exit program with text when last exit code is non-zero ###
 # usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
@@ -115,22 +114,27 @@ function convertEnvVars {
 function importLibs {
 
     # For each lib
+    result=0
     while [ "$1" ]; do
         lib="${1}"
-        lib_var="GITLAB_LIB_${1}"
-        lib_alias=${lib,,}lib
-        lib_file=$(eval "echo ${!lib_var}")
+        lib_alias="${lib}lib"
+        lib_file="${GITLAB_LIBS_DIR}/${lib}/main.sh"
 
         # Check if lib exists
         if [ ! -f "${lib_file}" ]; then
             echo "GITLAB Library '${lib}' not found!"
-            exit -1
-        fi
+            ((result+=1))
+        else
+            echo "Importing GITLAB Library: ${lib_alias}..."
+            alias ${lib_alias}=${lib_file}
+        if
 
-        echo "Importing GITLAB Library: ${lib_alias}..."
-        alias ${lib_alias}=${lib_file}
+        # Go to next arg
         shift
     done
+
+    # Case any libs was not found, exit with error
+    exitOnError "GITLAB Library '${lib}' not found!" ${result}
 }
 
 # Validate if OS is supported

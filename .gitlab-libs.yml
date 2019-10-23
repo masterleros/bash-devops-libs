@@ -6,15 +6,12 @@
 #######################################
 
 variables:
-  GITLAB_LIBS_DIR: "/tmp/${CI_JOB_ID}"
+  ########## LIB DEFINITIONS ############
+  GITLAB_LIBS_CLONEDIR: "/tmp/${CI_JOB_ID}"
+  GITLAB_LIBS_DIR: "/tmp/${CI_JOB_ID}/libs"
   GITLAB_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@$(echo ${CI_PROJECT_URL} | cut -d'/' -f3)/${GITLAB_LIBS_REPO}.git"
-  
-  ########## LIB CATALOG ############
-  GITLAB_LIB_UTILS: "${GITLAB_LIBS_DIR}/libs/utils/main.sh"  
-  GITLAB_LIB_GCP: "${GITLAB_LIBS_DIR}/libs/gcp/main.sh"  
-  GITLAB_LIB_GITSYNC: "${GITLAB_LIBS_DIR}/libs/gitsync/main.sh"  
   ########## LIB COMMANDS ############
-  GITLAB_LIBS_CMD_IMPORT: "if [ $$(which git &> /dev/null || echo $$?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi; if [ ! -d ${GITLAB_LIBS_DIR} ]; then git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_DIR}; find ${GITLAB_LIBS_DIR}/libs -name '*.sh' -exec chmod +x {} \\;; fi; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/libs/common.sh"
+  GITLAB_LIBS_CMD_IMPORT: "if [ $$(which git &> /dev/null || echo $$?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi; if [ ! -d ${GITLAB_LIBS_CLONEDIR} ]; then git clone ${GITLAB_LIBS_URL} ${GITLAB_LIBS_CLONEDIR}; find ${GITLAB_LIBS_DIR} -name '*.sh' -exec chmod +x {} \\;; fi; shopt -s expand_aliases; source ${GITLAB_LIBS_DIR}/common.sh"
   ###################################
 
 # Common lib template
