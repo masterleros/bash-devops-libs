@@ -140,10 +140,12 @@ function importLibs {
 
             # Rename functions
             for funct in ${functs[@]}; do
-                echo "  -> ${lib_alias}.${funct}()"
-                eval "$(echo "${lib_alias}.${funct}()"; declare -f ${funct} | tail -n +2)"
-                unset -f ${funct}
-            done             
+                if [[ ${funct} != "_"* ]]; then # if it is not a private function
+                    echo "  -> ${lib_alias}.${funct}()"
+                    eval "$(echo "${lib_alias}.${funct}()"; declare -f ${funct} | tail -n +2)"
+                    unset -f ${funct}
+                fi
+            done
         fi
 
         # Go to next arg
