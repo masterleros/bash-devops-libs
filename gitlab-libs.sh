@@ -28,7 +28,7 @@ fi
 set +e
 
 ### Copy the libs inside the project ###
-cp -r ${GITLAB_TMP_DIR}/libs ${GITLAB_LIBS_DIR}
+cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}
 
 ### Include GitLab Libs ###
 source ${GITLAB_LIBS_DIR}/common.sh
