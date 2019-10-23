@@ -1,5 +1,9 @@
 #!/bin/bash
 
+### Call the desired function when script is invoked directly instead of included ###
+### Usage: eval '${useInternalFunctions}' at the end of your script
+useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" ${@}; ${function} "${args[@]}"; fi'
+
 ### Exit program with text when last exit code is non-zero ###
 # usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
 function exitOnError {
@@ -114,8 +118,7 @@ function convertEnvVars {
 function importLibs {
 
     # Expand aliases (old approach)
-    #shopt -s expand_aliases
-    #alias ${lib_alias}=${lib_file}
+    shopt -s expand_aliases    
 
     # For each lib
     result=0
@@ -129,6 +132,9 @@ function importLibs {
             echo "GITLAB Library '${lib}' not found!"
             ((result+=1))
         else
+            # Alias to execute the lib as subprocess (to use in .gitlab-ci.yml)
+            alias ${lib_alias}=${lib_file}
+
             # Import lib
             source ${lib_file}
             
@@ -160,10 +166,5 @@ function importLibs {
 # Validate if OS is supported
 [[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
 
-###############################################################################
-# Call the desired function when script is invoked directly instead of included
-if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
-    getArgs "function &@args" ${@}
-    ${function} "${args[@]}"
-fi
-###############################################################################
+# Export internal functions
+eval "${useInternalFunctions}"

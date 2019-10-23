@@ -1,6 +1,5 @@
 #!/bin/bash
 CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
-#source ${CURRENT_DIR}/../common.sh
 source ${CURRENT_DIR}/gae.sh
 source ${CURRENT_DIR}/iam.sh
 source ${CURRENT_DIR}/api.sh
@@ -22,10 +21,5 @@ function useProject {
     exitOnError "Failed to set working project '${project}'"
 }
 
-###############################################################################
-# Call the desired function when script is invoked directly instead of included
-if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
-    getArgs "function &@args" ${@}
-    ${function} "${args[@]}"
-fi
-###############################################################################
+# Export internal functions
+eval "${useInternalFunctions}"

@@ -1,2 +1,4 @@
 #!/bin/bash
-#source $(dirname ${BASH_SOURCE[0]})/../common.sh
+
+# Export internal functions
+eval "${useInternalFunctions}"
