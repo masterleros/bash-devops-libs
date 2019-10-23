@@ -6,12 +6,12 @@
 
       source ${CI_PROJECT_DIR}/scripts/gitlab-libs.sh
 
+      # Convert environment variables
+      convertEnvVars ${CI_COMMIT_REF_NAME} ${GITLAB_LIBS_BRANCHES_DEFINITION}
+
       # Validate required vars and dependencies
       validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
       verifyDeps gcloud
-
-      # Convert environment variables
-      convertEnvVars ${CI_COMMIT_REF_NAME} ${GITLAB_LIBS_BRANCHES_DEFINITION}
 
       # Import GCP lib
       importLibs gcp
