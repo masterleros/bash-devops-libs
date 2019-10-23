@@ -19,11 +19,13 @@ if [[ "${OSTYPE}" != "linux-gnu" ]]; then echo "OS '${OSTYPE}' is not supported"
 if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
 
 ### Clone / update the libraries ###
+set -e
 if [ ! -d ${GITLAB_TMP_DIR} ]; then
     git clone git@git.gft.com:devops-br/gitlab-gft-libs.git ${GITLAB_TMP_DIR}
 else
     git -C ${GITLAB_TMP_DIR} pull 
 fi
+set +e
 
 ### Copy the libs inside the project ###
 cp -r ${GITLAB_TMP_DIR}/libs ${GITLAB_LIBS_DIR}

@@ -4,7 +4,7 @@
 # usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
 function exitOnError {
     code=${2:-$?}
-    text=${1}    
+    text=${1}
     if [ "${code}" -ne 0 ]; then
         if [ ! -z "${text}" ]; then echo -e "ERROR: ${text}" >&2 ; fi
         echo "Exiting..." >&2
@@ -47,11 +47,11 @@ function getArgs {
 # usage: validateVars <var1> <var2> ... <varN>
 function validateVars {
     retval=0
-    for var in ${@}; do       
+    for var in ${@}; do
         if [ -z "${!var}" ]; then
             echo "Environment varirable '${var}' is not declared!" >&2
             ((retval+=1))
-        fi    
+        fi
     done
     exitOnError "Some variables were not found" ${retval}
 }
@@ -79,21 +79,21 @@ function verifyDeps {
 # GITLAB_LIBS_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
 #
 function convertEnvVars {
-    
+
     getArgs "CI_COMMIT_REF_NAME @GITLAB_LIBS_BRANCHES_DEFINITION" ${@}
 
-    # Set environment depending on branches definition    
+    # Set environment depending on branches definition
     for _definition in "${GITLAB_LIBS_BRANCHES_DEFINITION[@]}"; do
         _branch=${_definition%:*}
         _environment=${_definition#*:}
 
-        # Check if matched current definition        
-        if [[ ${CI_COMMIT_REF_NAME} == ${_branch} ]]; then            
-            CI_BRANCH_ENVIRONMENT=${_environment};            
+        # Check if matched current definition
+        if [[ ${CI_COMMIT_REF_NAME} == ${_branch} ]]; then
+            CI_BRANCH_ENVIRONMENT=${_environment};
             break
         fi
     done
-    
+
     # Check if found an environment
     [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your GITLAB_LIBS_BRANCHES_DEFINITION!" -1
 
