@@ -1,7 +1,7 @@
 # GITLAB libraries for .gitlab-ci.yml #
 
 ## Introduction
-GitLab Libs is a set of common functionatilities and templates to speed up DevOps setup processes
+GitLab Libs is a set of common functionatilities and templates to accelerate DevOps setup processes
 
 > **Obs:** Templates are definitions of `before_script` and in some cases `after_script`, please be sure you don't need to implement your own mentioned sections as GitLab does not support both (template and custom) section to be merged and only one will be executed.
 
@@ -18,74 +18,114 @@ GitLab Libs is a set of common functionatilities and templates to speed up DevOp
 └── gitlab-libs.sh          (External GitLab Libs management)
 ```
 
-### Using Libraries externally
-In order to use this library externally (i.e: local execution outside GitLab) you can import the libraries in your project:
-``` sh
-MYPROJECT_DIR=<MYPROJECT>/scripts/libs
-GITLAB_LIB_REPO=gitlab-gft-libs
-GITLAB_TMP_DIR=/tmp/${GITLAB_LIB_REPO}
-test -d ${GITLAB_TMP_DIR} && rm -rf ${GITLAB_TMP_DIR}
-git clone git@git.gft.com:devops-br/${GITLAB_LIB_REPO}.git ${GITLAB_TMP_DIR}
-chmod +x ${GITLAB_TMP_DIR}/gitlab-libs.sh
-${GITLAB_TMP_DIR}/gitlab-libs.sh ${MYPROJECT_DIR}
-```
+### Using Libraries
+In order to use this library (i.e: local execution or in GitLab Pipeline) you need to include the GitLab Libs in your project.
 
-To import the libraries include at the top of your sh files:
-``` sh
-CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
-source ${CURRENT_DIR}/<rel_path_to_libs>/<lib>/main.sh
-```
+In order to use the libraries, you need to follow the steps:
 
-### Requirements
-Before you use this GitLab library you need to include and define repository and branch mappings
+#### 1. Include the library
+Download the file `gitlab-libs.sh` placed in the root folder of this repository and copy to: `<YOUR_REPO>/scripts/gitlab-libs.sh`
 
+#### 2. Use the libraries
+There are two ways to use the libraries:
+> `**WARNING**:` In the below examples you can see that GitLab Pipeline uses `<lib> <func>` and local execution uses `<lib>.<func>`. This is because GitLab Pipeline uses an environment set with `set -e` which makes the execution to exit at first error. On Local execution it is not the default setup so the difference. (`<lib> <func>` executes the command in a subprocess where `<lib>.<func>` execute it in same process, i.e: sourcing the script)
+
+**A. Use the libraries on GitLab Pipelines**
+> **Obs:** In this usage, the libraries will not be commited to your repo.
+
+In order to use the libraries, it is only required to include the desired GitLab template (check the available templates) or use the base template and import the librearies you need to use. Let's see an example using the base template:
+
+**.gitlab-ci.yml**
 ``` yaml
 include:
   - project: 'devops-br/gitlab-gft-libs'
-    file: '/.gft-libs.yml' 
+    file: '/templates/.base-template.yml'
 
 variables:
-  ################# GITLAB LIBS DEFINITIONS #################
-  GITLAB_LIBS_REPO: "devops-br/gitlab-gft-libs"
+  GITLAB_LIBS_BRANCHES_DEFINITION: "<definitions>"
+
+example_module:
+  extends: .base-template
+  script:
+    - import_gitlab_libs <lib1> <lib2> ... <libN>
+    - libXlib <function> <arg1> <arg2> ... <argN>
+```
+
+**B.** Use library for local executions**
+> **Obs:** In this usage, the libraries will be addded to your repo (i.e: to redistribute your code).
+
+**scripts/cicd/my-script.sh**
+``` sh
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh
+
+# Import required lib
+importLibs gcp
+
+# Consume the lib
+gcplib.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+```
+
+**.gitlab-ci.yml**
+``` yaml
+example_module:
+  script:
+    - scripts/cicd/my-script.sh
+```
+
+## GitLab Pipeline Requirements
+When using any GitLab template in this library, you will need to define some required values. Each template has it's own requirements, but there are some values that all of them require:
+
+### Git environment variables mapping definition:
+The library includes a default functionality to map environment variables depending on the branch name, this is very useful when the pipeline execute activities in different environments, this configuration is made in the global variable `GITLAB_LIBS_BRANCHES_DEFINITION`.
+
+**Example:**
+``` yaml
+variables:
   GITLAB_LIBS_BRANCHES_DEFINITION: "feature/*:DEV fix/*:DEV develop:INT release/*:HML bugfix/*:HML master:PRD hotfix/*:PRD"
-  ################# GITLAB LIBS DEFINITIONS #################
 ```
 
-## Use template that includes librearies from GITLAB Libs
-This example clones the libraries and import the desired ones in the script section
+**The above example will map:**
 
-``` yaml
-test_module:
-  extends: .gitlab-libs-template
-  script:
-    - import_gitlab_libs DEVOPS GCP ETC
+| Branches | Environment |
+|-|-|
+| `feature/*` and `fix/*` | **DEV** |
+| `develop` | **INT** |
+| `release/*` and `bugfix/*` | **UAT** |
+| `master` and `hotfix/*` | **PRD** |
+
+This will indicate to the templates to convert Environment Variables depending on the building Branch. The format to follow to define those variables is `<ENV>_CI_<VAR>`.
+
+**Definition example:**
+
+| Environment | Var | Value |
+|-|-|-|
+| **DEV** | DEV_CI_MYVAR | "Hello from DEV!" |
+| **INT** | INT_CI_MYVAR | "Hello from INT!" |
+| **UAT** | UAT_CI_MYVAR | "Hello from UAT!" |
+| **PRD** | PRD_CI_MYVAR | "Hello from PRD!" |
+
+**Execution example:**
+
+Supposing that we are building on `develop` branch an following the above branch definition, we can see:
+``` sh
+# Current branch = develop
+
+echo ${MYVAR} # This will print: "Hello from INT!"
 ```
 
-## Use the common template
-This example clones the libraries, maps branches to environment and rework variables for the detected environemnt (i.e: `<ENV>_CI_MYVAR` -> MYVAR)
+## Global definitions
+This library includes an automated inclusion of the file `scripts/definitions.sh`. This is very usefull to define variables/definitions accesibles to your project's scripts globaly. Example:
 
-``` yaml
-test_module:
-  extends: .gitlab-common-template
+**scripts/definitions.sh**
+``` sh
+export MY_PROJECT_DESCRIPTION="My cool project!"
 ```
 
-## Use the common template
-This example clones the libraries, maps branches to environment and rework variables for the detected environemnt (i.e: `<ENV>_CI_MYVAR` -> MYVAR)
-Additionally GCP credential.json will be installed from defined environment variables `<ENV>_CI_GCLOUD_CREDENTIAL` to the `<ENV>_CI_GOOGLE_APPLICATION_CREDENTIALS` defined file.
+The above environment variable `MY_PROJECT_DESCRIPTION` will be accesible locally and in the GitLab Automation.
 
-When in the script section, you SA `credential.json` will be already set and ready to go.
+## Additional Templates
+Check the templates section to check the available templates and their functionalities: [Templates](templates/README.md)
 
-``` yaml
-include:
-  ...
-  - project: 'devops-br/gitlab-gft-libs'
-    file: '/templates/.gcp-template.yml'
-
-gcp_module:
-  image: google/cloud-sdk:latest  
-  extends: .gcp-template
-  script:
-    - <gcloud command>
-  tag:
-    - my-docker-runnner
-```
+## Available librearies
+Check the available libraries and their functionalities: [Libraries](libs/README.md)
