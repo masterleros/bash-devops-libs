@@ -4,9 +4,8 @@
     - | 
       # .gcp-template before_script
 
-      source ${CI_PROJECT_DIR}/scripts/gitlab-libs.sh
-
-      # Convert environment variables
+      # Import base libs and convert environment variables
+      source ${CI_PROJECT_DIR}/scripts/gitlab-libs.sh      
       convertEnvVars ${CI_COMMIT_REF_NAME} ${GITLAB_LIBS_BRANCHES_DEFINITION}
 
       # Validate required vars and dependencies

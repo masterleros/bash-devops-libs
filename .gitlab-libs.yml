@@ -5,25 +5,12 @@
 #
 #######################################
 
-#variables:
-  ########## LIB DEFINITIONS ############
-  #GITLAB_TMP_DIR: "/tmp/${CI_JOB_ID}"
-  #GITLAB_LIBS_DIR: "/tmp/${CI_JOB_ID}/libs"
-  #GITLAB_LIBS_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@$(echo ${CI_PROJECT_URL} | cut -d'/' -f3)/${GITLAB_LIBS_REPO}.git"
-  ########## LIB COMMANDS ############
-  #GITLAB_LIBS_CMD_IMPORT: "if [ $$(which git &> /dev/null || echo $$?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi; if [ ! -d ${GITLAB_TMP_DIR} ]; then git clone ${GITLAB_LIBS_URL} ${GITLAB_TMP_DIR}; cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}; find ${GITLAB_LIBS_DIR} -name 'main.sh' -exec chmod +x {} \\;; fi; source ${GITLAB_LIBS_DIR}/common.sh"
-  ###################################
-
 # Common lib template
 .gitlab-common-template:
   before_script:
     - | 
       # .gitlab-common-template
 
-      # Check and import gitlab-lib
-      #if [ ! "${GITLAB_LIBS_CMD_IMPORT}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
-      #eval "${GITLAB_LIBS_CMD_IMPORT}"
-
-      # Convert environment variables
+      # Import base libs and convert environment variables
       source ${CI_PROJECT_DIR}/scripts/gitlab-libs.sh
       convertEnvVars ${CI_COMMIT_REF_NAME} ${GITLAB_LIBS_BRANCHES_DEFINITION}

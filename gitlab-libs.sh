@@ -3,11 +3,12 @@
 # This script provides the common definitions and funcions to execute
 # to help scripts contextualize the executions
 #
+ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd )"
 
 ### GITLAB LIBS DEFINITIONS ###
 GITLAB_LIBS_SERVER="git.gft.com"
 GITLAB_LIBS_REPO="devops-br/gitlab-gft-libs.git"
-GITLAB_LIBS_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd)/libs"
+GITLAB_LIBS_DIR="${ROOTDIR}/scripts/libs"
 GITLAB_TMP_DIR="/tmp/gitlab-gft-libs"
 ### GITLAB LIBS DEFINITIONS ###
 

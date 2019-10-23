@@ -113,8 +113,9 @@ function convertEnvVars {
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
 
-    # Expand aliases
+    # Expand aliases (old approach)
     #shopt -s expand_aliases
+    #alias ${lib_alias}=${lib_file}
 
     # For each lib
     result=0
@@ -128,10 +129,6 @@ function importLibs {
             echo "GITLAB Library '${lib}' not found!"
             ((result+=1))
         else
-            echo "Importing GITLAB Library: ${lib_alias}..."
-
-            #alias ${lib_alias}=${lib_file}
-
             # Import lib
             source ${lib_file}
             
@@ -139,13 +136,17 @@ function importLibs {
             functs=($(bash -c '. '${lib_file}'; typeset -F' | awk '{print $NF}'))
 
             # Rename functions
+            funcCount=0
             for funct in ${functs[@]}; do
-                if [[ ${funct} != "_"* ]]; then # if it is not a private function
-                    echo "  -> ${lib_alias}.${funct}()"
+                if [[ ${funct} != "_"* ]]; then
+                    # echo "  -> ${lib_alias}.${funct}()"
                     eval "$(echo "${lib_alias}.${funct}()"; declare -f ${funct} | tail -n +2)"
                     unset -f ${funct}
+                    ((funcCount+=1))
                 fi
             done
+
+            echo "Imported GITLAB Library '${lib_alias}' (${funcCount} functions)"
         fi
 
         # Go to next arg
