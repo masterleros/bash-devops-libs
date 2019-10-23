@@ -1,6 +1,6 @@
 #!/bin/bash
 CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
-source ${CURRENT_DIR}/../common.sh
+#source ${CURRENT_DIR}/../common.sh
 source ${CURRENT_DIR}/gae.sh
 source ${CURRENT_DIR}/iam.sh
 source ${CURRENT_DIR}/api.sh

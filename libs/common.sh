@@ -114,7 +114,7 @@ function convertEnvVars {
 function importLibs {
 
     # Expand aliases
-    shopt -s expand_aliases
+    #shopt -s expand_aliases
 
     # For each lib
     result=0
@@ -129,7 +129,21 @@ function importLibs {
             ((result+=1))
         else
             echo "Importing GITLAB Library: ${lib_alias}..."
-            alias ${lib_alias}=${lib_file}
+
+            #alias ${lib_alias}=${lib_file}
+
+            # Import lib
+            source ${lib_file}
+            
+            # Get lib function names
+            functs=($(bash -c '. '${lib_file}'; typeset -F' | awk '{print $NF}'))
+
+            # Rename functions
+            for funct in ${functs[@]}; do
+                echo "  -> ${lib_alias}.${funct}()"
+                eval "$(echo "${lib_alias}.${funct}()"; declare -f ${funct} | tail -n +2)"
+                unset -f ${funct}
+            done             
         fi
 
         # Go to next arg

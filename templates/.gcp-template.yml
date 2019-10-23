@@ -5,14 +5,12 @@
       # .gcp-template before_script      
 
       # Check and import gitlab-lib
-      if [ ! "${GITLAB_LIBS_CMD_IMPORT}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
-      eval "${GITLAB_LIBS_CMD_IMPORT}"
+      #if [ ! "${GITLAB_LIBS_CMD_IMPORT}" ]; then echo "You must include '.gitlab-libs.yml' before use this template!"; exit -1; fi
+      #eval "${GITLAB_LIBS_CMD_IMPORT}"
 
       # Convert environment variables
+      source ${CI_PROJECT_DIR}/scripts/gitlab-libs.sh
       convertEnvVars ${CI_COMMIT_REF_NAME} ${GITLAB_LIBS_BRANCHES_DEFINITION}
-
-      # Import GCP lib
-      importLibs GCP
 
       # Validate required vars and dependencies
       validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
@@ -20,6 +18,9 @@
 
       # Install credential and set SA as active
       echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+
+      # Import GCP lib
+      importLibs GCP
       gcplib useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
   after_script:

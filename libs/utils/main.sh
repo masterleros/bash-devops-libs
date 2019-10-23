@@ -1,5 +1,5 @@
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../common.sh
+#source $(dirname ${BASH_SOURCE[0]})/../common.sh
 
 ### Print a nice title ###
 # usage: showTitle "title text"
@@ -66,11 +66,3 @@ function retryExecution {
     # if could not be sucess after retries
     exitOnError "The command '${cmd}' could not be executed successfuly after ${retries} retry(s)" -1
 }
-
-###############################################################################
-# Call the desired function when script is invoked directly instead of included
-if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
-    getArgs "function &@args" ${@}
-    ${function} "${args[@]}"
-fi
-###############################################################################
