@@ -136,17 +136,11 @@ function importLibs {
             alias ${lib_alias}=${lib_file}
 
             # Import lib
-            echo "---- importing "
-            set_e_enabled=${-//[^x]/}
-            [ ${set_e_enabled} ] || set -e # Enable set e
             source ${lib_file}
-            [ ${set_e_enabled} ] || set +e # Disable set e
-            
+            exitOnError "Error importing '${lib_alias}'"
             
             # Get lib function names
             functs=($(bash -c '. '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
-
-            echo "---- done "
 
             # Rename functions
             funcCount=0

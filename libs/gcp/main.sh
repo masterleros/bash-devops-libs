@@ -2,7 +2,7 @@
 CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
 
 # Verify Dependencies
-verifyDeps gcloud
+verifyDeps gcloud testasd
 
 # Import sub-modules
 source ${CURRENT_DIR}/gae.sh
