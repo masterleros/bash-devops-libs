@@ -144,7 +144,7 @@ function importLibs {
             
             
             # Get lib function names
-            functs=($(bash -c '. '${lib_file}'; typeset -F' | awk '{print $NF}'))
+            functs=($(bash -c '. '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
 
             echo "---- done "
 
