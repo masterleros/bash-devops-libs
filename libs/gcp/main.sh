@@ -1,7 +1,7 @@
 #!/bin/bash
 CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
 
-# Validate Dependencies
+# Verify Dependencies
 verifyDeps gcloud
 
 # Import sub-modules

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Validate Dependencies
+# Verify Dependencies
 verifyDeps terraform
 
 # Export internal functions
