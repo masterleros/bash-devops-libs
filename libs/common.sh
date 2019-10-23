@@ -163,8 +163,5 @@ function importLibs {
     exitOnError "GITLAB Library '${lib}' not found!" ${result}
 }
 
-# Validate if OS is supported
-[[ "${OSTYPE}" == "linux-gnu" ]] || exitOnError "OS '${OSTYPE}' is not supported" -1
-
 # Export internal functions
 eval "${useInternalFunctions}"
