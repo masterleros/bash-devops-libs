@@ -127,7 +127,7 @@ function importLibs {
         else
             echo "Importing GITLAB Library: ${lib_alias}..."
             alias ${lib_alias}=${lib_file}
-        if
+        fi
 
         # Go to next arg
         shift
@@ -146,4 +146,4 @@ if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then
     getArgs "function &@args" ${@}
     ${function} "${args[@]}"
 fi
-###############################################################################
+###############################################################################i
