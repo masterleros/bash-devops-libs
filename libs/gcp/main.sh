@@ -1,5 +1,10 @@
 #!/bin/bash
 CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
+
+# Validate Dependencies
+verifyDeps gcloud
+
+# Import sub-modules
 source ${CURRENT_DIR}/gae.sh
 source ${CURRENT_DIR}/iam.sh
 source ${CURRENT_DIR}/api.sh
