@@ -29,7 +29,7 @@ set_e_enabled=${-//[^x]/}
 [ ${set_e_enabled} ] || set -e # Enable set e
 
 if [ ! -d ${GITLAB_TMP_DIR} ]; then
-    if [ ${CI_JOB_TOKEN} ]; then 
+    if [ ${CI_JOB_TOKEN} ]; then
         git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${GITLAB_LIBS_SERVER}/${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
     else
         git clone git@${GITLAB_LIBS_SERVER}:${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
@@ -41,6 +41,9 @@ fi
 ### Create dir and copy the libs inside the project ###
 mkdir -p ${GITLAB_LIBS_DIR}
 cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}
+
+# Make libraries executable
+find ${GITLAB_LIBS_DIR} -name 'main.sh' -exec chmod +x {} \;
 
 [ ${set_e_enabled} ] || set +e # Disable set e
 
