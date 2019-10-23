@@ -141,10 +141,12 @@ function importLibs {
             [ ${set_e_enabled} ] || set -e # Enable set e
             source ${lib_file}
             [ ${set_e_enabled} ] || set +e # Disable set e
-            echo "---- done "
+            
             
             # Get lib function names
             functs=($(bash -c '. '${lib_file}'; typeset -F' | awk '{print $NF}'))
+
+            echo "---- done "
 
             # Rename functions
             funcCount=0
