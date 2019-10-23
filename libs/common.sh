@@ -113,6 +113,9 @@ function convertEnvVars {
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
 
+    # Expand aliases
+    shopt -s expand_aliases
+
     # For each lib
     result=0
     while [ "$1" ]; do
