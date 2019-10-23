@@ -30,5 +30,8 @@ set +e
 ### Copy the libs inside the project ###
 cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}
 
+# Make all libs executable
+find ${GITLAB_LIBS_DIR} -name 'main.sh' -exec chmod +x {} \
+
 ### Include GitLab Libs ###
 source ${GITLAB_LIBS_DIR}/common.sh
