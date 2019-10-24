@@ -41,7 +41,7 @@ You can edit the `gitlab-libs.sh` inside your project to change some of its char
 
 #### 3. Use the libraries
 There are two ways to use the libraries:
-> `**WARNING**:` In the below examples you can see that GitLab Pipeline uses `<lib> <func>` and local execution uses `<lib>.<func>`. This is because GitLab Pipeline uses an environment set with `set -e` which makes the execution to exit at first error. On Local execution it is not the default setup so the difference. (`<lib> <func>` executes the command in a subprocess where `<lib>.<func>` execute it in same process, i.e: sourcing the script)
+> `**WARNING**:` GitLab Pipeline uses an environment set with `set -e` which makes the execution to exit at first error (On Local execution it is not the default and your script will continue)
 
 **A. Use the libraries on GitLab Pipelines**
 > **Obs:** In this usage, the libraries will not be commited to your repo.
@@ -61,7 +61,7 @@ example_module:
   extends: .base-template
   script:
     - import_gitlab_libs <lib1> <lib2> ... <libN>
-    - libXlib <function> <arg1> <arg2> ... <argN>
+    - libXlib.<function> <arg1> <arg2> ... <argN>
 ```
 
 **B.** Use library for local executions**

@@ -5,11 +5,7 @@ eval "${importBaseLib}"
 verifyDeps gcloud
 
 # Import sub-modules
-source ${CURRENT_DIR}/gae.sh &&
-source ${CURRENT_DIR}/iam.sh &&
-source ${CURRENT_DIR}/api.sh &&
-source ${CURRENT_DIR}/auth.sh
-exitOnError "Error importing sub-modules"
+importSubModules gae.sh iam.sh api.sh auth.sh
 
 ### Validate and set the requested project ###
 # usage: useProject <project_id>

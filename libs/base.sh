@@ -1,8 +1,8 @@
 #!/bin/bash
 
-### Define CURRENT_DIR and include the base lib
+### Define LIBNAME, CURRENT_DIR and include the base lib
 ### Usage: eval '${importBaseLib}' at the beginning of your script
-export importBaseLib='CURRENT_DIR=$(dirname ${BASH_SOURCE[0]}); if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then source ${CURRENT_DIR}/../base.sh; fi'
+export importBaseLib='LIBNAME="$(echo $(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd) | awk -F / '\''{print $NF}'\'')"; CURRENT_DIR=$(dirname ${BASH_SOURCE[0]}); if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then source ${CURRENT_DIR}/../base.sh; fi'
 
 ### Call the desired function when script is invoked directly instead of included ###
 ### Usage: eval '${useInternalFunctions}' at the end of your script
@@ -182,6 +182,30 @@ function importLibs {
 
     # Case any libs was not found, exit with error
     exitOnError "Some GitLab Libraries were not found!" ${result}
+}
+
+### Import GitLab Libs sub-modules ###
+# Usage: importSubModules <mod1> <mod2> ... <modN>
+function importSubModules {
+
+    # For each sub-module
+    result=0
+    while [ "${1}" ]; do        
+        module_file="${CURRENT_DIR}/${1}"
+
+        # Check if the module exists
+        if [ ! -f "${module_file}" ]; then
+            echo "GITLAB Library sub-module '${LIBNAME}/${1}' not found! (was it downloaded already in online mode?)"            
+            ((result+=1))
+        else
+            # Import sub-module
+            source ${module_file}
+        fi
+        shift
+    done
+
+    # Case any libs was not found, exit with error
+    exitOnError "Some GitLab Libraries sub-modules were not found!" ${result}
 }
 
 # Verify bash version

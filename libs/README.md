@@ -77,7 +77,7 @@ eval "${useInternalFunctions}"
 ``` sh
 ...
 importLibs myfuncslib
-myfuncslib doSomething Hi There From GitLab Libs!
+myfuncslib.doSomething Hi There From GitLab Libs!
 
 # Ourtput:
 # Arg1 = Hi
