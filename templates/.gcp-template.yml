@@ -3,6 +3,15 @@
   image: google/cloud-sdk:latest
   extends: .gcp-template
 
+# GCP template for GIT sync
+.gcp-gitsync-template:
+  extends: .gcp-template-docker
+  script:
+    - validateVars REMOTE_REPO REMOTE_BRANCH
+    - importLibs gitsync
+    - git config --local credential.helper gcloud.sh
+    - gitsynclib.sync ${REMOTE_REPO} ${REMOTE_BRANCH}
+
 # GCP template
 .gcp-template:
   before_script:
