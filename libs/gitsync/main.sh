@@ -11,11 +11,12 @@ function sync() {
     getArgs "url &branch" "${@}"
 
     # Remote repository to sync and current branch
-    remote="gitsync"    
+    remote="gitsync"
+
+    git branch
 
     # If not branch specified, use current one
-    if [ ! $branch ]; then
-        git branch
+    if [ ! $branch ]; then        
         current_branch=$(git rev-parse --abbrev-ref HEAD)
         echo "Branch not specified, used current: '${current_branch}'"
         branch=${current_branch}
