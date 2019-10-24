@@ -35,7 +35,7 @@
       importLibs gcp
 
       # Revoke service account
-      gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gcplib revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Delete installed credential
       rm -f ${GOOGLE_APPLICATION_CREDENTIALS}

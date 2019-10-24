@@ -126,8 +126,6 @@ function importLibs {
     # Expand aliases (old approach)
     if [ "${CI}" ]; then shopt -s expand_aliases; fi
 
-    echo "Set: ${-}"
-
     # For each lib
     result=0
     while [ "$1" ]; do
