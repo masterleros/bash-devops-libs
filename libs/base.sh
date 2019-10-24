@@ -124,7 +124,7 @@ function convertEnvVars {
 function importLibs {
 
     # Expand aliases (old approach)
-    shopt -s expand_aliases    
+    if [ "${CI}" ]; then shopt -s expand_aliases; fi
 
     # For each lib
     result=0
@@ -139,7 +139,7 @@ function importLibs {
             ((result+=1))
         else
             # Alias to execute the lib as subprocess (to use in .gitlab-ci.yml)
-            alias ${lib_alias}=${lib_file}
+            if [ "${CI}" ]; then alias ${lib_alias}=${lib_file}; fi
 
             # Import lib
             source ${lib_file}
@@ -153,7 +153,7 @@ function importLibs {
             for funct in ${functs[@]}; do
                 if [[ ${funct} != "_"* ]]; then
                     # echo "  -> ${lib_alias}.${funct}()"
-                    eval "$(echo "${lib_alias}.${funct}()"; declare -f ${funct} | tail -n +2)"
+                    eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then echo "ERROR: Using 'set -e' is not supported! (executing in GitLab Pipeline? use: <lib> <cmd> instead)"; exit -1; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
                     ((funcCount+=1))
                 fi

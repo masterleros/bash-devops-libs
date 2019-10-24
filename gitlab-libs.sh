@@ -29,7 +29,7 @@ if [ "${1}" != "offline" ]; then
     if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
 
     ### Clone / update the libraries ###
-    set_e_enabled=${-//[^x]/}
+    set_e_enabled=${-//[^e]/}
     [ ${set_e_enabled} ] || set -e # Enable set e
 
     echo "Retrieving GitLab Libs code...."
