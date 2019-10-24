@@ -109,12 +109,14 @@ function convertEnvVars {
     vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*=" | awk -F= '{print $1}'))
 
     # Set same variable with the final name
+    echo "**************************************************"
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
         echo "${CI_BRANCH_ENVIRONMENT} value set: '${new_var}'"
         export ${new_var}="${!var}"
     done
+    echo "**************************************************"
 }
 
 ### Import GitLab Libs ###
