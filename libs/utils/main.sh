@@ -1,5 +1,6 @@
 #!/bin/bash
-#source $(dirname ${BASH_SOURCE[0]})/../common.sh
+CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
+[ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ] && source ${CURRENT_DIR}/../libs/base.sh
 
 ### Print a nice title ###
 # usage: showTitle "title text"
