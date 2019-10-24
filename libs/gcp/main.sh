@@ -1,14 +1,16 @@
 #!/bin/bash
-eval "${importBaseLib}"
+#eval "${importBaseLib}"
+CURRENT_DIR=something
 
 # Verify Dependencies
-verifyDeps gcloude
+verifyDeps gcloud
 
 # Import sub-modules
-source ${CURRENT_DIR}/gae.sh
-source ${CURRENT_DIR}/iam.sh
-source ${CURRENT_DIR}/api.sh
-source ${CURRENT_DIR}/auth.sh
+source ${CURRENT_DIR}/gae.sh &&
+source ${CURRENT_DIR}/iam.sh &&
+source ${CURRENT_DIR}/api.sh &&
+source ${CURRENT_DIR}/auth.sh &&
+exitOnError "Error importing sub-modules"
 
 ### Validate and set the requested project ###
 # usage: useProject <project_id>
