@@ -32,7 +32,16 @@ When you develop a new library, some steps should be followed:
     # Export internal functions
     eval "${useInternalFunctions}"
     ```
-7. Document your library properly in the library folder and include a reference in this README.md file
+7. To import sub-modules, follow the example right after the validations:
+> **Obs:** CURRENT_DIR variable is already defined by `eval "${importBaseLib}"`
+
+    ``` sh
+    # Import sub-modules
+    source ${CURRENT_DIR}/sub-module1.sh &&
+    source ${CURRENT_DIR}/sub-module2.sh
+    exitOnError "Error importing sub-modules"
+    ```
+8. Document your library properly in the library folder and include a reference in this README.md file
 
 ### Implementation example:
 
@@ -42,10 +51,15 @@ When you develop a new library, some steps should be followed:
 eval "${importBaseLib}"
 
 # Validate Variables
-# validateVars example_var
+validateVars example_var
 
 # Verify Dependencies
-# verifyDeps example_dep
+verifyDeps example_dep
+
+# Import sub-modules
+source ${CURRENT_DIR}/sub-module1.sh &&
+source ${CURRENT_DIR}/sub-module2.sh
+exitOnError "Error importing sub-modules"
 
 function doSomething() {
     getArgs "arg1 arg2 $@other_args" ${@}

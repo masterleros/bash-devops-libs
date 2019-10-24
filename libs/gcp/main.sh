@@ -1,6 +1,5 @@
 #!/bin/bash
-#eval "${importBaseLib}"
-CURRENT_DIR=something
+eval "${importBaseLib}"
 
 # Verify Dependencies
 verifyDeps gcloud
