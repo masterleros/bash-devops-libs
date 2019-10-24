@@ -5,7 +5,7 @@ eval "${importBaseLib}"
 # usage: showTitle "title text"
 function showTitle {
 
-    getArgs "text" ${@}
+    getArgs "text" "${@}"
 
     len=$(echo "# ${text} #"| wc -c)
     separator=$(eval printf '\#%.0s' {2..$len})
@@ -18,7 +18,7 @@ function showTitle {
 # usage: tokenReplaceFromFile <path_to_file> [continue<true>]
 function tokenReplaceFromFile {
 
-    getArgs "file &continue" ${@}
+    getArgs "file &continue" "${@}"
     
     # Check if file exists
     [ -f ${file} ] || exitOnError "File '${file}' not found"
@@ -52,7 +52,7 @@ function tokenReplaceFromFile {
 # usage: retryExecution "command"
 function retryExecution {
     
-    getArgs "retries @cmd" ${@}
+    getArgs "retries @cmd" "${@}"
 
     for retry in $(seq $((${retries}+1))); do
         eval "${cmd}"

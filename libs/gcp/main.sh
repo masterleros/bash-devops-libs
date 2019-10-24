@@ -15,7 +15,7 @@ exitOnError "Error importing sub-modules"
 # usage: useProject <project_id>
 function useProject {
 
-    getArgs "project" ${@}
+    getArgs "project" "${@}"
     
     # Check project    
     gcloud projects list | grep ${project} &> /dev/null

@@ -2,7 +2,7 @@
 # usage: enableAPI <api_domain>
 function enableAPI {
 
-    getArgs "project api" ${@}
+    getArgs "project api" "${@}"
 
     gcloud --project ${project} services enable ${api}
     exitOnError "Failing enabling API: ${api}"

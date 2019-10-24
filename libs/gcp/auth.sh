@@ -1,7 +1,7 @@
 ### Get a value from the credential json file ###
 # usage: _gcplib.getValueFromCredential <credential_file> <key>
 function _gcplib.getValueFromCredential {
-    getArgs "credential_path key" ${@}
+    getArgs "credential_path key" "${@}"
 
     # Verify if SA credential file exist
     [[ -f ${credential_path} ]] || exitOnError "Cannot find SA credential file '${credential_path}'"
@@ -13,7 +13,7 @@ function _gcplib.getValueFromCredential {
 # usage: useSA <credential_file>
 function useSA {
 
-    getArgs "credential_path" ${@}
+    getArgs "credential_path" "${@}"
 
     # Get SA user email
     _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)
@@ -27,7 +27,7 @@ function useSA {
 # usage: revokeSA <credential_file>
 function revokeSA {
     
-    getArgs "credential_path" ${@}
+    getArgs "credential_path" "${@}"
 
     # Get SA user email
     _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)

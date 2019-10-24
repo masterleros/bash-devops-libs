@@ -35,7 +35,7 @@ if [ ${GITLAB_LIBS_ONLINE_MODE} ]; then
     if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
 
     ### Clone / update the libraries ###
-    set_e_enabled=${-//[^x]/}
+    set_e_enabled=${-//[^e]/}
     [ ${set_e_enabled} ] || set -e # Enable set e
 
     echo "Retrieving GitLab Libs code...."
@@ -50,9 +50,6 @@ if [ ${GITLAB_LIBS_ONLINE_MODE} ]; then
     else    
         git -C ${GITLAB_TMP_DIR} pull
     fi    
-
-    # Case lib exist, remove it
-    if [ -d ${GITLAB_LIBS_DIR} ]; then rm -rf ${GITLAB_LIBS_DIR}; fi
 
     ### Create dir and copy the base lib inside the project ###
     mkdir -p ${GITLAB_LIBS_DIR}

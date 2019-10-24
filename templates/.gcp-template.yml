@@ -23,7 +23,7 @@
       echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Activate the Service Account from credential
-      gcplib useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gcplib.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
   after_script:
     - | 
@@ -35,7 +35,7 @@
       importLibs gcp
 
       # Revoke service account
-      gcplib revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gcplib.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Delete installed credential
       rm -f ${GOOGLE_APPLICATION_CREDENTIALS}
