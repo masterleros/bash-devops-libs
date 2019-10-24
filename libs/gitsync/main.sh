@@ -20,8 +20,8 @@ function sync() {
         branch=${current_branch}
     fi
 
+    git fetch origin ${branch}
     git branch
-    git checkout ${branch}
 
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
