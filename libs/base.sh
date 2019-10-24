@@ -126,6 +126,8 @@ function importLibs {
     # Expand aliases (old approach)
     if [ "${CI}" ]; then shopt -s expand_aliases; fi
 
+    echo "Set: ${-}"
+
     # For each lib
     result=0
     while [ "$1" ]; do
@@ -155,6 +157,7 @@ function importLibs {
                     # echo "  -> ${lib_alias}.${funct}()"
                     eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then echo "ERROR: Using 'set -e' is not supported! (executing in GitLab Pipeline? use: <lib> <cmd> instead)"; exit -1; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
+                    declare -f ${lib_alias}.${funct}
                     ((funcCount+=1))
                 fi
             done
