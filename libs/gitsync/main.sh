@@ -32,7 +32,7 @@ function sync() {
         git push ${remote} ${branch}
     else
         # Push head to remote
-        git push ${remote} head:${branch}
+        git push ${remote} HEAD:${branch}
     fi
     exitOnError
 
