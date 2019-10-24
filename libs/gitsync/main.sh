@@ -13,14 +13,15 @@ function sync() {
     # Remote repository to sync and current branch
     remote="gitsync"
 
-    git branch
-
     # If not branch specified, use current one
-    if [ ! $branch ]; then        
+    if [ ! ${branch} ]; then        
         current_branch=$(git rev-parse --abbrev-ref HEAD)
         echo "Branch not specified, used current: '${current_branch}'"
         branch=${current_branch}
     fi
+
+    git branch
+    git checkout ${branch}
 
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
