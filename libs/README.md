@@ -1,5 +1,6 @@
-# Library development rules
+# Library Development
 
+## Rules
 When you develop a new library, some steps should be followed:
 
 1. Place your library on the `libs/<LIB_NAME>/main.sh` file. This will implicitly recognize the library "<LIB_NAME>lib", example:
@@ -8,6 +9,8 @@ When you develop a new library, some steps should be followed:
     #!/bin/bash
     eval "${importBaseLib}"
     ```
+> **Info:** `LIBNAME` (your own library name) and `CURRENT_DIR` (your library path) variables will be defined in this execution.
+
 3. Verify the required dependencies for your execution, example:
     ``` sh
     # Validate available variables (if applicable)
@@ -32,18 +35,53 @@ When you develop a new library, some steps should be followed:
     # Export internal functions
     eval "${useInternalFunctions}"
     ```
-7. To import sub-modules, follow the example right after the validations:
-> **Obs:** CURRENT_DIR variable is already defined by `eval "${importBaseLib}"`
+7. Document your library properly in the library folder and include a reference in this README.md file
 
-    ``` sh
-    # Import sub-modules
-    source ${CURRENT_DIR}/sub-module1.sh &&
-    source ${CURRENT_DIR}/sub-module2.sh
-    exitOnError "Error importing sub-modules"
-    ```
-8. Document your library properly in the library folder and include a reference in this README.md file
+## Sub Modules
 
-### Implementation example:
+Use the `importSubModules` function to import sub-modules, example:
+``` sh
+# Import sub-modules
+importSubModules gae.sh iam.sh api.sh auth.sh
+```
+
+## Private Functions
+
+To implement private functions, define them as `_<function_name>`. By doing this, your function will not be exposed as <lib>.<function> so you can use it internally in within your code. example:
+
+**libs/myfunc/main.sh**
+``` sh
+#!/bin/bash
+eval "${importBaseLib}"
+
+function _my_private_function() { 
+    echo "Hi from my private function!" 
+}
+
+function my_public_function() 
+{ 
+    echo "Hi from my public function!" 
+    _my_private_function
+}
+
+# Export internal functions
+eval "${useInternalFunctions}"
+```
+
+**test.sh**
+``` sh
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh
+importLibs myfunc
+myfunc.my_public_function
+# myfunc._my_private_function <-- does not exist!
+
+# Output:
+# Hi from my public function!
+# Hi from my private function!
+```
+
+## Implementation example:
 
 **libs/myfuncs/main.sh**
 ``` sh
@@ -75,11 +113,12 @@ eval "${useInternalFunctions}"
 
 **Following the above definition, we can see:**
 ``` sh
-...
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh
 importLibs myfuncslib
 myfuncslib.doSomething Hi There From GitLab Libs!
 
-# Ourtput:
+# Output:
 # Arg1 = Hi
 # Arg1 = There
 # Others = From GitLab Libs!
