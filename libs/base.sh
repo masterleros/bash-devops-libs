@@ -1,8 +1,11 @@
 #!/bin/bash
 
+### Define CURRENT_DIR and include the base lib
+export importBaseLib='$(dirname ${BASH_SOURCE[0]}); [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ] && source ${CURRENT_DIR}/../base.sh'
+
 ### Call the desired function when script is invoked directly instead of included ###
 ### Usage: eval '${useInternalFunctions}' at the end of your script
-useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" ${@}; ${function} "${args[@]}"; fi'
+export useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" ${@}; ${function} "${args[@]}"; fi'
 
 ### Exit program with text when last exit code is non-zero ###
 # usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
