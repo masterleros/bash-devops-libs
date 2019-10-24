@@ -7,7 +7,7 @@
 .gcp-gitsync-template:
   extends: .gcp-template-docker
   script:
-    - validateVars REMOTE_REPO REMOTE_BRANCH
+    - validateVars REMOTE_REPO
     - importLibs gitsync
     - git config --local credential.helper gcloud.sh
     - gitsynclib.sync ${REMOTE_REPO} ${REMOTE_BRANCH}
