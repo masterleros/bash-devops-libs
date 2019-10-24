@@ -112,7 +112,7 @@ function convertEnvVars {
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
-        echo "${CI_BRANCH_ENVIRONMENT} - Setting: '${new_var}'"
+        echo "${CI_BRANCH_ENVIRONMENT} value set: '${new_var}'"
         export ${new_var}="${!var}"
     done
 }

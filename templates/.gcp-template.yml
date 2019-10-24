@@ -24,6 +24,7 @@
     - | 
       # .gcp-template after_script
      
+      set -x
       source ${CI_PROJECT_DIR}/scripts/gitlab-libs.sh offline
 
       # Reimport as after script process is other than before_script/script
