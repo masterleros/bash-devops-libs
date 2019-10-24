@@ -199,6 +199,7 @@ function importSubModules {
             ((result+=1))
         else
             # Import sub-module
+            echo "Importing module: '${LIBNAME}/${1}'..."
             source ${module_file}
         fi
         shift
