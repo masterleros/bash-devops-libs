@@ -16,6 +16,8 @@ function sync() {
     # Get the origin code from the required branch
     git fetch origin ${branch}
 
+    git branch
+
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
         git remote remove ${remote}
