@@ -2,7 +2,7 @@
 eval "${importBaseLib}"
 
 # Verify Dependencies
-verifyDeps gcloud
+verifyDeps gcloude
 
 # Import sub-modules
 source ${CURRENT_DIR}/gae.sh
