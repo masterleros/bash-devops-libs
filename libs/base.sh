@@ -151,7 +151,7 @@ function importLibs {
             fi
         # Check if the lib is available locally
         elif [ ! -f "${lib_file}" ]; then
-            echo "GITLAB Library '${lib}' not found!"
+            echo "GITLAB Library '${lib}' not found! (was it downloaded already in online mode?)"
             lib_error="true"
             ((result+=1))
         fi
@@ -187,7 +187,7 @@ function importLibs {
     done
 
     # Case any libs was not found, exit with error
-    exitOnError "GITLAB Library '${lib}' not found!" ${result}
+    exitOnError "Some GitLab Libraries were not found!" ${result}
 }
 
 # Export internal functions
