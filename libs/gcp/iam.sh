@@ -39,7 +39,7 @@ function bindRole {
 
         # Validate if the role is already provided
         echo "validateRole ${domain} ${domain_id} ${role} ${email}"
-        validateRole ${domain} ${domain_id} ${role} ${email}
+        gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
         if [ $? -ne 0 ]; then
 
             # Concat the domain
