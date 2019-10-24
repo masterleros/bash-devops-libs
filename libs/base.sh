@@ -155,7 +155,7 @@ function importLibs {
             for funct in ${functs[@]}; do
                 if [[ ${funct} != "_"* ]]; then
                     # echo "  -> ${lib_alias}.${funct}()"
-                    eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then echo "ERROR: Using 'set -e' is not supported! (executing in GitLab Pipeline? use: <lib> <cmd> instead)"; exit -1; fi'; declare -f ${funct} | tail -n +3)"
+                    eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then echo "ERROR: ${FUNCNAME}() - Using 'set -e' is not supported! (executing in GitLab Pipeline? use: <lib> <cmd> instead)"; exit -1; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
                     ((funcCount+=1))
                 fi
