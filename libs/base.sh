@@ -123,6 +123,9 @@ function convertEnvVars {
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
 
+    # Get own functions to not rework them
+    own_functs=($(bash -c '. '${BASH_SOURCE[0]}' &> /dev/null; typeset -F' | awk '{print $NF}'))
+
     # For each lib
     result=0
     while [ "$1" ]; do
@@ -158,9 +161,6 @@ function importLibs {
             # Import lib
             source ${lib_file}
             exitOnError "Error importing '${lib_alias}'"
-            
-            # Get own functions
-            own_functs=($(bash -c '. '${BASH_SOURCE[0]}' &> /dev/null; typeset -F' | awk '{print $NF}'))
 
             # Get lib function names
             functs=($(bash -c 'source '${BASH_SOURCE[0]}'; . '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
@@ -171,7 +171,7 @@ function importLibs {
 
                 # if not an internal function neiter a private one (i.e: _<var>)
                 if [[ ! " ${own_functs[@]} " =~ " ${funct}" && ${funct} != "_"* ]]; then
-                    echo "  -> ${lib_alias}.${funct}()"
+                    # echo "  -> ${lib_alias}.${funct}()"
                     eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${lib_file} ${funct} "\"\${@}\""'; return; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
                     ((funcCount+=1))
