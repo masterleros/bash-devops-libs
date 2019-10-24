@@ -26,6 +26,8 @@ In order to use the libraries, you need to follow the steps:
 #### 1. Include the library
 Download the file `gitlab-libs.sh` placed in the root folder of this repository and copy to: `<YOUR_REPO>/scripts/gitlab-libs.sh`
 
+After copying the file to your project folder, if necesary, update the GitLab Libs brach used in the `GITLAB_LIBS_BRANCH` variable.
+
 This is the entry point of the library, and once exeucted (see below) will automatically retrieve the GitLab Libs code and include for you in your project at `scripts/libs`
 
 #### 2. Use the libraries
@@ -74,6 +76,8 @@ example_module:
   script:
     - scripts/cicd/my-script.sh
 ```
+
+> **Tip:** You can use the library in offline mode (use previous downloaded library) by using: `source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh offline`
 
 ## GitLab Pipeline Requirements
 When using any GitLab template in this library, you will need to define some required values. Each template has it's own requirements, but there are some values that all of them require:
