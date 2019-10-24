@@ -30,7 +30,7 @@ function sync() {
     exitOnError
 
     # Push remote
-    echo "Sending code to the repository..."
+    echo "Sending code to the remote repository '${url}' at branch '${branch}'"
     git push ${remote} ${branch}
     exitOnError
 
