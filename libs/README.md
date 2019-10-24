@@ -22,8 +22,8 @@ When you develop a new library, some steps should be followed:
 4. Use the function `getArgs` to validate the passed arguments (Check documentation in `base.sh` file):
     ``` sh    
     # Validate and get the required arguments
-    # Special chars: '$' = not mandatory / '@' = get rest of arguments    
-    getArgs "arg1 arg2 $@other_args" ${@}
+    # Special chars: '&' = not mandatory / '@' = get rest of arguments    
+    getArgs "arg1 arg2 &@other_args" ${@}
     ```
 5. Use the function `exitOnError` to explicitly show an error if it happens (if not, nothing will be shown and the execution will continue)
     ``` sh
@@ -100,7 +100,7 @@ source ${CURRENT_DIR}/sub-module2.sh
 exitOnError "Error importing sub-modules"
 
 function doSomething() {
-    getArgs "arg1 arg2 $@other_args" ${@}
+    getArgs "arg1 arg2 &@other_args" ${@}
     echo "Arg1 = ${arg1}"
     echo "Arg2 = ${arg2}"
     echo "Others = ${other_args[@]}"

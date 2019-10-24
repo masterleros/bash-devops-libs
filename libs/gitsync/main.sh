@@ -8,12 +8,17 @@ verifyDeps git
 # usage: sync <git_url>
 function sync() {
 
-    getArgs "url branch" "${@}"
+    getArgs "url &branch" "${@}"
 
     # Remote repository to sync and current branch
-    remote="gitsync"
-    current_branch=$(git rev-parse --abbrev-ref HEAD)
-    echo "Current Branch: ${current_branch}"
+    remote="gitsync"    
+
+    # If not branch specified, use current one
+    if [ ! $branch ]; then
+        current_branch=$(git rev-parse --abbrev-ref HEAD)
+        echo "Branch not specified, used current: '${current_branch}'"
+        branch=${current_branch}
+    fi
 
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
@@ -22,24 +27,12 @@ function sync() {
 
     # Add remote
     git remote add ${remote} ${url}
-
-    # Get remote code from upstream
-    git fetch ${remote}
-    exitOnError
-
-    # Checkout to the desired branch
-    git checkout ${branch}
-    exitOnError
-
-    # Merge branches
-    git merge ${remote}/${branch}
-
-    # Get back to the original branch
-    git checkout ${current_branch}
     exitOnError
 
     # Push remote
-    #git push ${remote}
+    echo "Sending code to the repository..."
+    git push ${remote} ${branch}
+    exitOnError
 
     # Remove upstream remote
     git remote remove ${remote}
