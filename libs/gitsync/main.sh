@@ -13,11 +13,6 @@ function sync() {
     # Remote repository to sync and current branch
     remote="gitsync"
     
-    # Get the origin code from the required branch
-    git fetch origin ${branch}
-
-    git branch
-
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
         git remote remove ${remote}
@@ -29,7 +24,16 @@ function sync() {
 
     # Push remote
     echo "Sending code to the remote repository '${url}' at branch '${branch}'"
-    git push ${remote} ${branch}
+    if [[ "${branch}" != "${CI_COMMIT_REF_NAME}" ]]; then
+        # Get the origin code from the required branch
+        git fetch origin ${branch}
+
+        # Push to remote
+        git push ${remote} ${branch}
+    else
+        # Push head to remote
+        git push ${remote} head:${branch}
+    fi
     exitOnError
 
     # Remove upstream remote
