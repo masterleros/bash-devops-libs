@@ -20,6 +20,7 @@ function sync() {
         branch=${current_branch}
     fi
 
+    git remote -v
     git fetch origin ${branch}
     git branch
 
