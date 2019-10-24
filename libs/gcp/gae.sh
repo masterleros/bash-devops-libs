@@ -2,7 +2,7 @@
 # usage: gae_deploy <gae_yaml>
 function gae_deploy {
 
-    getArgs "GAE_YAML &GAE_VERSION" ${@}
+    getArgs "GAE_YAML &GAE_VERSION" "${@}"
     DESTOKENIZED_GAE_YAML="DESTOKENIZED_${GAE_YAML}"
     
     # Check if file exists

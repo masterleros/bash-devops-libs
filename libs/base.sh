@@ -6,7 +6,7 @@ export importBaseLib='CURRENT_DIR=$(dirname ${BASH_SOURCE[0]}); if [ $(basename 
 
 ### Call the desired function when script is invoked directly instead of included ###
 ### Usage: eval '${useInternalFunctions}' at the end of your script
-export useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" ${@}; ${function} "${args[@]}"; fi'
+export useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" "${@}"; ${function} "${args[@]}"; fi'
 
 ### Exit program with text when last exit code is non-zero ###
 # usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
@@ -88,7 +88,7 @@ function verifyDeps {
 #
 function convertEnvVars {
 
-    getArgs "CI_COMMIT_REF_NAME @GITLAB_LIBS_BRANCHES_DEFINITION" ${@}
+    getArgs "CI_COMMIT_REF_NAME @GITLAB_LIBS_BRANCHES_DEFINITION" "${@}"
 
     # Set environment depending on branches definition
     for _definition in "${GITLAB_LIBS_BRANCHES_DEFINITION[@]}"; do
@@ -123,9 +123,6 @@ function convertEnvVars {
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
 
-    # Expand aliases (old approach)
-    if [ "${CI}" ]; then shopt -s expand_aliases; fi
-
     # For each lib
     result=0
     while [ "$1" ]; do
@@ -158,9 +155,6 @@ function importLibs {
 
         # Check if there was no error importing the lib files
         if [ ! ${lib_error} ]; then
-            # Alias to execute the lib as subprocess (to use in .gitlab-ci.yml)
-            if [ "${CI}" ]; then alias ${lib_alias}=${lib_file}; fi
-
             # Import lib
             source ${lib_file}
             exitOnError "Error importing '${lib_alias}'"
@@ -173,7 +167,7 @@ function importLibs {
             for funct in ${functs[@]}; do
                 if [[ ${funct} != "_"* ]]; then
                     # echo "  -> ${lib_alias}.${funct}()"
-                    eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then echo "ERROR: ${FUNCNAME}() - Using '"'set -e'"' is not supported! (executing in GitLab Pipeline? use: '"'${lib_alias} ${funct} <args>'"' instead)"; exit -1; fi'; declare -f ${funct} | tail -n +3)"
+                    eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${lib_file} ${funct} "\"\${@}\""'; return; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
                     ((funcCount+=1))
                 fi
@@ -189,6 +183,10 @@ function importLibs {
     # Case any libs was not found, exit with error
     exitOnError "Some GitLab Libraries were not found!" ${result}
 }
+
+# Verify bash version
+$(awk 'BEGIN { exit ARGV[1] < 4.3 }' ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})
+exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})"
 
 # Export internal functions
 eval "${useInternalFunctions}"

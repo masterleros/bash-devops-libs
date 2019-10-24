@@ -3,7 +3,7 @@
 # domains: project folder billing
 function validateRole {
     
-    getArgs "domain domain_id role email" ${@}
+    getArgs "domain domain_id role email" "${@}"
 
     # Validate role format
     [[ ${role} == "roles/"* ]] || exitOnError "Role must use format roles/<role>" -1    
@@ -32,7 +32,7 @@ function validateRole {
 # domains: project folder
 function bindRole {
 
-    getArgs "domain domain_id role @emails" ${@}
+    getArgs "domain domain_id role @emails" "${@}"
 
     # For each user
     for email in ${emails[@]}; do
