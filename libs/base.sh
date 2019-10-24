@@ -123,9 +123,6 @@ function convertEnvVars {
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
 
-    # Get own functions to not rework them
-    own_functs=($(bash -c '. '${BASH_SOURCE[0]}' &> /dev/null; typeset -F' | awk '{print $NF}'))
-
     # For each lib
     result=0
     while [ "$1" ]; do
@@ -163,14 +160,14 @@ function importLibs {
             exitOnError "Error importing '${lib_alias}'"
 
             # Get lib function names
-            functs=($(bash -c 'source '${BASH_SOURCE[0]}'; . '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
+            functs=($(bash -c '. '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
 
             # Rename functions
             funcCount=0
             for funct in ${functs[@]}; do
 
                 # if not an internal function neiter a private one (i.e: _<var>)
-                if [[ ! " ${own_functs[@]} " =~ " ${funct}" && ${funct} != "_"* ]]; then
+                if [[ ! "${GITLAB_LIBS_FUNCT_LOADED[@]}" =~ "${funct}" && ${funct} != "_"* ]]; then
                     # echo "  -> ${lib_alias}.${funct}()"
                     eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${lib_file} ${funct} "\"\${@}\""'; return; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
@@ -217,6 +214,12 @@ function importSubModules {
 # Verify bash version
 $(awk 'BEGIN { exit ARGV[1] < 4.3 }' ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})
 exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})"
+
+# Export all functions for sub-bash executions
+export GITLAB_LIBS_FUNCT_LOADED=$(typeset -F | awk '{print $NF}')
+for funct in ${GITLAB_LIBS_FUNCT_LOADED[@]}; do
+    export -f ${funct}
+done
 
 # Export internal functions
 eval "${useInternalFunctions}"

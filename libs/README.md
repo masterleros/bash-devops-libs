@@ -71,7 +71,7 @@ eval "${useInternalFunctions}"
 **test.sh**
 ``` sh
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh
+source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
 importLibs myfunc
 myfunc.my_public_function
 # myfunc._my_private_function <-- does not exist!
@@ -114,7 +114,7 @@ eval "${useInternalFunctions}"
 **Following the above definition, we can see:**
 ``` sh
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh
+source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
 importLibs myfuncslib
 myfuncslib.doSomething Hi There From GitLab Libs!
 
@@ -128,7 +128,7 @@ myfuncslib.doSomething Hi There From GitLab Libs!
 
 ## base.sh
 This is the root level source and includes all the base functions to use the GitLab Libs (i.e: importLibs)
-> **Obs:** This file will be automatically be imported by the gitlab-libs.sh execution.
+> **Obs:** This file will be automatically be imported by the devops-libs.sh execution.
 
 ## gcp
 This library includes different functionalities for Google Cloud Platform

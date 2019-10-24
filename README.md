@@ -15,7 +15,7 @@ GitLab Libs is a set of common functionatilities and templates to accelerate Dev
 ├── templates               (Templates folders)
 │   ├── .base-template.yml  (Basic GitLab Libs template)
 │   └── .gcp-template.yml   (Example: GCP templates)
-└── gitlab-libs.sh          (GitLab Libs management)
+└── devops-libs.sh          (GitLab Libs management)
 ```
 
 ### Using Libraries
@@ -24,13 +24,13 @@ In order to use this library (i.e: local execution or in GitLab Pipeline) you ne
 In order to use the libraries, you need to follow the steps:
 
 #### 1. Include the library
-Download the file `gitlab-libs.sh` placed in the root folder of this repository and copy to: `<YOUR_REPO>/scripts/gitlab-libs.sh`
+Download the file `devops-libs.sh` placed in the root folder of this repository and copy to: `<YOUR_REPO>/scripts/devops-libs.sh`
 
 This is the entry point of the library, and once executed (see below) it will automatically retrieve the GitLab Libs code and include for you in your project at `${GITLAB_LIBS_DIR}` folder
 
 #### 2. Configure the library
 
-You can edit the `gitlab-libs.sh` inside your project to change some of its characteristics:
+You can edit the `devops-libs.sh` inside your project to change some of its characteristics:
 
 |Config|Description|
 |-|-|
@@ -70,7 +70,7 @@ example_module:
 **scripts/cicd/my-script.sh**
 ``` sh
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh
+source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
 
 # Import required lib
 importLibs gcp
@@ -86,7 +86,7 @@ example_module:
     - scripts/cicd/my-script.sh
 ```
 
-> **Tip:** You can use the library in offline mode (use previous downloaded library) by using: `source $(dirname ${BASH_SOURCE[0]})/../gitlab-libs.sh offline`
+> **Tip:** You can use the library in offline mode (use previous downloaded library) by using: `source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh offline`
 
 ## GitLab Pipeline Requirements
 When using any GitLab template in this library, you will need to define some required values. Each template has it's own requirements, but there are some values that all of them require:
