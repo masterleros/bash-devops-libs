@@ -5,11 +5,14 @@
 #
 ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd )"
 
-### GITLAB LIBS DEFINITIONS ###
+### GITLAB LIBS BRANCH ###
 GITLAB_LIBS_BRANCH="master"
+
+### GITLAB LIBS DEFINITIONS ###
 GITLAB_LIBS_SERVER="git.gft.com"
 GITLAB_LIBS_REPO="devops-br/gitlab-gft-libs.git"
-GITLAB_LIBS_DIR="${ROOTDIR}/scripts/libs"
+GITLAB_LIBS_DIR="${ROOTDIR}/scripts/devops-libs"
+GITLAB_LIBS_ONLINE_MODE=$([ "${1}" == "offline" ] || echo 'true')
 GITLAB_TMP_DIR="/tmp/gitlab-gft-libs/${GITLAB_LIBS_BRANCH}"
 ### GITLAB LIBS DEFINITIONS ###
 
@@ -22,14 +25,17 @@ if [[ "${OSTYPE}" != "linux-gnu" ]]; then echo "OS '${OSTYPE}' is not supported"
 # Check if the execution in on GitLab
 if [ "${CI}" ]; then echo "---> Running on GitLab CI/CD <---"; fi
 
+# Show using branch
+echo "---> GitLab Libs branch: '${GITLAB_LIBS_BRANCH}'$([ ${GITLAB_LIBS_ONLINE_MODE} ] || echo ' (offline)') <---"
+
 # Check if not in off line mode
-if [ "${1}" != "offline" ]; then 
+if [ ${GITLAB_LIBS_ONLINE_MODE} ]; then
 
     # Check if git is present
     if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
 
     ### Clone / update the libraries ###
-    set_e_enabled=${-//[^e]/}
+    set_e_enabled=${-//[^x]/}
     [ ${set_e_enabled} ] || set -e # Enable set e
 
     echo "Retrieving GitLab Libs code...."
@@ -43,19 +49,23 @@ if [ "${1}" != "offline" ]; then
         fi
     else    
         git -C ${GITLAB_TMP_DIR} pull
-    fi
+    fi    
 
-    echo "*** GitLab Libs branch: '${GITLAB_LIBS_BRANCH}' ***"
+    # Case lib exist, remove it
+    if [ -d ${GITLAB_LIBS_DIR} ]; then rm -rf ${GITLAB_LIBS_DIR}; fi
 
-    ### Create dir and copy the libs inside the project ###
-    mkdir -p ${GITLAB_LIBS_DIR} && cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}
-
-    # Make libraries executable
-    find ${GITLAB_LIBS_DIR} -name 'main.sh' -exec chmod +x {} \;
+    ### Create dir and copy the base lib inside the project ###
+    mkdir -p ${GITLAB_LIBS_DIR}
+    cp -r ${GITLAB_TMP_DIR}/libs/*.* ${GITLAB_LIBS_DIR}    
 
     [ ${set_e_enabled} ] || set +e # Disable set e
 fi
 
 ### Include GitLab Libs ###
-source ${GITLAB_LIBS_DIR}/base.sh
-if [ $? -ne 0 ]; then echo "Could not import GitLab Libs"; exit 1; fi
+if [ -f ${GITLAB_LIBS_DIR}/base.sh ]; then
+    source ${GITLAB_LIBS_DIR}/base.sh
+    if [ $? -ne 0 ]; then echo "Could not import GitLab Libs"; exit 1; fi
+else
+    echo "Could not find GitLab Libs (offline mode?)"
+    exit 1
+fi
