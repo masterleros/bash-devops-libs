@@ -159,14 +159,19 @@ function importLibs {
             source ${lib_file}
             exitOnError "Error importing '${lib_alias}'"
             
+            # Get own functions
+            own_functs=($(bash -c '. '${BASH_SOURCE[0]}' &> /dev/null; typeset -F' | awk '{print $NF}'))
+
             # Get lib function names
-            functs=($(bash -c '. '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
+            functs=($(bash -c 'source '${BASH_SOURCE[0]}'; . '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
 
             # Rename functions
             funcCount=0
             for funct in ${functs[@]}; do
-                if [[ ${funct} != "_"* ]]; then
-                    # echo "  -> ${lib_alias}.${funct}()"
+
+                # if not an internal function neiter a private one (i.e: _<var>)
+                if [[ ! " ${own_functs[@]} " =~ " ${funct}" && ${funct} != "_"* ]]; then
+                    echo "  -> ${lib_alias}.${funct}()"
                     eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${lib_file} ${funct} "\"\${@}\""'; return; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
                     ((funcCount+=1))
@@ -195,11 +200,11 @@ function importSubModules {
 
         # Check if the module exists
         if [ ! -f "${module_file}" ]; then
-            echo "GITLAB Library sub-module '${LIBNAME}/${1}' not found! (was it downloaded already in online mode?)"            
+            echoError "GITLAB Library sub-module '${LIBNAME}/${1}' not found! (was it downloaded already in online mode?)"
             ((result+=1))
         else
             # Import sub-module
-            echo "Importing module: '${LIBNAME}/${1}'..."
+            #echo "Importing module: '${module_file}'..."
             source ${module_file}
         fi
         shift
