@@ -2,7 +2,7 @@
 
 ### Define CURRENT_DIR and include the base lib
 ### Usage: eval '${importBaseLib}' at the beginning of your script
-export importBaseLib='CURRENT_DIR=$(dirname ${BASH_SOURCE[0]}); [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ] && source ${CURRENT_DIR}/../base.sh'
+export importBaseLib='CURRENT_DIR=$(dirname ${BASH_SOURCE[0]}); if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then source ${CURRENT_DIR}/../base.sh; fi'
 
 ### Call the desired function when script is invoked directly instead of included ###
 ### Usage: eval '${useInternalFunctions}' at the end of your script
