@@ -130,14 +130,34 @@ function importLibs {
     result=0
     while [ "$1" ]; do
         lib="${1}"
-        lib_alias="${lib}lib"
+        lib_alias="${lib}lib"        
         lib_file="${GITLAB_LIBS_DIR}/${lib}/main.sh"
+        lib_error=""
 
-        # Check if lib exists
-        if [ ! -f "${lib_file}" ]; then
+        # Check if it is in online mode to copy/update libs
+        if [ ${GITLAB_LIBS_ONLINE_MODE} ]; then
+            # Check if the lib is available from download
+            if [ ! -f ${GITLAB_TMP_DIR}/libs/${lib}/main.sh ]; then
+                echo "GITLAB Library '${lib}' not found!"
+                lib_error="true"
+                ((result+=1))
+            else
+                # Create lib dir and copy
+                mkdir -p ${GITLAB_LIBS_DIR}/${lib} && cp -r ${GITLAB_TMP_DIR}/libs/${lib}/* ${GITLAB_LIBS_DIR}/${lib}
+                exitOnError "Could not copy the '${lib_alias}' library files"
+
+                # Make the lib executable
+                chmod +x ${lib_file}
+            fi
+        # Check if the lib is available locally
+        elif [ ! -f "${lib_file}" ]; then
             echo "GITLAB Library '${lib}' not found!"
+            lib_error="true"
             ((result+=1))
-        else
+        fi
+
+        # Check if there was no error importing the lib files
+        if [ ! ${lib_error} ]; then
             # Alias to execute the lib as subprocess (to use in .gitlab-ci.yml)
             if [ "${CI}" ]; then alias ${lib_alias}=${lib_file}; fi
 
