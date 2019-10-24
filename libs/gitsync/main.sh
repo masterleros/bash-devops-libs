@@ -19,11 +19,9 @@ function sync() {
         echo "Branch not specified, used current: '${current_branch}'"
         branch=${current_branch}
     fi
-
+    
     # Get the origin code from the required branch
     git fetch origin ${branch}
-    gcloud auth list
-
 
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
