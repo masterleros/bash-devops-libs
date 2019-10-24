@@ -1,4 +1,9 @@
-# GCP Run template
+# GCP template docker
+.gcp-template-docker:
+  image: google/cloud-sdk:latest
+  extends: .gcp-template
+
+# GCP template
 .gcp-template:
   before_script:
     - | 
