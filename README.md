@@ -26,11 +26,20 @@ In order to use the libraries, you need to follow the steps:
 #### 1. Include the library
 Download the file `gitlab-libs.sh` placed in the root folder of this repository and copy to: `<YOUR_REPO>/scripts/gitlab-libs.sh`
 
-After copying the file to your project folder, if necesary, update the GitLab Libs brach used in the `GITLAB_LIBS_BRANCH` variable.
+This is the entry point of the library, and once executed (see below) it will automatically retrieve the GitLab Libs code and include for you in your project at `${GITLAB_LIBS_DIR}` folder
 
-This is the entry point of the library, and once exeucted (see below) will automatically retrieve the GitLab Libs code and include for you in your project at `scripts/libs`
+#### 2. Configure the library
 
-#### 2. Use the libraries
+You can edit the `gitlab-libs.sh` inside your project to change some of its characteristics:
+
+|Config|Description|
+|-|-|
+|`GITLAB_LIBS_BRANCH`|Branch from where the lib is cloned (useful to lock a lib version)|
+|`GITLAB_LIBS_DIR`|Directory where the libraries will be imported on your project|
+
+> **Warning:** Do not change `GITLAB_LIBS_ONLINE_MODE` definition, to use the library in offline mode, check the local examples below.
+
+#### 3. Use the libraries
 There are two ways to use the libraries:
 > `**WARNING**:` In the below examples you can see that GitLab Pipeline uses `<lib> <func>` and local execution uses `<lib>.<func>`. This is because GitLab Pipeline uses an environment set with `set -e` which makes the execution to exit at first error. On Local execution it is not the default setup so the difference. (`<lib> <func>` executes the command in a subprocess where `<lib>.<func>` execute it in same process, i.e: sourcing the script)
 
