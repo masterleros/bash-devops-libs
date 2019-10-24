@@ -9,7 +9,7 @@ verifyDeps gcloud
 source ${CURRENT_DIR}/gae.sh &&
 source ${CURRENT_DIR}/iam.sh &&
 source ${CURRENT_DIR}/api.sh &&
-source ${CURRENT_DIR}/auth.sh &&
+source ${CURRENT_DIR}/auth.sh
 exitOnError "Error importing sub-modules"
 
 ### Validate and set the requested project ###
