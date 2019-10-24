@@ -16,9 +16,6 @@ GITLAB_LIBS_ONLINE_MODE=$([ "${1}" == "offline" ] || echo 'true')
 GITLAB_TMP_DIR="/tmp/gitlab-gft-libs/${GITLAB_LIBS_BRANCH}"
 ### GITLAB LIBS DEFINITIONS ###
 
-# Include project definitions case exists
-test -f $(dirname ${BASH_SOURCE[0]})/definitions.sh && source $(dirname ${BASH_SOURCE[0]})/definitions.sh
-
 # Validate OS
 if [[ "${OSTYPE}" != "linux-gnu" ]]; then echo "OS '${OSTYPE}' is not supported" >&2; exit -1; fi
 
@@ -66,3 +63,6 @@ else
     echo "Could not find GitLab Libs (offline mode?)"
     exit 1
 fi
+
+# Include project definitions case exists
+test -f $(dirname ${BASH_SOURCE[0]})/definitions.sh && source $(dirname ${BASH_SOURCE[0]})/definitions.sh
