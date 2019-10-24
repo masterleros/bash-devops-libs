@@ -20,9 +20,10 @@ function sync() {
         branch=${current_branch}
     fi
 
-    git remote -v
+    # Get the origin code from the required branch
     git fetch origin ${branch}
-    git branch
+    gcloud auth list
+
 
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
