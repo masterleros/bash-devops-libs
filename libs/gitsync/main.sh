@@ -15,6 +15,7 @@ function sync() {
 
     # If not branch specified, use current one
     if [ ! $branch ]; then
+        git branch
         current_branch=$(git rev-parse --abbrev-ref HEAD)
         echo "Branch not specified, used current: '${current_branch}'"
         branch=${current_branch}
