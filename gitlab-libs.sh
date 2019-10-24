@@ -19,38 +19,42 @@ test -f $(dirname ${BASH_SOURCE[0]})/definitions.sh && source $(dirname ${BASH_S
 # Validate OS
 if [[ "${OSTYPE}" != "linux-gnu" ]]; then echo "OS '${OSTYPE}' is not supported" >&2; exit -1; fi
 
-# Check if git is present
-if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
-
 # Check if the execution in on GitLab
-if [ "$CI" ]; then echo "---> Running on GitLab CI/CD <---"; fi
+if [ "${CI}" ]; then echo "---> Running on GitLab CI/CD <---"; fi
 
-### Clone / update the libraries ###
-set_e_enabled=${-//[^x]/}
-[ ${set_e_enabled} ] || set -e # Enable set e
+# Check if not in off line mode
+if [ "${1}" != "offline" ]; then 
 
-echo "Retrieving GitLab Libs code...."
+    # Check if git is present
+    if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
 
-# Get the code
-if [ ! -d ${GITLAB_TMP_DIR} ]; then
-    if [ ${CI_JOB_TOKEN} ]; then
-        git clone -b ${GITLAB_LIBS_BRANCH} --single-branch https://gitlab-ci-token:${CI_JOB_TOKEN}@${GITLAB_LIBS_SERVER}/${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
-    else
-        git clone -b ${GITLAB_LIBS_BRANCH} --single-branch git@${GITLAB_LIBS_SERVER}:${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
+    ### Clone / update the libraries ###
+    set_e_enabled=${-//[^x]/}
+    [ ${set_e_enabled} ] || set -e # Enable set e
+
+    echo "Retrieving GitLab Libs code...."
+
+    # Get the code
+    if [ ! -d ${GITLAB_TMP_DIR} ]; then
+        if [ ${CI_JOB_TOKEN} ]; then
+            git clone -b ${GITLAB_LIBS_BRANCH} --single-branch https://gitlab-ci-token:${CI_JOB_TOKEN}@${GITLAB_LIBS_SERVER}/${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
+        else
+            git clone -b ${GITLAB_LIBS_BRANCH} --single-branch git@${GITLAB_LIBS_SERVER}:${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
+        fi
+    else    
+        git -C ${GITLAB_TMP_DIR} pull
     fi
-else    
-    git -C ${GITLAB_TMP_DIR} pull
+
+    echo "*** GitLab Libs branch: '${GITLAB_LIBS_BRANCH}' ***"
+
+    ### Create dir and copy the libs inside the project ###
+    mkdir -p ${GITLAB_LIBS_DIR} && cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}
+
+    # Make libraries executable
+    find ${GITLAB_LIBS_DIR} -name 'main.sh' -exec chmod +x {} \;
+
+    [ ${set_e_enabled} ] || set +e # Disable set e
 fi
-
-echo "*** GitLab Libs branch: '${GITLAB_LIBS_BRANCH}' ***"
-
-### Create dir and copy the libs inside the project ###
-mkdir -p ${GITLAB_LIBS_DIR} && cp -r ${GITLAB_TMP_DIR}/libs/* ${GITLAB_LIBS_DIR}
-
-# Make libraries executable
-find ${GITLAB_LIBS_DIR} -name 'main.sh' -exec chmod +x {} \;
-
-[ ${set_e_enabled} ] || set +e # Disable set e
 
 ### Include GitLab Libs ###
 source ${GITLAB_LIBS_DIR}/base.sh
