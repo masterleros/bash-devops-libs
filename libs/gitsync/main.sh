@@ -13,6 +13,10 @@ function sync() {
     # Remote repository to sync and current branch
     remote="gitsync"
 
+    echo "---"
+    git rev-parse --abbrev-ref HEAD
+    echo "---"
+
     # If not branch specified, use current one
     if [ ! ${branch} ]; then        
         current_branch=$(git rev-parse --abbrev-ref HEAD)
