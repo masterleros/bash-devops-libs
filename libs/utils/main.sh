@@ -1,6 +1,5 @@
 #!/bin/bash
-CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
-[ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ] && source ${CURRENT_DIR}/../base.sh
+eval "${importBaseLib}"
 
 ### Print a nice title ###
 # usage: showTitle "title text"
@@ -67,3 +66,6 @@ function retryExecution {
     # if could not be sucess after retries
     exitOnError "The command '${cmd}' could not be executed successfuly after ${retries} retry(s)" -1
 }
+
+# Export internal functions
+eval "${useInternalFunctions}"

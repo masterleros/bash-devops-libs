@@ -3,10 +3,10 @@
 When you develop a new library, some steps should be followed:
 
 1. Place your library on the `libs/<LIB_NAME>/main.sh` file. This will implicitly recognize the library "<LIB_NAME>lib", example:
-2. Include the base lib:
+2. Include the base lib at the very beginning:
     ``` sh
-    CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
-    [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ] && source ${CURRENT_DIR}/../base.sh
+    #!/bin/bash
+    eval "${importBaseLib}"
     ```
 3. Verify the required dependencies for your execution, example:
     ``` sh
@@ -38,8 +38,8 @@ When you develop a new library, some steps should be followed:
 
 **libs/myfuncs/main.sh**
 ``` sh
-CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})
-[ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ] && source ${CURRENT_DIR}/../base.sh
+#!/bin/bash
+eval "${importBaseLib}"
 
 # Validate Variables
 # validateVars example_var
