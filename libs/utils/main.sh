@@ -35,7 +35,7 @@ function tokenReplaceFromFile {
         if [ "${!var}" ]; then
             content=${content//$token/${!var}}
         else
-            echo "Variable '${var}' is not defined!" >&2
+            echoError "Variable '${var}' is not defined!"
             ((retval+=1))
         fi
     done
@@ -46,6 +46,19 @@ function tokenReplaceFromFile {
     fi
 
     echo "${content}"
+}
+
+### This function will replace from a file to file
+# usage: tokenReplaceInFile <path_source> [path_target]
+function tokenReplaceInFile {
+
+    getArgs "path_source @path_target" "${@}"
+
+    # If not specified file, use source as target
+    if [ ! "${path_target}" ]; then path_target=${path_source}; fi
+
+    # Replace tokens, if not present, fail
+    utilslib.tokenReplaceFromFile ${path_source} > ${path_target}
 }
 
 ### Execute a command until success within a retries ###
@@ -65,6 +78,29 @@ function retryExecution {
 
     # if could not be sucess after retries
     exitOnError "The command '${cmd}' could not be executed successfuly after ${retries} retry(s)" -1
+}
+
+### Wait with a message until a condition is true ###
+# usage: showTextUntil <cmd> <text>
+function showTextUntil {
+    
+    getArgs "cmd text" "${@}"
+
+    # Wait until firebase project is available
+    shownInstruction=0
+    while [ True ]; do
+
+        # execute the verification command
+        eval "${cmd}"
+
+        if [ $? -eq 0 ]; then
+            break
+        elif [ ${shownInstruction} -eq 0 ]; then
+            echo "${text}"
+            shownInstruction=1
+        fi
+        sleep 5
+    done
 }
 
 # Export internal functions

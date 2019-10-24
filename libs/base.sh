@@ -8,13 +8,28 @@ export importBaseLib='LIBNAME="$(echo $(cd $(dirname ${BASH_SOURCE[0]}) >/dev/nu
 ### Usage: eval '${useInternalFunctions}' at the end of your script
 export useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" "${@}"; ${function} "${args[@]}"; fi'
 
+### Show a test in the stderr
+# usage: echoError <text>
+function echoError() {
+    text="${1/'\n'/$'\n'}"
+    local IFS=$'\n'
+    local _lines=(${text})
+    local _error="ERROR: "
+    for _line in "${_lines[@]}"; do
+        echo "${_error} ${_line}" >&2
+        _error="       "
+    done
+}
+
 ### Exit program with text when last exit code is non-zero ###
 # usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
 function exitOnError {
     code=${2:-$?}
     text=${1}
     if [ "${code}" -ne 0 ]; then
-        if [ ! -z "${text}" ]; then echo -e "ERROR: ${text}" >&2 ; fi
+        if [ ! -z "${text}" ]; then
+            echoError "${text}"
+        fi
         echo "Exiting..." >&2
         exit $code
     fi
@@ -25,7 +40,8 @@ function exitOnError {
 # when a variable name starts with @<var> it will take the rest of values
 # when a variable name starts with &<var> it is optional and script will not fail case there is no value for it
 function getArgs {
-    retval=0
+
+    _argsResult=0
     _args=(${1})
 
     for _arg in ${_args[@]}; do
@@ -36,7 +52,7 @@ function getArgs {
         elif [ ! "${1}" ]; then
             echo "Values for argument '${_arg}' not found!"
             _arg=""
-            ((retval+=1))
+            ((_argsResult+=1))
         fi
 
         # if has @ will get all the rest of args
@@ -48,34 +64,35 @@ function getArgs {
             declare -n _ref=${_arg}; _ref=${1}
         fi
     done
-    exitOnError "Some arguments are missing" ${retval}
+
+    exitOnError "Invalid arguments at '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})\nUsage: ${FUNCNAME[1]} \"$(echo ${_args[@]})\"" ${_argsResult}
 }
 
 ### Validate defined variables ###
 # usage: validateVars <var1> <var2> ... <varN>
 function validateVars {
-    retval=0
+    _varsResult=0
     for var in ${@}; do
         if [ -z "${!var}" ]; then
             echo "Environment varirable '${var}' is not declared!" >&2
-            ((retval+=1))
+            ((_varsResult+=1))
         fi
     done
-    exitOnError "Some variables were not found" ${retval}
+    exitOnError "Some variables were not found" ${_varsResult}
 }
 
 ### dependencies verification ###
 # usage: verifyDeps <dep1> <dep2> ... <depN>
 function verifyDeps {
-    retval=0
+    _depsResult=0
     for dep in ${@}; do
         which ${dep} &> /dev/null
         if [[ $? -ne 0 ]]; then
             echo "Binary dependency '${dep}' not found!" >&2
-            ((retval+=1))
+            ((_depsResult+=1))
         fi
     done
-    exitOnError "Some dependencies were not found" ${retval}
+    exitOnError "Some dependencies were not found" ${_depsResult}
 }
 
 ### This funciton will map environment variables to the final name ###
@@ -124,7 +141,7 @@ function convertEnvVars {
 function importLibs {
 
     # For each lib
-    result=0
+    _libsResult=0
     while [ "$1" ]; do
         lib="${1}"
         lib_alias="${lib}lib"        
@@ -137,7 +154,7 @@ function importLibs {
             if [ ! -f ${GITLAB_TMP_DIR}/libs/${lib}/main.sh ]; then
                 echo "GITLAB Library '${lib}' not found!"
                 lib_error="true"
-                ((result+=1))
+                ((_libsResult+=1))
             else
                 # Create lib dir and copy
                 mkdir -p ${GITLAB_LIBS_DIR}/${lib} && cp -r ${GITLAB_TMP_DIR}/libs/${lib}/* ${GITLAB_LIBS_DIR}/${lib}
@@ -150,7 +167,7 @@ function importLibs {
         elif [ ! -f "${lib_file}" ]; then
             echo "GITLAB Library '${lib}' not found! (was it downloaded already in online mode?)"
             lib_error="true"
-            ((result+=1))
+            ((_libsResult+=1))
         fi
 
         # Check if there was no error importing the lib files
@@ -183,7 +200,7 @@ function importLibs {
     done
 
     # Case any libs was not found, exit with error
-    exitOnError "Some GitLab Libraries were not found!" ${result}
+    exitOnError "Some GitLab Libraries were not found!" ${_libsResult}
 }
 
 ### Import GitLab Libs sub-modules ###
@@ -191,14 +208,14 @@ function importLibs {
 function importSubModules {
 
     # For each sub-module
-    result=0
+    _modsResult=0
     while [ "${1}" ]; do        
         module_file="${CURRENT_DIR}/${1}"
 
         # Check if the module exists
         if [ ! -f "${module_file}" ]; then
             echoError "GITLAB Library sub-module '${LIBNAME}/${1}' not found! (was it downloaded already in online mode?)"
-            ((result+=1))
+            ((_modsResult+=1))
         else
             # Import sub-module
             #echo "Importing module: '${module_file}'..."
@@ -208,7 +225,7 @@ function importSubModules {
     done
 
     # Case any libs was not found, exit with error
-    exitOnError "Some GitLab Libraries sub-modules were not found!" ${result}
+    exitOnError "Some GitLab Libraries sub-modules were not found!" ${_modsResult}
 }
 
 # Verify bash version
