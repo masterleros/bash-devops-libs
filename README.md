@@ -10,9 +10,9 @@ DevOps Libs is a set of common functionatilities and templates to accelerate Dev
 │   ├── gcp                 (Example: GCP library)
 │   ...
 │   └── base.sh             (Base functions library)
-├── templates               (Templates folders)
-│   ├── .base-template.yml  (Basic DevOps Libs template)
-│   └── .gcp-template.yml   (Example: GCP templates)
+├── gitlab                  (GitLab templates folders)
+│   ├── .base-template.yml  (Basic GitLab DevOps Libs template)
+│   └── .gcp-template.yml   (Example: GitLab DevOps GCP Libs templates)
 └── devops-libs.sh          (DevOps Libs management)
 ```
 
@@ -84,6 +84,19 @@ example_module:
 
 > **Tip:** You can use the library in offline mode (use previous downloaded library) by using: `source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh offline`
 
+## Operation Mode
+DevOps Liberary have 3 operations modes:
+
+  - **A. Auto (default)** - This mode will attempt to download the liraries if not found locally
+  - **B. Online** - This mode will download and update the libraries on all executions
+  - **C. Offline** - This Mode will use available libraries, if any is not found, it will fail.
+
+You can force the operation mode in the inclusion of the library:
+``` yaml
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh offline # or online
+```
+
 ## GitLab Pipeline Requirements
 > **Obs:** Templates are definitions of `before_script` and in some cases `after_script`, please be sure you don't need to implement your own mentioned sections as GitLab does not support both (template and custom) section to be merged and only one will be executed.
 
@@ -140,5 +153,5 @@ The above environment variable `MY_PROJECT_DESCRIPTION` will be accesible locall
 ## Additional Templates
 Check the templates section to check the available templates and their functionalities: [Templates](templates/README.md)
 
-## Available librearies
+## Available libraries
 Check the available libraries and their functionalities: [Libraries](libs/README.md)

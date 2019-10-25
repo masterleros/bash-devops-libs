@@ -7,6 +7,7 @@ export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 
 ### DEVOPS LIBS BRANCH ###
 DEVOPS_LIBS_BRANCH="feature/lib-updates"
+### DEVOPS LIBS DEFINITIONS ###
 DEVOPS_LIBS_SERVER="git.gft.com"
 DEVOPS_LIBS_REPO="devops-br/gitlab-gft-libs.git"
 ### DEVOPS LIBS DEFINITIONS ###
