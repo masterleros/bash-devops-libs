@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if not being included twice
-if [ ${GITLAB_LIBS_FUNCT_LOADED} ]; then 
+if [ ${DEVOPS_LIBS_FUNCT_LOADED} ]; then 
     exitOnError "You cannot include twice $(basename ${BASH_SOURCE[0]})" -1
 fi
 
@@ -106,19 +106,19 @@ function verifyDeps {
 }
 
 ### This funciton will map environment variables to the final name ###
-# Usage: convertEnvVars <GITLAB_LIBS_BRANCHES_DEFINITION>
+# Usage: convertEnvVars <DEVOPS_LIBS_BRANCHES_DEFINITION>
 # Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ### 
 #
-# GITLAB_LIBS_BRANCHES_DEFINITION: "<def1> <def2> ... <defN>"
+# DEVOPS_LIBS_BRANCHES_DEFINITION: "<def1> <def2> ... <defN>"
 # Definition: <branch>:<env> (example: feature/*:DEV)
-# GITLAB_LIBS_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
+# DEVOPS_LIBS_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
 #
 function convertEnvVars {
 
-    getArgs "CI_COMMIT_REF_NAME @GITLAB_LIBS_BRANCHES_DEFINITION" "${@}"
+    getArgs "CI_COMMIT_REF_NAME @DEVOPS_LIBS_BRANCHES_DEFINITION" "${@}"
 
     # Set environment depending on branches definition
-    for _definition in "${GITLAB_LIBS_BRANCHES_DEFINITION[@]}"; do
+    for _definition in "${DEVOPS_LIBS_BRANCHES_DEFINITION[@]}"; do
         _branch=${_definition%:*}
         _environment=${_definition#*:}
 
@@ -130,7 +130,7 @@ function convertEnvVars {
     done
 
     # Check if found an environment
-    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your GITLAB_LIBS_BRANCHES_DEFINITION!" -1
+    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your DEVOPS_LIBS_BRANCHES_DEFINITION!" -1
 
     # Get vars to be renamed    
     vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*=" | awk -F= '{print $1}'))
@@ -146,15 +146,15 @@ function convertEnvVars {
     echoInfo "**************************************************"
 }
 
-### Import GitLab Lib files ###
+### Import DevOps Lib files ###
 # Usage: _importLibFiles <lib>
-function _importLibFiles() {    
+function _importLibFiles() {
     
     getArgs "_lib" "${@}"
     _libAlias=${_lib}lib
-    _libPath=${GITLAB_LIBS_DIR}/${_lib}
+    _libPath=${DEVOPS_LIBS_DIR}/${_lib}
     _libFile="${_libPath}/lib.sh"
-    _libTmpPath=${GITLAB_TMP_DIR}/libs/${_lib}
+    _libTmpPath=${DEVOPS_LIBS_TMP_DIR}/libs/${_lib}
 
     # Check if the lib is available from download
     if [ -f ${_libTmpPath}/main.sh ]; then
@@ -163,7 +163,7 @@ function _importLibFiles() {
         exitOnError "Could not copy the '${_libAlias}' library files"
 
         # Include the lib.sh (entrypoint)
-        cp ${GITLAB_TMP_DIR}/libs/_libsh ${_libFile}
+        cp ${DEVOPS_LIBS_TMP_DIR}/libs/_libsh ${_libFile}
         exitOnError "Could not copy the '${_libFile}' library inclussion file"
 
         # Make the lib executable
@@ -173,11 +173,11 @@ function _importLibFiles() {
         return 0        
     fi
 
-    echoError "GITLAB Library '${_lib}' not found! (was it downloaded already?)"
+    echoError "DEVOPS Library '${_lib}' not found! (was it downloaded already?)"
     return 1
 }
 
-### Import GitLab Libs ###
+### Import DevOps Libs ###
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
 
@@ -186,18 +186,18 @@ function importLibs {
     while [ "${1}" ]; do
         _lib="${1}"
         _libAlias=${_lib}lib
-        _libPath=${GITLAB_LIBS_DIR}/${_lib}
+        _libPath=${DEVOPS_LIBS_DIR}/${_lib}
         _libFile="${_libPath}/lib.sh"
-        _libTmpPath=${GITLAB_TMP_DIR}/libs/${_lib}
+        _libTmpPath=${DEVOPS_LIBS_TMP_DIR}/libs/${_lib}
 
         # Check if it is in online mode to copy/update libs
-        if [ ${GITLAB_LIBS_MODE} == "online" ]; then
+        if [ ${DEVOPS_LIBS_MODE} == "online" ]; then
             # Include the lib
             _importLibFiles ${_lib}
         # Check if the lib is available locally
         elif [ ! -f "${_libFile}" ]; then
             # In in auto mode
-            if [[ ${GITLAB_LIBS_MODE} == "auto" && ! -f "${_libTmpPath}/main.sh" ]]; then
+            if [[ ${DEVOPS_LIBS_MODE} == "auto" && ! -f "${_libTmpPath}/main.sh" ]]; then
                 echoInfo "AUTO MODE - '${_libAlias}' is not installed neither found in cache, cloning code"
 
                 # Try to clone the lib code                
@@ -222,7 +222,7 @@ function importLibs {
             _funcCount=0
             for _libFunct in ${_libFuncts[@]}; do
                 # if not an internal function neiter a private one (i.e: _<var>)
-                if [[ ! "${GITLAB_LIBS_FUNCT_LOADED[@]}" =~ "${_libFunct}" && ${_libFunct} != "_"* ]]; then
+                if [[ ! "${DEVOPS_LIBS_FUNCT_LOADED[@]}" =~ "${_libFunct}" && ${_libFunct} != "_"* ]]; then
                     # echoInfo "  -> ${_libAlias}.${_libFunct}()"
                     eval "$(echo "${_libAlias}.${_libFunct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${_libFile} ${_libFunct} "\"\${@}\""'; return; fi'; declare -f ${_libFunct} | tail -n +3)"
                     unset -f ${_libFunct}
@@ -230,7 +230,7 @@ function importLibs {
                 fi
             done
 
-            echoInfo "Imported GITLAB Library '${_libAlias}' (${_funcCount} functions)" 
+            echoInfo "Imported DEVOPS Library '${_libAlias}' (${_funcCount} functions)" 
         else 
             ((_libsResult+=1)); 
         fi
@@ -240,10 +240,10 @@ function importLibs {
     done
 
     # Case any libs was not found, exit with error
-    exitOnError "Some GitLab Libraries were not found!" ${_libsResult}
+    exitOnError "Some DevOps Libraries were not found!" ${_libsResult}
 }
 
-### Import GitLab Libs sub-modules ###
+### Import DevOps Libs sub-modules ###
 # Usage: importSubModules <mod1> <mod2> ... <modN>
 function importSubModules {
 
@@ -254,7 +254,7 @@ function importSubModules {
 
         # Check if the module exists
         if [ ! -f "${module_file}" ]; then
-            echoError "GITLAB Library sub-module '${CURRENT_LIB_NAME}/${1}' not found! (was it downloaded already in online mode?)"
+            echoError "DEVOPS Library sub-module '${CURRENT_LIB_NAME}/${1}' not found! (was it downloaded already in online mode?)"
             ((_modsResult+=1))
         else
             # Import sub-module
@@ -265,7 +265,7 @@ function importSubModules {
     done
 
     # Case any libs was not found, exit with error
-    exitOnError "Some GitLab Libraries sub-modules were not found!" ${_modsResult}
+    exitOnError "Some DevOps Libraries sub-modules were not found!" ${_modsResult}
 }
 
 # Verify bash version
@@ -273,7 +273,7 @@ $(awk 'BEGIN { exit ARGV[1] < 4.3 }' ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})
 exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})"
 
 # Export all functions for sub-bash executions
-export GITLAB_LIBS_FUNCT_LOADED=$(typeset -F | awk '{print $NF}')
-for funct in ${GITLAB_LIBS_FUNCT_LOADED[@]}; do
+export DEVOPS_LIBS_FUNCT_LOADED=$(typeset -F | awk '{print $NF}')
+for funct in ${DEVOPS_LIBS_FUNCT_LOADED[@]}; do
     export -f ${funct}
 done

@@ -5,8 +5,8 @@
       # .docker-template before_script      
 
       # Import base libs and convert environment variables
-      source ${CI_PROJECT_DIR}/scripts/gitlab-libs.sh
-      convertEnvVars ${CI_COMMIT_REF_NAME} ${GITLAB_LIBS_BRANCHES_DEFINITION}
+      source ${CI_PROJECT_DIR}/scripts/devops-libs.sh
+      convertEnvVars ${CI_COMMIT_REF_NAME} ${DEVOPS_LIBS_BRANCHES_DEFINITION}
 
       # Validate required vars and dependencies
       validateVars DOCKERFILE_PATH IMAGE_TAG
