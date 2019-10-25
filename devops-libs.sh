@@ -5,6 +5,8 @@
 #
 export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 
+### GITLAB LIBS OPERATION MODE ###
+GITLAB_LIBS_DEFAULT_MODE='online' # online / offline / auto
 ### GITLAB LIBS BRANCH ###
 GITLAB_LIBS_BRANCH="feature/lib-updates"
 GITLAB_LIBS_SERVER="git.gft.com"
@@ -14,11 +16,11 @@ GITLAB_LIBS_REPO="devops-br/gitlab-gft-libs.git"
 # If library was already loaded, exit
 if [ ! "${GITLAB_LIBS_FUNCT_LOADED}" ]; then
 
-    ###############################
+    ###############################    
     export GITLAB_LIBS_MODE=${1}
-    if [ ! ${GITLAB_LIBS_MODE} ]; then export GITLAB_LIBS_MODE='online'; fi # Set default mode case not provided
+    if [ ! ${GITLAB_LIBS_MODE} ]; then export GITLAB_LIBS_MODE=${GITLAB_LIBS_DEFAULT_MODE}; fi # Set default mode case not provided
     export GITLAB_LIBS_DIR="${ROOTDIR}/scripts/devops-libs"    
-    export GITLAB_TMP_DIR="/tmp/gitlab-gft-libs/${GITLAB_LIBS_BRANCH}"
+    export GITLAB_TMP_DIR="${GITLAB_LIBS_DIR}/.libtmp/${GITLAB_LIBS_BRANCH}"
     ###############################
 
     # Validate OS
