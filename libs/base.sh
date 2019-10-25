@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if not being included twice
-if [ ${DEVOPS_LIBS_FUNCT_LOADED} ]; then 
+if [ "${DEVOPS_LIBS_FUNCT_LOADED}" ]; then 
     exitOnError "You cannot include twice $(basename ${BASH_SOURCE[0]})" -1
 fi
 
@@ -191,7 +191,7 @@ function importLibs {
         _libTmpPath=${DEVOPS_LIBS_TMP_DIR}/libs/${_lib}
 
         # Check if it is in online mode to copy/update libs
-        if [ ${DEVOPS_LIBS_MODE} == "online" ]; then
+        if [ "${DEVOPS_LIBS_MODE}" == "online" ]; then
             # Include the lib
             _importLibFiles ${_lib}
         # Check if the lib is available locally

@@ -92,7 +92,7 @@ function showTextUntil {
         # execute the verification command
         eval "${cmd}"
 
-        if [ $? -eq 0 ]; then
+        if [ ${?} -eq 0 ]; then
             break
         elif [ ${shownInstruction} -eq 0 ]; then
             echo "${text}"

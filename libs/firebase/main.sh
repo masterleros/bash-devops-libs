@@ -11,7 +11,7 @@ function projectCreate {
 
     # Check if firebase project is available, else create
     firebase projects:list 2>&1 | grep ${project} | grep ${id} > /dev/null
-    if [ $? -ne 0 ]; then 
+    if [ ${?} -ne 0 ]; then 
         echoInfo "Creating Firebase project '${id}' in '${project}' GCP project..."
         firebase projects:addfirebase --project=${project} ${id}
         exitOnError
@@ -28,7 +28,7 @@ function appCreate {
 
     # Create Web Application is not exist
     firebase apps:list --project=${project} 2>&1 | grep ${type} | grep "${application}" > /dev/null
-    if [ $? -ne 0 ]; then
+    if [ ${?} -ne 0 ]; then
         echoInfo "Creating ${type} Application '${application}' at '${project}' project..."
         firebase apps:create --project=${project} ${type} ${application}
         exitOnError

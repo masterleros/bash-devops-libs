@@ -44,8 +44,8 @@ function devOpsLibsClone() {
     echo "Retrieving DevOps Libs code...."
 
     # Get the code
-    if [ ! -d ${DEVOPS_LIBS_TMP_DIR} ]; then
-        if [ ${CI_JOB_TOKEN} ]; then
+    if [ ! -d "${DEVOPS_LIBS_TMP_DIR}" ]; then
+        if [ "${CI_JOB_TOKEN}" ]; then
             git clone -b ${DEVOPS_LIBS_BRANCH} --single-branch https://gitlab-ci-token:${CI_JOB_TOKEN}@${DEVOPS_LIBS_SERVER}/${DEVOPS_LIBS_REPO} ${DEVOPS_LIBS_TMP_DIR}
         else
             git clone -b ${DEVOPS_LIBS_BRANCH} --single-branch git@${DEVOPS_LIBS_SERVER}:${DEVOPS_LIBS_REPO} ${DEVOPS_LIBS_TMP_DIR}
@@ -70,7 +70,7 @@ function devOpsLibsClone() {
 echo "---> DevOps Libs branch: '${DEVOPS_LIBS_BRANCH}' (${DEVOPS_LIBS_MODE}) <---"
 
 # Check if in on line mode
-if [ ${DEVOPS_LIBS_MODE} == 'online' ]; then
+if [ "${DEVOPS_LIBS_MODE}" == 'online' ]; then
     devOpsLibsClone
 fi
 
@@ -79,7 +79,7 @@ if [ ! "${DEVOPS_LIBS_FUNCT_LOADED}" ]; then
     ### Include DevOps Libs ###
     if [ -f ${DEVOPS_LIBS_DIR}/base.sh ]; then
         source ${DEVOPS_LIBS_DIR}/base.sh
-        if [ $? -ne 0 ]; then echo "Could not import DevOps Libs"; exit 1; fi
+        if [ ${?} -ne 0 ]; then echo "Could not import DevOps Libs"; exit 1; fi
     else
         echo "Could not find DevOps Libs (offline mode?)"
         exit 1
