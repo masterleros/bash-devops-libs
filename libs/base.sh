@@ -150,11 +150,11 @@ function convertEnvVars {
 # Usage: _importLibFiles <lib>
 function _importLibFiles() {    
     
-    getArgs "lib" "${@}"
-    _libAlias=${lib}lib
-    _libPath=${GITLAB_LIBS_DIR}/${lib}
+    getArgs "_lib" "${@}"
+    _libAlias=${_lib}lib
+    _libPath=${GITLAB_LIBS_DIR}/${_lib}
     _libFile="${_libPath}/lib.sh"
-    _libTmpPath=${GITLAB_TMP_DIR}/libs/${lib}
+    _libTmpPath=${GITLAB_TMP_DIR}/libs/${_lib}
 
     # Check if the lib is available from download
     if [ -f ${_libTmpPath}/main.sh ]; then
@@ -173,7 +173,7 @@ function _importLibFiles() {
         return 0        
     fi
 
-    echoError "GITLAB Library '${lib}' not found! (was it downloaded already?)"
+    echoError "GITLAB Library '${_lib}' not found! (was it downloaded already?)"
     return 1
 }
 
@@ -181,9 +181,9 @@ function _importLibFiles() {
 # Usage: _importLib <lib>
 function _importLib() {    
     
-    getArgs "lib" "${@}"
-    _libAlias=${lib}lib
-    _libPath=${GITLAB_LIBS_DIR}/${lib}
+    getArgs "_lib" "${@}"
+    _libAlias=${_lib}lib
+    _libPath=${GITLAB_LIBS_DIR}/${_lib}
     _libFile="${_libPath}/lib.sh"
 
     # Import lib
@@ -218,37 +218,29 @@ function importLibs {
     _libsResult=0
     while [ "${1}" ]; do
         _lib="${1}"
-        _lib_file="${GITLAB_LIBS_DIR}/${lib}/lib.sh"
+        _libFile="${GITLAB_LIBS_DIR}/${_lib}/lib.sh"
+        _libTmpPath=${GITLAB_TMP_DIR}/libs/${_lib}
 
         # Check if it is in online mode to copy/update libs
         if [ ${GITLAB_LIBS_MODE} == "online" ]; then
             # Include the lib
             _importLibFiles ${_lib}
-            _importResult=${?}
         # Check if the lib is available locally
-        elif [ ! -f "${_lib_file}" ]; then
+        elif [ ! -f "${_libFile}" ]; then
             # In in auto mode
-            if [ ${GITLAB_LIBS_MODE} == "auto" ]; then
-                # Try to clone the lib code
+            if [[ ${GITLAB_LIBS_MODE} == "auto" && ! -f "${_libTmpPath}/main.sh" ]]; then
+                # Try to clone the lib code                
                 devOpsLibsClone
                 exitOnError "It was not possible to clone the library code"
             fi
 
             # Include the lib
             _importLibFiles ${_lib}
-            _importResult=${?}
-            #else
-            #    echoError "GITLAB Library '${_lib}' not found! (was it downloaded already in online mode?)"
-            #    _importResult='1'
-            #fi            
         fi
 
         # Check if there was no error importing the lib files
-        if [ ${_importResult} -ne 0 ]; then
-            _importLib ${_lib}
-        else
-            ((_libsResult+=1))
-        fi
+        if [ ${?} -eq 0 ]; then _importLib ${_lib}
+        else ((_libsResult+=1)); fi
 
         # Go to next arg
         shift
