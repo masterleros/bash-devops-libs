@@ -4,14 +4,9 @@
 When you develop a new library, some steps should be followed:
 
 1. Place your library on the `libs/<LIB_NAME>/main.sh` file. This will implicitly recognize the library "<LIB_NAME>lib", example:
-2. Include the base lib at the very beginning:
-    ``` sh
-    #!/bin/bash
-    eval "${headLibScript}"
-    ```
-> **Info:** `LIBNAME` (your own library name) and `CURRENT_DIR` (your library path) variables will be defined in this execution.
+> **Info:** `CURRENT_LIB_DIR` (your library relative path), `CURRENT_LIB_PATH` (your library path) and `CURRENT_LIB_NAME` (your own library name) variables will be defined in this execution.
 
-3. Verify the required dependencies for your execution, example:
+2. Verify the required dependencies for your execution, example:
     ``` sh
     # Validate available variables (if applicable)
     validateVars <var1> <var2> ... <varN>
@@ -19,23 +14,18 @@ When you develop a new library, some steps should be followed:
     # Verify Dependencies (if applicable)
     verifyDeps <dep1> <dep2> ... <depN>
     ```
-4. Use the function `getArgs` to validate the passed arguments (Check documentation in `base.sh` file):
+3. Use the function `getArgs` to validate the passed arguments (Check documentation in `base.sh` file):
     ``` sh    
     # Validate and get the required arguments
     # Special chars: '&' = not mandatory / '@' = get rest of arguments    
     getArgs "arg1 arg2 &@other_args" ${@}
     ```
-5. Use the function `exitOnError` to explicitly show an error if it happens (if not, nothing will be shown and the execution will continue)
+4. Use the function `exitOnError` to explicitly show an error if it happens (if not, nothing will be shown and the execution will continue)
     ``` sh
     ((1/0))
     exitOnError "It has happend a division by 0 error here!"
     ```
-6. Include at the very end of you script the following instruction (this will export your functions when executing your script directly)
-    ``` sh
-    # Export internal functions
-    eval "${footLibScript}"
-    ```
-7. Document your library properly in the library folder and include a reference in this README.md file
+5. Document your library properly in the library folder and include a reference in this README.md file
 
 ## Sub Modules
 
@@ -52,7 +42,6 @@ To implement private functions, define them as `_<function_name>`. By doing this
 **libs/myfunc/main.sh**
 ``` sh
 #!/bin/bash
-eval "${headLibScript}"
 
 function _my_private_function() { 
     echoInfo "Hi from my private function!" 
@@ -63,9 +52,6 @@ function my_public_function()
     echoInfo "Hi from my public function!" 
     _my_private_function
 }
-
-# Export internal functions
-eval "${footLibScript}"
 ```
 
 **test.sh**
@@ -86,7 +72,6 @@ myfunc.my_public_function
 **libs/myfuncs/main.sh**
 ``` sh
 #!/bin/bash
-eval "${headLibScript}"
 
 # Validate Variables
 validateVars example_var
@@ -106,9 +91,6 @@ function doSomething() {
     echoInfo "Others = ${other_args[@]}"
     exitOnError "It was not possible to print properly the arguments =("
 }
-
-# Export internal functions
-eval "${footLibScript}"
 ```
 
 **Following the above definition, we can see:**
