@@ -18,7 +18,7 @@ function useProject {
     exitOnError "Project '${project}' not found"
 
     # Set project
-    echo "Setting current project to '${project}'..."
+    echoInfo "Setting current project to '${project}'..."
     gcloud config set project ${project}
     exitOnError "Failed to set working project '${project}'"
 }

@@ -55,12 +55,12 @@ To implement private functions, define them as `_<function_name>`. By doing this
 eval "${importBaseLib}"
 
 function _my_private_function() { 
-    echo "Hi from my private function!" 
+    echoInfo "Hi from my private function!" 
 }
 
 function my_public_function() 
 { 
-    echo "Hi from my public function!" 
+    echoInfo "Hi from my public function!" 
     _my_private_function
 }
 
@@ -101,9 +101,9 @@ exitOnError "Error importing sub-modules"
 
 function doSomething() {
     getArgs "arg1 arg2 &@other_args" ${@}
-    echo "Arg1 = ${arg1}"
-    echo "Arg2 = ${arg2}"
-    echo "Others = ${other_args[@]}"
+    echoInfo "Arg1 = ${arg1}"
+    echoInfo "Arg2 = ${arg2}"
+    echoInfo "Others = ${other_args[@]}"
     exitOnError "It was not possible to print properly the arguments =("
 }
 

@@ -23,7 +23,7 @@ function sync() {
     exitOnError
 
     # Push remote
-    echo "Sending code to the remote repository '${url}' at branch '${branch}'"
+    echoInfo "Sending code to the remote repository '${url}' at branch '${branch}'"
     if [[ "${branch}" != "${CI_COMMIT_REF_NAME}" ]]; then
         # Get the origin code from the required branch
         git fetch origin ${branch}

@@ -2,11 +2,24 @@
 
 ### Define LIBNAME, CURRENT_DIR and include the base lib
 ### Usage: eval '${importBaseLib}' at the beginning of your script
-export importBaseLib='LIBNAME="$(echo $(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd) | awk -F / '\''{print $NF}'\'')"; CURRENT_DIR=$(dirname ${BASH_SOURCE[0]}); if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then source ${CURRENT_DIR}/../base.sh; fi'
+export importBaseLib='LIBNAME="$(echo $(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd) | awk -F / '\''{print $NF}'\'')"; CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})'
 
 ### Call the desired function when script is invoked directly instead of included ###
 ### Usage: eval '${useInternalFunctions}' at the end of your script
 export useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" "${@}"; ${function} "${args[@]}"; fi'
+
+### Show a info text
+# usage: echoInfo <text>
+function echoInfo() {
+    text="${1/'\n'/$'\n'}"
+    local IFS=$'\n'
+    local _lines=(${text})
+    local _error="INFO: "
+    for _line in "${_lines[@]}"; do
+        echo "${_error} ${_line}"
+        _error="      "
+    done
+}
 
 ### Show a test in the stderr
 # usage: echoError <text>
@@ -50,7 +63,7 @@ function getArgs {
         if [[ ${_arg} == "&"* ]]; then
             _arg=$(echo ${_arg}| sed 's/&//')
         elif [ ! "${1}" ]; then
-            echo "Values for argument '${_arg}' not found!"
+            echoError "Values for argument '${_arg}' not found!"
             _arg=""
             ((_argsResult+=1))
         fi
@@ -74,7 +87,7 @@ function validateVars {
     _varsResult=0
     for var in ${@}; do
         if [ -z "${!var}" ]; then
-            echo "Environment varirable '${var}' is not declared!" >&2
+            echoError "Environment varirable '${var}' is not declared!" >&2
             ((_varsResult+=1))
         fi
     done
@@ -88,7 +101,7 @@ function verifyDeps {
     for dep in ${@}; do
         which ${dep} &> /dev/null
         if [[ $? -ne 0 ]]; then
-            echo "Binary dependency '${dep}' not found!" >&2
+            echoError "Binary dependency '${dep}' not found!" >&2
             ((_depsResult+=1))
         fi
     done
@@ -126,14 +139,14 @@ function convertEnvVars {
     vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*=" | awk -F= '{print $1}'))
 
     # Set same variable with the final name
-    echo "**************************************************"
+    echoInfo "**************************************************"
     for var in "${vars[@]}"; do
         var=$(echo ${var} | awk -F '=' '{print $1}')
         new_var=$(echo ${var} | cut -d'_' -f3-)
-        echo "${CI_BRANCH_ENVIRONMENT} value set: '${new_var}'"
+        echoInfo "${CI_BRANCH_ENVIRONMENT} value set: '${new_var}'"
         export ${new_var}="${!var}"
     done
-    echo "**************************************************"
+    echoInfo "**************************************************"
 }
 
 ### Import GitLab Libs ###
@@ -152,7 +165,7 @@ function importLibs {
         if [ ${GITLAB_LIBS_ONLINE_MODE} ]; then
             # Check if the lib is available from download
             if [ ! -f ${GITLAB_TMP_DIR}/libs/${lib}/main.sh ]; then
-                echo "GITLAB Library '${lib}' not found!"
+                echoError "GITLAB Library '${lib}' not found!"
                 lib_error="true"
                 ((_libsResult+=1))
             else
@@ -165,7 +178,7 @@ function importLibs {
             fi
         # Check if the lib is available locally
         elif [ ! -f "${lib_file}" ]; then
-            echo "GITLAB Library '${lib}' not found! (was it downloaded already in online mode?)"
+            echoError "GITLAB Library '${lib}' not found! (was it downloaded already in online mode?)"
             lib_error="true"
             ((_libsResult+=1))
         fi
@@ -185,14 +198,14 @@ function importLibs {
 
                 # if not an internal function neiter a private one (i.e: _<var>)
                 if [[ ! "${GITLAB_LIBS_FUNCT_LOADED[@]}" =~ "${funct}" && ${funct} != "_"* ]]; then
-                    # echo "  -> ${lib_alias}.${funct}()"
+                    # echoInfo "  -> ${lib_alias}.${funct}()"
                     eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${lib_file} ${funct} "\"\${@}\""'; return; fi'; declare -f ${funct} | tail -n +3)"
                     unset -f ${funct}
                     ((funcCount+=1))
                 fi
             done
 
-            echo "Imported GITLAB Library '${lib_alias}' (${funcCount} functions)"
+            echoInfo "Imported GITLAB Library '${lib_alias}' (${funcCount} functions)"
         fi
 
         # Go to next arg
@@ -218,7 +231,7 @@ function importSubModules {
             ((_modsResult+=1))
         else
             # Import sub-module
-            #echo "Importing module: '${module_file}'..."
+            #echoInfo "Importing module: '${module_file}'..."
             source ${module_file}
         fi
         shift
