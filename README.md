@@ -48,7 +48,7 @@ In order to use the libraries, it is only required to include the desired GitLab
 ``` yaml
 include:
   - project: 'devops-br/gitlab-gft-libs'
-    file: '/templates/.base-template.yml'
+    file: '/gitlab/.base-template.yml'
 
 variables:
   DEVOPS_LIBS_BRANCHES_DEFINITION: "<definitions>"
@@ -150,8 +150,8 @@ export MY_PROJECT_DESCRIPTION="My cool project!"
 
 The above environment variable `MY_PROJECT_DESCRIPTION` will be accesible locally and in the DevOps Automation.
 
-## Additional Templates
-Check the templates section to check the available templates and their functionalities: [Templates](templates/README.md)
+## Additional GitLab Pipeline templates
+Check the templates section to check the available templates and their functionalities: [Templates](gitlab/README.md)
 
 ## Available libraries
 Check the available libraries and their functionalities: [Libraries](libs/README.md)

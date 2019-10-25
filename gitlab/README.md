@@ -7,7 +7,7 @@ When in the script section, you SA `credential.json` will be already set and rea
 ``` yaml
 include:
   - project: 'devops-br/gitlab-gft-libs'
-    file: '/templates/.gcp-template.yml'
+    file: '/gitlab/.gcp-template.yml'
 
 gcp_module:
   image: google/cloud-sdk:latest  
