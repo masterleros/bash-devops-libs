@@ -1,5 +1,4 @@
 #!/bin/bash
-eval "${headLibScript}"
 
 ### Print a nice title ###
 # usage: showTitle "title text"
@@ -102,6 +101,3 @@ function showTextUntil {
         sleep 5
     done
 }
-
-# Export internal functions
-eval "${footLibScript}"

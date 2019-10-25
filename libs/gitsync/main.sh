@@ -1,5 +1,4 @@
 #!/bin/bash
-eval "${headLibScript}"
 
 # Verify Dependencies
 verifyDeps git
@@ -39,6 +38,3 @@ function sync() {
     # Remove upstream remote
     git remote remove ${remote}
 }
-
-# Export internal functions
-eval "${footLibScript}"

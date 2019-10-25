@@ -1,5 +1,4 @@
 #!/bin/bash
-eval "${headLibScript}"
 
 # Verify Dependencies
 verifyDeps gcloud
@@ -22,6 +21,3 @@ function useProject {
     gcloud config set project ${project}
     exitOnError "Failed to set working project '${project}'"
 }
-
-# Export internal functions
-eval "${footLibScript}"

@@ -1,5 +1,4 @@
 #!/bin/bash
-eval "${headLibScript}"
 
 # Verify Dependencies
 verifyDeps terraform
@@ -22,6 +21,3 @@ function apply() {
 
     exitOnError "Failed to execute 'apply' terraform command"
 }
-
-# Export internal functions
-eval "${footLibScript}"

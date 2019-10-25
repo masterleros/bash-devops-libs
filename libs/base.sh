@@ -1,12 +1,9 @@
 #!/bin/bash
 
-### Define LIBNAME, CURRENT_DIR and include the base lib
-### Usage: eval '${headLibScript}' at the beginning of your script
-export headLibScript='LIBNAME="$(echo $(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd) | awk -F / '\''{print $NF}'\'')"; CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})'
-
-### Call the desired function when script is invoked directly instead of included ###
-### Usage: eval '${footLibScript}' at the end of your script
-export footLibScript='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" "${@}"; ${function} "${args[@]}"; fi'
+# Check if not being included twice
+if [ ${GITLAB_LIBS_FUNCT_LOADED} ]; then 
+    exitOnError "You cannot include twice $(basename ${BASH_SOURCE[0]})" -1
+fi
 
 ### Show a info text
 # usage: echoInfo <text>
@@ -158,7 +155,7 @@ function importLibs {
     while [ "$1" ]; do
         lib="${1}"
         lib_alias="${lib}lib"        
-        lib_file="${GITLAB_LIBS_DIR}/${lib}/main.sh"
+        lib_file="${GITLAB_LIBS_DIR}/${lib}/lib.sh"
         lib_error=""
 
         # Check if it is in online mode to copy/update libs
@@ -172,6 +169,9 @@ function importLibs {
                 # Create lib dir and copy
                 mkdir -p ${GITLAB_LIBS_DIR}/${lib} && cp -r ${GITLAB_TMP_DIR}/libs/${lib}/* ${GITLAB_LIBS_DIR}/${lib}
                 exitOnError "Could not copy the '${lib_alias}' library files"
+
+                # Include the lib.sh (entrypoint)
+                cp ${GITLAB_TMP_DIR}/lib.sh ${lib_file}
 
                 # Make the lib executable
                 chmod +x ${lib_file}
@@ -223,11 +223,11 @@ function importSubModules {
     # For each sub-module
     _modsResult=0
     while [ "${1}" ]; do        
-        module_file="${CURRENT_DIR}/${1}"
+        module_file="${CURRENT_LIB_DIR}/${1}"
 
         # Check if the module exists
         if [ ! -f "${module_file}" ]; then
-            echoError "GITLAB Library sub-module '${LIBNAME}/${1}' not found! (was it downloaded already in online mode?)"
+            echoError "GITLAB Library sub-module '${CURRENT_LIB_NAME}/${1}' not found! (was it downloaded already in online mode?)"
             ((_modsResult+=1))
         else
             # Import sub-module
@@ -250,6 +250,3 @@ export GITLAB_LIBS_FUNCT_LOADED=$(typeset -F | awk '{print $NF}')
 for funct in ${GITLAB_LIBS_FUNCT_LOADED[@]}; do
     export -f ${funct}
 done
-
-# Export internal functions
-eval "${footLibScript}"

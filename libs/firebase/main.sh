@@ -1,5 +1,4 @@
 #!/bin/bash
-eval "${headLibScript}"
 
 # Verify Dependencies
 verifyDeps firebase
@@ -37,6 +36,3 @@ function appCreate {
         echoInfo "Great! ${type} Application '${application}' already exist in project '${project}'"
     fi
 }
-
-# Export internal functions
-eval "${footLibScript}"
