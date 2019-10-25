@@ -1,5 +1,4 @@
 #!/bin/bash
-eval "${importBaseLib}"
 
 ### Print a nice title ###
 # usage: showTitle "title text"
@@ -9,9 +8,9 @@ function showTitle {
 
     len=$(echo "# ${text} #"| wc -c)
     separator=$(eval printf '\#%.0s' {2..$len})
-    echo $separator
-    echo "# ${text} #"
-    echo $separator
+    echoInfo $separator
+    echoInfo "# ${text} #"
+    echoInfo $separator
 }
 
 ### This function will echo the content of a file with tokens updated to values ###
@@ -102,6 +101,3 @@ function showTextUntil {
         sleep 5
     done
 }
-
-# Export internal functions
-eval "${useInternalFunctions}"

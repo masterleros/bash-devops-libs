@@ -20,11 +20,11 @@ function createSA {
 
     gcloud --project ${project} iam service-accounts list | grep ${sa_mail} > /dev/null
     if [ $? -ne 0 ]  ; then
-        echo "Creating Service account '${sa_mail}'..."
+        echoInfo "Creating Service account '${sa_mail}'..."
         gcloud --project ${project} iam service-accounts create ${sa_id} --display-name ${description}
         exitOnError
     else
-        echo "Service Account '${sa_mail}' already created!"
+        echoInfo "Service Account '${sa_mail}' already created!"
     fi
 }
 
@@ -37,7 +37,7 @@ function useSA {
     # Get SA user email
     _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)
 
-    echo "Activating Service Account '${_client_mail}'..."
+    echoInfo "Activating Service Account '${_client_mail}'..."
     gcloud auth activate-service-account --key-file=${credential_path}
     exitOnError "Could not activate '${_client_mail}' SA"
 }
@@ -51,7 +51,7 @@ function revokeSA {
     # Get SA user email
     _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)
 
-    echo "Revoking Service Account '${_client_mail}'..."
+    echoInfo "Revoking Service Account '${_client_mail}'..."
     gcloud auth revoke ${_client_mail}
     exitOnError "Could not revoke '${_client_mail}' SA"
 }
@@ -64,11 +64,11 @@ function createCredential {
 
     # Check if account is already created
     if [ -f ${credential_path} ]; then  
-        echo "Creating '${sa_mail}' credential..."
+        echoInfo "Creating '${sa_mail}' credential..."
         if [ -z "$(cat ${credential_path} | grep ${sa_mail})" ]; then   
             exitOnError "The file ${credential_path} is used by other account, please rename/move it" -1
         fi
-        echo "Great! Credentials are already present on your environment"
+        echoInfo "Great! Credentials are already present on your environment"
     else
         ## Create/Download credentials ######
         gcloud iam service-accounts keys create ${credential_path} --iam-account ${sa_mail} --user-output-enabled false

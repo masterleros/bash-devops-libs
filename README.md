@@ -37,8 +37,6 @@ You can edit the `devops-libs.sh` inside your project to change some of its char
 |`GITLAB_LIBS_BRANCH`|Branch from where the lib is cloned (useful to lock a lib version)|
 |`GITLAB_LIBS_DIR`|Directory where the libraries will be imported on your project|
 
-> **Warning:** Do not change `GITLAB_LIBS_ONLINE_MODE` definition, to use the library in offline mode, check the local examples below.
-
 #### 3. Use the libraries
 There are two ways to use the libraries:
 > `**WARNING**:` GitLab Pipeline uses an environment set with `set -e` which makes the execution to exit at first error (On Local execution it is not the default and your script will continue)

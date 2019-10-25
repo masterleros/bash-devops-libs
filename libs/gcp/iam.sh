@@ -38,7 +38,6 @@ function bindRole {
     for email in ${emails[@]}; do
 
         # Validate if the role is already provided
-        echo "validateRole ${domain} ${domain_id} ${role} ${email}"
         gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
         if [ $? -ne 0 ]; then
 
@@ -51,7 +50,7 @@ function bindRole {
                 exitOnError "Unsupported add-iam-policy-binding to '${domain}' domain" -1
             fi
 
-            echo "Binding '${email}' role '${role}' to ${domain}: ${domain_id}..."
+            echoInfo "Binding '${email}' role '${role}' to ${domain}: ${domain_id}..."
             if [[ "${email}" == *".iam.gserviceaccount.com" ]]; then
                 ${cmd} --member serviceAccount:${email} --role ${role} > /dev/null
             else
