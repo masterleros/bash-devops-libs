@@ -1,5 +1,5 @@
 #!/bin/bash
-eval "${importBaseLib}"
+eval "${headLibScript}"
 
 ### Print a nice title ###
 # usage: showTitle "title text"
@@ -104,4 +104,4 @@ function showTextUntil {
 }
 
 # Export internal functions
-eval "${useInternalFunctions}"
+eval "${footLibScript}"

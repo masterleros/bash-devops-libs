@@ -1,12 +1,12 @@
 #!/bin/bash
 
 ### Define LIBNAME, CURRENT_DIR and include the base lib
-### Usage: eval '${importBaseLib}' at the beginning of your script
-export importBaseLib='LIBNAME="$(echo $(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd) | awk -F / '\''{print $NF}'\'')"; CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})'
+### Usage: eval '${headLibScript}' at the beginning of your script
+export headLibScript='LIBNAME="$(echo $(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd) | awk -F / '\''{print $NF}'\'')"; CURRENT_DIR=$(dirname ${BASH_SOURCE[0]})'
 
 ### Call the desired function when script is invoked directly instead of included ###
-### Usage: eval '${useInternalFunctions}' at the end of your script
-export useInternalFunctions='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" "${@}"; ${function} "${args[@]}"; fi'
+### Usage: eval '${footLibScript}' at the end of your script
+export footLibScript='if [ $(basename $0) == $(basename ${BASH_SOURCE[0]}) ]; then getArgs "function &@args" "${@}"; ${function} "${args[@]}"; fi'
 
 ### Show a info text
 # usage: echoInfo <text>
@@ -162,7 +162,7 @@ function importLibs {
         lib_error=""
 
         # Check if it is in online mode to copy/update libs
-        if [ ${GITLAB_LIBS_ONLINE_MODE} ]; then
+        if [ ${GITLAB_LIBS_MODE} == "online" ]; then
             # Check if the lib is available from download
             if [ ! -f ${GITLAB_TMP_DIR}/libs/${lib}/main.sh ]; then
                 echoError "GITLAB Library '${lib}' not found!"
@@ -252,4 +252,4 @@ for funct in ${GITLAB_LIBS_FUNCT_LOADED[@]}; do
 done
 
 # Export internal functions
-eval "${useInternalFunctions}"
+eval "${footLibScript}"

@@ -1,5 +1,5 @@
 #!/bin/bash
-eval "${importBaseLib}"
+eval "${headLibScript}"
 
 # Verify Dependencies
 verifyDeps firebase
@@ -39,4 +39,4 @@ function appCreate {
 }
 
 # Export internal functions
-eval "${useInternalFunctions}"
+eval "${footLibScript}"

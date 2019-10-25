@@ -1,5 +1,5 @@
 #!/bin/bash
-eval "${importBaseLib}"
+eval "${headLibScript}"
 
 # Verify Dependencies
 verifyDeps terraform
@@ -24,4 +24,4 @@ function apply() {
 }
 
 # Export internal functions
-eval "${useInternalFunctions}"
+eval "${footLibScript}"

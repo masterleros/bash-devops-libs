@@ -6,16 +6,18 @@
 export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 
 ### GITLAB LIBS BRANCH ###
-export GITLAB_LIBS_BRANCH="develop"
-export GITLAB_LIBS_SERVER="git.gft.com"
-export GITLAB_LIBS_REPO="devops-br/gitlab-gft-libs.git"
-export GITLAB_LIBS_DIR="${ROOTDIR}/scripts/devops-libs"
+GITLAB_LIBS_BRANCH="feature/lib-updates"
+GITLAB_LIBS_SERVER="git.gft.com"
+GITLAB_LIBS_REPO="devops-br/gitlab-gft-libs.git"
 ### GITLAB LIBS DEFINITIONS ###
 
 # If library was already loaded, exit
 if [ ! "${GITLAB_LIBS_FUNCT_LOADED}" ]; then
 
-    export GITLAB_LIBS_ONLINE_MODE=$([ "${1}" == "offline" ] || echo 'true')
+    ###############################
+    export GITLAB_LIBS_MODE=${1}
+    if [ ! ${GITLAB_LIBS_MODE} ]; then export GITLAB_LIBS_MODE='online'; fi # Set default mode case not provided
+    export GITLAB_LIBS_DIR="${ROOTDIR}/scripts/devops-libs"    
     export GITLAB_TMP_DIR="/tmp/gitlab-gft-libs/${GITLAB_LIBS_BRANCH}"
     ###############################
 
@@ -26,10 +28,10 @@ if [ ! "${GITLAB_LIBS_FUNCT_LOADED}" ]; then
     if [ "${CI}" ]; then echo "---> Running on GitLab CI/CD <---"; fi
 
     # Show using branch
-    echo "---> GitLab Libs branch: '${GITLAB_LIBS_BRANCH}'$([ ${GITLAB_LIBS_ONLINE_MODE} ] || echo ' (offline)') <---"
+    echo "---> GitLab Libs branch: '${GITLAB_LIBS_BRANCH}' (${GITLAB_LIBS_MODE}) <---"
 
-    # Check if not in off line mode
-    if [ ${GITLAB_LIBS_ONLINE_MODE} ]; then
+    # Check if in on line mode
+    if [ ${GITLAB_LIBS_MODE} == 'online' ]; then
 
         # Check if git is present
         if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi

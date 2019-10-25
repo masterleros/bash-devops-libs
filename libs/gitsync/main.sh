@@ -1,5 +1,5 @@
 #!/bin/bash
-eval "${importBaseLib}"
+eval "${headLibScript}"
 
 # Verify Dependencies
 verifyDeps git
@@ -41,4 +41,4 @@ function sync() {
 }
 
 # Export internal functions
-eval "${useInternalFunctions}"
+eval "${footLibScript}"

@@ -7,7 +7,7 @@ When you develop a new library, some steps should be followed:
 2. Include the base lib at the very beginning:
     ``` sh
     #!/bin/bash
-    eval "${importBaseLib}"
+    eval "${headLibScript}"
     ```
 > **Info:** `LIBNAME` (your own library name) and `CURRENT_DIR` (your library path) variables will be defined in this execution.
 
@@ -33,7 +33,7 @@ When you develop a new library, some steps should be followed:
 6. Include at the very end of you script the following instruction (this will export your functions when executing your script directly)
     ``` sh
     # Export internal functions
-    eval "${useInternalFunctions}"
+    eval "${footLibScript}"
     ```
 7. Document your library properly in the library folder and include a reference in this README.md file
 
@@ -52,7 +52,7 @@ To implement private functions, define them as `_<function_name>`. By doing this
 **libs/myfunc/main.sh**
 ``` sh
 #!/bin/bash
-eval "${importBaseLib}"
+eval "${headLibScript}"
 
 function _my_private_function() { 
     echoInfo "Hi from my private function!" 
@@ -65,7 +65,7 @@ function my_public_function()
 }
 
 # Export internal functions
-eval "${useInternalFunctions}"
+eval "${footLibScript}"
 ```
 
 **test.sh**
@@ -86,7 +86,7 @@ myfunc.my_public_function
 **libs/myfuncs/main.sh**
 ``` sh
 #!/bin/bash
-eval "${importBaseLib}"
+eval "${headLibScript}"
 
 # Validate Variables
 validateVars example_var
@@ -108,7 +108,7 @@ function doSomething() {
 }
 
 # Export internal functions
-eval "${useInternalFunctions}"
+eval "${footLibScript}"
 ```
 
 **Following the above definition, we can see:**
