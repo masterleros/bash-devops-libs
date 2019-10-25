@@ -146,68 +146,108 @@ function convertEnvVars {
     echoInfo "**************************************************"
 }
 
+### Import GitLab Lib files ###
+# Usage: _importLibFiles <lib>
+function _importLibFiles() {    
+    
+    getArgs "lib" "${@}"
+    _libAlias=${lib}lib
+    _libPath=${GITLAB_LIBS_DIR}/${lib}
+    _libFile="${_libPath}/lib.sh"
+    _libTmpPath=${GITLAB_TMP_DIR}/libs/${lib}
+
+    # Check if the lib is available from download
+    if [ -f ${_libTmpPath}/main.sh ]; then
+        # Create lib dir and copy
+        mkdir -p ${_libPath} && cp -r ${_libTmpPath}/* ${_libPath}
+        exitOnError "Could not copy the '${_libAlias}' library files"
+
+        # Include the lib.sh (entrypoint)
+        cp ${GITLAB_TMP_DIR}/libs/_libsh ${_libFile}
+        exitOnError "Could not copy the '${_libFile}' library inclussion file"
+
+        # Make the lib executable
+        chmod +x ${_libFile}
+        exitOnError "Could not make '${_libFile}' executable"
+
+        return 0        
+    fi
+
+    echoError "GITLAB Library '${lib}' not found! (was it downloaded already?)"
+    return 1
+}
+
+### Import GitLab Lib ###
+# Usage: _importLib <lib>
+function _importLib() {    
+    
+    getArgs "lib" "${@}"
+    _libAlias=${lib}lib
+    _libPath=${GITLAB_LIBS_DIR}/${lib}
+    _libFile="${_libPath}/lib.sh"
+
+    # Import lib
+    source ${_libFile}
+    exitOnError "Error importing '${_libFile}'"
+
+    # Get lib function names
+    _libFuncts=($(bash -c '. '${_libFile}' &> /dev/null; typeset -F' | awk '{print $NF}'))
+
+    # Rename functions
+    _funcCount=0
+    for _libFunct in ${_libFuncts[@]}; do
+
+        # if not an internal function neiter a private one (i.e: _<var>)
+        if [[ ! "${GITLAB_LIBS_FUNCT_LOADED[@]}" =~ "${funct}" && ${funct} != "_"* ]]; then
+            # echoInfo "  -> ${_libAlias}.${funct}()"
+            eval "$(echo "${_libAlias}.${_libFunct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${_libFile} ${_libFunct} "\"\${@}\""'; return; fi'; declare -f ${_libFunct} | tail -n +3)"
+            unset -f ${_libFunct}
+            ((_funcCount+=1))
+        fi
+    done
+
+    echoInfo "Imported GITLAB Library '${_libAlias}' (${_funcCount} functions)"    
+}
+
+
 ### Import GitLab Libs ###
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
 
     # For each lib
     _libsResult=0
-    while [ "$1" ]; do
-        lib="${1}"
-        lib_alias="${lib}lib"        
-        lib_file="${GITLAB_LIBS_DIR}/${lib}/lib.sh"
-        lib_error=""
+    while [ "${1}" ]; do
+        _lib="${1}"
+        _lib_file="${GITLAB_LIBS_DIR}/${lib}/lib.sh"
 
         # Check if it is in online mode to copy/update libs
         if [ ${GITLAB_LIBS_MODE} == "online" ]; then
-            # Check if the lib is available from download
-            if [ ! -f ${GITLAB_TMP_DIR}/libs/${lib}/main.sh ]; then
-                echoError "GITLAB Library '${lib}' not found!"
-                lib_error="true"
-                ((_libsResult+=1))
-            else
-                # Create lib dir and copy
-                mkdir -p ${GITLAB_LIBS_DIR}/${lib} && cp -r ${GITLAB_TMP_DIR}/libs/${lib}/* ${GITLAB_LIBS_DIR}/${lib}
-                exitOnError "Could not copy the '${lib_alias}' library files"
-
-                # Include the lib.sh (entrypoint)
-                cp ${GITLAB_TMP_DIR}/libs/_libsh ${lib_file}
-                exitOnError "Could not copy the '${lib_file}' library inclussion file"
-
-                # Make the lib executable
-                chmod +x ${lib_file}
-                exitOnError "Could not make '${lib_file}' executable"
-            fi
+            # Include the lib
+            _importLibFiles ${_lib}
+            _importResult=${?}
         # Check if the lib is available locally
-        elif [ ! -f "${lib_file}" ]; then
-            echoError "GITLAB Library '${lib}' not found! (was it downloaded already in online mode?)"
-            lib_error="true"
-            ((_libsResult+=1))
+        elif [ ! -f "${_lib_file}" ]; then
+            # In in auto mode
+            if [ ${GITLAB_LIBS_MODE} == "auto" ]; then
+                # Try to clone the lib code
+                devOpsLibsClone
+                exitOnError "It was not possible to clone the library code"
+            fi
+
+            # Include the lib
+            _importLibFiles ${_lib}
+            _importResult=${?}
+            #else
+            #    echoError "GITLAB Library '${_lib}' not found! (was it downloaded already in online mode?)"
+            #    _importResult='1'
+            #fi            
         fi
 
         # Check if there was no error importing the lib files
-        if [ ! ${lib_error} ]; then
-            # Import lib
-            source ${lib_file}
-            exitOnError "Error importing '${lib_alias}'"
-
-            # Get lib function names
-            functs=($(bash -c '. '${lib_file}' &> /dev/null; typeset -F' | awk '{print $NF}'))
-
-            # Rename functions
-            funcCount=0
-            for funct in ${functs[@]}; do
-
-                # if not an internal function neiter a private one (i.e: _<var>)
-                if [[ ! "${GITLAB_LIBS_FUNCT_LOADED[@]}" =~ "${funct}" && ${funct} != "_"* ]]; then
-                    # echoInfo "  -> ${lib_alias}.${funct}()"
-                    eval "$(echo "${lib_alias}.${funct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${lib_file} ${funct} "\"\${@}\""'; return; fi'; declare -f ${funct} | tail -n +3)"
-                    unset -f ${funct}
-                    ((funcCount+=1))
-                fi
-            done
-
-            echoInfo "Imported GITLAB Library '${lib_alias}' (${funcCount} functions)"
+        if [ ${_importResult} -ne 0 ]; then
+            _importLib ${_lib}
+        else
+            ((_libsResult+=1))
         fi
 
         # Go to next arg

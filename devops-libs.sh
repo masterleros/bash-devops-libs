@@ -32,7 +32,7 @@ fi
 #########################################################
 
 # Function to clone the lib
-function cloneLib() {
+function devOpsLibsClone() {
 
     # Check if git is present
     if [ $(which git &> /dev/null || echo $?) ]; then echo 'ERROR: git command is required!' >&2; exit -1; fi
@@ -61,7 +61,7 @@ function cloneLib() {
     cp ${GITLAB_TMP_DIR}/libs/README.md ${GITLAB_LIBS_DIR}    
 
     # Copy the GitLab Libs help
-    cp -r ${GITLAB_TMP_DIR}/README.md $(dirname ${BASH_SOURCE[0]})/GITLAB-LIBS.md
+    cp -r ${GITLAB_TMP_DIR}/README.md ${GITLAB_LIBS_DIR}/../DEVOPS-LIBS.md
 
     [ ${set_e_enabled} ] || set +e # Disable set e
 }
@@ -71,7 +71,7 @@ echo "---> GitLab Libs branch: '${GITLAB_LIBS_BRANCH}' (${GITLAB_LIBS_MODE}) <--
 
 # Check if in on line mode
 if [ ${GITLAB_LIBS_MODE} == 'online' ]; then
-    cloneLib
+    devOpsLibsClone
 fi
 
 # If base library was not yet loaded
@@ -87,4 +87,4 @@ if [ ! "${GITLAB_LIBS_FUNCT_LOADED}" ]; then
 fi
 
 # Include project definitions case exists
-test -f $(dirname ${BASH_SOURCE[0]})/definitions.sh && source $(dirname ${BASH_SOURCE[0]})/definitions.sh
+test -f ${GITLAB_LIBS_DIR}/../definitions.sh && source ${GITLAB_LIBS_DIR}/../definitions.sh
