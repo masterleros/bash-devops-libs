@@ -185,7 +185,9 @@ function importLibs {
     _libsResult=0
     while [ "${1}" ]; do
         _lib="${1}"
-        _libFile="${GITLAB_LIBS_DIR}/${_lib}/lib.sh"
+        _libAlias=${_lib}lib
+        _libPath=${GITLAB_LIBS_DIR}/${_lib}
+        _libFile="${_libPath}/lib.sh"
         _libTmpPath=${GITLAB_TMP_DIR}/libs/${_lib}
 
         # Check if it is in online mode to copy/update libs
@@ -196,6 +198,8 @@ function importLibs {
         elif [ ! -f "${_libFile}" ]; then
             # In in auto mode
             if [[ ${GITLAB_LIBS_MODE} == "auto" && ! -f "${_libTmpPath}/main.sh" ]]; then
+                echoInfo "AUTO MODE - '${_libAlias}' is not installed neither found in cache, cloning code"
+
                 # Try to clone the lib code                
                 devOpsLibsClone
                 exitOnError "It was not possible to clone the library code"
@@ -206,10 +210,7 @@ function importLibs {
         fi
 
         # Check if there was no error importing the lib files
-        if [ ${?} -eq 0 ]; then 
-            _libAlias=${_lib}lib
-            _libPath=${GITLAB_LIBS_DIR}/${_lib}
-
+        if [ ${?} -eq 0 ]; then
             # Import lib
             source ${_libFile}
             exitOnError "Error importing '${_libFile}'"
