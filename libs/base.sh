@@ -177,39 +177,6 @@ function _importLibFiles() {
     return 1
 }
 
-### Import GitLab Lib ###
-# Usage: _importLib <lib>
-function _importLib() {    
-    
-    getArgs "_lib" "${@}"
-    _libAlias=${_lib}lib
-    _libPath=${GITLAB_LIBS_DIR}/${_lib}
-    _libFile="${_libPath}/lib.sh"
-
-    # Import lib
-    source ${_libFile}
-    exitOnError "Error importing '${_libFile}'"
-
-    # Get lib function names
-    _libFuncts=($(bash -c '. '${_libFile}' &> /dev/null; typeset -F' | awk '{print $NF}'))
-
-    # Rename functions
-    _funcCount=0
-    for _libFunct in ${_libFuncts[@]}; do
-
-        # if not an internal function neiter a private one (i.e: _<var>)
-        if [[ ! "${GITLAB_LIBS_FUNCT_LOADED[@]}" =~ "${funct}" && ${funct} != "_"* ]]; then
-            # echoInfo "  -> ${_libAlias}.${funct}()"
-            eval "$(echo "${_libAlias}.${_libFunct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${_libFile} ${_libFunct} "\"\${@}\""'; return; fi'; declare -f ${_libFunct} | tail -n +3)"
-            unset -f ${_libFunct}
-            ((_funcCount+=1))
-        fi
-    done
-
-    echoInfo "Imported GITLAB Library '${_libAlias}' (${_funcCount} functions)"    
-}
-
-
 ### Import GitLab Libs ###
 # Usage: importLibs <lib1> <lib2> ... <libN>
 function importLibs {
@@ -239,8 +206,33 @@ function importLibs {
         fi
 
         # Check if there was no error importing the lib files
-        if [ ${?} -eq 0 ]; then _importLib ${_lib}
-        else ((_libsResult+=1)); fi
+        if [ ${?} -eq 0 ]; then 
+            _libAlias=${_lib}lib
+            _libPath=${GITLAB_LIBS_DIR}/${_lib}
+
+            # Import lib
+            source ${_libFile}
+            exitOnError "Error importing '${_libFile}'"
+
+            # Get lib function names
+            _libFuncts=($(bash -c '. '${_libFile}' &> /dev/null; typeset -F' | awk '{print $NF}'))
+
+            # Rename functions
+            _funcCount=0
+            for _libFunct in ${_libFuncts[@]}; do
+                # if not an internal function neiter a private one (i.e: _<var>)
+                if [[ ! "${GITLAB_LIBS_FUNCT_LOADED[@]}" =~ "${_libFunct}" && ${_libFunct} != "_"* ]]; then
+                    # echoInfo "  -> ${_libAlias}.${_libFunct}()"
+                    eval "$(echo "${_libAlias}.${_libFunct}() {"; echo '    if [[ ${-//[^e]/} == e ]]; then '${_libFile} ${_libFunct} "\"\${@}\""'; return; fi'; declare -f ${_libFunct} | tail -n +3)"
+                    unset -f ${_libFunct}
+                    ((_funcCount+=1))
+                fi
+            done
+
+            echoInfo "Imported GITLAB Library '${_libAlias}' (${_funcCount} functions)" 
+        else 
+            ((_libsResult+=1)); 
+        fi
 
         # Go to next arg
         shift
