@@ -8,11 +8,11 @@ function validateRole {
     # Validate role format
     [[ ${role} == "roles/"* ]] || exitOnError "Role must use format roles/<role>" -1    
 
-    if [ ${domain} == "project" ]; then
+    if [ "${domain}" == "project" ]; then
         cmd="gcloud projects get-iam-policy ${domain_id}"
-    elif [ ${domain} == "folder" ]; then
+    elif [ "${domain}" == "folder" ]; then
         cmd="gcloud alpha resource-manager folders get-iam-policy ${domain_id}"
-    elif [ ${domain} == "billing" ]; then
+    elif [ "${domain}" == "billing" ]; then
         cmd="gcloud alpha billing accounts get-iam-policy ${domain_id}"
     else
         exitOnError "Unsupported get-iam-policy from '${domain}' domain" -1
@@ -39,12 +39,12 @@ function bindRole {
 
         # Validate if the role is already provided
         gcplib.validateRole ${domain} ${domain_id} ${role} ${email}
-        if [ $? -ne 0 ]; then
+        if [ ${?} -ne 0 ]; then
 
             # Concat the domain
-            if [ ${domain} == "project" ]; then
+            if [ "${domain}" == "project" ]; then
                 cmd="gcloud projects add-iam-policy-binding ${domain_id}"
-            elif [ ${domain} == "folder" ]; then
+            elif [ "${domain}" == "folder" ]; then
                 cmd="gcloud alpha resource-manager folders add-iam-policy-binding ${domain_id}"
             else
                 exitOnError "Unsupported add-iam-policy-binding to '${domain}' domain" -1

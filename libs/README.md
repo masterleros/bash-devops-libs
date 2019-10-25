@@ -98,18 +98,18 @@ function doSomething() {
 #!/bin/bash
 source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
 importLibs myfuncslib
-myfuncslib.doSomething Hi There From GitLab Libs!
+myfuncslib.doSomething Hi There From DevOps Libs!
 
 # Output:
 # Arg1 = Hi
 # Arg1 = There
-# Others = From GitLab Libs!
+# Others = From DevOps Libs!
 ```    
 
 # Library Catalog
 
 ## base.sh
-This is the root level source and includes all the base functions to use the GitLab Libs (i.e: importLibs)
+This is the root level source and includes all the base functions to use the DevOps Libs (i.e: importLibs)
 > **Obs:** This file will be automatically be imported by the devops-libs.sh execution.
 
 ## gcp

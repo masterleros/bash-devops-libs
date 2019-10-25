@@ -19,7 +19,7 @@ function createSA {
     sa_mail="${sa_id}@${project}.iam.gserviceaccount.com"
 
     gcloud --project ${project} iam service-accounts list | grep ${sa_mail} > /dev/null
-    if [ $? -ne 0 ]  ; then
+    if [ ${?} -ne 0 ]  ; then
         echoInfo "Creating Service account '${sa_mail}'..."
         gcloud --project ${project} iam service-accounts create ${sa_id} --display-name ${description}
         exitOnError

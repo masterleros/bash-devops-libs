@@ -23,7 +23,7 @@ function gae_deploy {
 
             # Check if same version was deployed before but is stopped, if so, delete version
             gcloud --quiet app versions list --uri --service=${GAE_SERVICE} --hide-no-traffic | grep ${GAE_VERSION} > /dev/null
-            if [ $? -ne 0 ]; then
+            if [ ${?} -ne 0 ]; then
                 gcloud --quiet app versions delete --service=${GAE_SERVICE} ${GAE_VERSION}
                 exitOnError "Failed to delete same version which is currently stopped"
             fi

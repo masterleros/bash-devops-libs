@@ -5,29 +5,30 @@
 #
 export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 
-### GITLAB LIBS BRANCH ###
-GITLAB_LIBS_BRANCH="feature/lib-updates"
-GITLAB_LIBS_SERVER="git.gft.com"
-GITLAB_LIBS_REPO="devops-br/gitlab-gft-libs.git"
-### GITLAB LIBS DEFINITIONS ###
+### DEVOPS LIBS BRANCH ###
+DEVOPS_LIBS_BRANCH="develop"
+### DEVOPS LIBS DEFINITIONS ###
+DEVOPS_LIBS_SERVER="git.gft.com"
+DEVOPS_LIBS_REPO="devops-br/gitlab-gft-libs.git"
+### DEVOPS LIBS DEFINITIONS ###
 
 ###############################
-export GITLAB_LIBS_MODE=${1}
-export GITLAB_LIBS_DIR="${ROOTDIR}/scripts/devops-libs"    
-export GITLAB_TMP_DIR="${GITLAB_LIBS_DIR}/.libtmp/${GITLAB_LIBS_BRANCH}"
+export DEVOPS_LIBS_MODE=${1}
+export DEVOPS_LIBS_DIR="${ROOTDIR}/scripts/devops-libs"    
+export DEVOPS_LIBS_TMP_DIR="${DEVOPS_LIBS_DIR}/.libtmp/${DEVOPS_LIBS_BRANCH}"
 ###############################
 
 # Validate OS
 if [[ "${OSTYPE}" != "linux-gnu" ]]; then echo "OS '${OSTYPE}' is not supported" >&2; exit -1; fi
 
-# Check if the execution in on GitLab
-if [ "${CI}" ]; then echo "---> Running on GitLab CI/CD <---"; fi
+# Check if the execution in on DevOps
+if [ "${CI}" ]; then echo "---> Running on DevOps CI/CD <---"; fi
 
 ############## VALIDATE OPERATION MODE #################
-if [ ! ${GITLAB_LIBS_MODE} ]; then export GITLAB_LIBS_MODE='auto'; fi # Set default mode case not provided
-if [[ ${GITLAB_LIBS_MODE} == 'auto' && ! -f ${GITLAB_LIBS_DIR}/base.sh ]]; then 
+if [ ! ${DEVOPS_LIBS_MODE} ]; then export DEVOPS_LIBS_MODE='auto'; fi # Set default mode case not provided
+if [[ ${DEVOPS_LIBS_MODE} == 'auto' && ! -f ${DEVOPS_LIBS_DIR}/base.sh ]]; then 
     echo "DevOps Libs not found! forcing online mode..."
-    export GITLAB_LIBS_MODE='online'; 
+    export DEVOPS_LIBS_MODE='online'; 
 fi
 #########################################################
 
@@ -41,50 +42,50 @@ function devOpsLibsClone() {
     set_e_enabled=${-//[^e]/}
     [ ${set_e_enabled} ] || set -e # Enable set e
 
-    echo "Retrieving GitLab Libs code...."
+    echo "Retrieving DevOps Libs code...."
 
     # Get the code
-    if [ ! -d ${GITLAB_TMP_DIR} ]; then
-        if [ ${CI_JOB_TOKEN} ]; then
-            git clone -b ${GITLAB_LIBS_BRANCH} --single-branch https://gitlab-ci-token:${CI_JOB_TOKEN}@${GITLAB_LIBS_SERVER}/${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
+    if [ ! -d "${DEVOPS_LIBS_TMP_DIR}" ]; then
+        if [ "${CI_JOB_TOKEN}" ]; then
+            git clone -b ${DEVOPS_LIBS_BRANCH} --single-branch https://gitlab-ci-token:${CI_JOB_TOKEN}@${DEVOPS_LIBS_SERVER}/${DEVOPS_LIBS_REPO} ${DEVOPS_LIBS_TMP_DIR}
         else
-            git clone -b ${GITLAB_LIBS_BRANCH} --single-branch git@${GITLAB_LIBS_SERVER}:${GITLAB_LIBS_REPO} ${GITLAB_TMP_DIR}
+            git clone -b ${DEVOPS_LIBS_BRANCH} --single-branch git@${DEVOPS_LIBS_SERVER}:${DEVOPS_LIBS_REPO} ${DEVOPS_LIBS_TMP_DIR}
         fi
     else
-        git -C ${GITLAB_TMP_DIR} pull
+        git -C ${DEVOPS_LIBS_TMP_DIR} pull
     fi    
 
     ### Create dir and copy the base lib inside the project ###
-    mkdir -p ${GITLAB_LIBS_DIR}
-    cp ${GITLAB_TMP_DIR}/libs/.gitignore ${GITLAB_LIBS_DIR}
-    cp ${GITLAB_TMP_DIR}/libs/base.sh ${GITLAB_LIBS_DIR}
-    cp ${GITLAB_TMP_DIR}/libs/README.md ${GITLAB_LIBS_DIR}    
+    mkdir -p ${DEVOPS_LIBS_DIR}
+    cp ${DEVOPS_LIBS_TMP_DIR}/libs/.gitignore ${DEVOPS_LIBS_DIR}
+    cp ${DEVOPS_LIBS_TMP_DIR}/libs/base.sh ${DEVOPS_LIBS_DIR}
+    cp ${DEVOPS_LIBS_TMP_DIR}/libs/README.md ${DEVOPS_LIBS_DIR}    
 
-    # Copy the GitLab Libs help
-    cp -r ${GITLAB_TMP_DIR}/README.md ${GITLAB_LIBS_DIR}/../DEVOPS-LIBS.md
+    # Copy the DevOps Libs help
+    cp -r ${DEVOPS_LIBS_TMP_DIR}/README.md ${DEVOPS_LIBS_DIR}/../DEVOPS-LIBS.md
 
     [ ${set_e_enabled} ] || set +e # Disable set e
 }
 
 # Show using branch
-echo "---> GitLab Libs branch: '${GITLAB_LIBS_BRANCH}' (${GITLAB_LIBS_MODE}) <---"
+echo "---> DevOps Libs branch: '${DEVOPS_LIBS_BRANCH}' (${DEVOPS_LIBS_MODE}) <---"
 
 # Check if in on line mode
-if [ ${GITLAB_LIBS_MODE} == 'online' ]; then
+if [ "${DEVOPS_LIBS_MODE}" == 'online' ]; then
     devOpsLibsClone
 fi
 
 # If base library was not yet loaded
-if [ ! "${GITLAB_LIBS_FUNCT_LOADED}" ]; then
-    ### Include GitLab Libs ###
-    if [ -f ${GITLAB_LIBS_DIR}/base.sh ]; then
-        source ${GITLAB_LIBS_DIR}/base.sh
-        if [ $? -ne 0 ]; then echo "Could not import GitLab Libs"; exit 1; fi
+if [ ! "${DEVOPS_LIBS_FUNCT_LOADED}" ]; then
+    ### Include DevOps Libs ###
+    if [ -f ${DEVOPS_LIBS_DIR}/base.sh ]; then
+        source ${DEVOPS_LIBS_DIR}/base.sh
+        if [ ${?} -ne 0 ]; then echo "Could not import DevOps Libs"; exit 1; fi
     else
-        echo "Could not find GitLab Libs (offline mode?)"
+        echo "Could not find DevOps Libs (offline mode?)"
         exit 1
     fi
 fi
 
 # Include project definitions case exists
-test -f ${GITLAB_LIBS_DIR}/../definitions.sh && source ${GITLAB_LIBS_DIR}/../definitions.sh
+test -f ${DEVOPS_LIBS_DIR}/../definitions.sh && source ${DEVOPS_LIBS_DIR}/../definitions.sh
