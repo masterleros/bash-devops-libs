@@ -171,10 +171,12 @@ function importLibs {
                 exitOnError "Could not copy the '${lib_alias}' library files"
 
                 # Include the lib.sh (entrypoint)
-                cp ${GITLAB_TMP_DIR}/lib.sh ${lib_file}
+                cp ${GITLAB_TMP_DIR}/libs/_libsh ${lib_file}
+                exitOnError "Could not copy the '${lib_file}' library inclussion file"
 
                 # Make the lib executable
                 chmod +x ${lib_file}
+                exitOnError "Could not make '${lib_file}' executable"
             fi
         # Check if the lib is available locally
         elif [ ! -f "${lib_file}" ]; then
