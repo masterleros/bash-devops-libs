@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Verify Dependencies
-verifyDeps git
+verifyDeps git || return ${?}
 
 ### Synchronize a GIT repository with current code
 # usage: sync <git_url>

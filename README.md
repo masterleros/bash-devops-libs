@@ -24,7 +24,7 @@ In order to use the libraries, you need to follow the steps:
 #### 1. Include the library
 Download the file `devops-libs.sh` placed in the root folder of this repository and copy to: `<YOUR_REPO>/scripts/devops-libs.sh`
 
-This is the entry point of the library, and once executed (see below) it will automatically retrieve the DevOps Libs code and include for you in your project at `${DEVOPS_LIBS_DIR}` folder
+This is the entry point of the library, and once executed (see below) it will automatically retrieve the DevOps Libs code and include for you in your project at `${DEVOPS_LIBS_PATH}` folder
 
 #### 2. Configure the library
 
@@ -33,7 +33,7 @@ You can edit the `devops-libs.sh` inside your project to change some of its char
 |Config|Description|
 |-|-|
 |`DEVOPS_LIBS_BRANCH`|Branch from where the lib is cloned (useful to lock a lib version)|
-|`DEVOPS_LIBS_DIR`|Directory where the libraries will be imported on your project|
+|`DEVOPS_LIBS_PATH`|Directory where the libraries will be imported on your project|
 
 #### 3. Use the libraries
 There are two ways to use the libraries:

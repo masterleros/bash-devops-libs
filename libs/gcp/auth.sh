@@ -1,6 +1,6 @@
 ### Get a value from the credential json file ###
-# usage: _gcplib.getValueFromCredential <credential_file> <key>
-function _gcplib.getValueFromCredential {
+# usage: getValueFromCredential <credential_file> <key>
+function getValueFromCredential {
     getArgs "credential_path key" "${@}"
 
     # Verify if SA credential file exist
@@ -35,7 +35,8 @@ function useSA {
     getArgs "credential_path" "${@}"
 
     # Get SA user email
-    _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(self getValueFromCredential ${credential_path} client_email)
+    exitOnError "Could not get Service Account information"
 
     echoInfo "Activating Service Account '${_client_mail}'..."
     gcloud auth activate-service-account --key-file=${credential_path}
@@ -49,7 +50,8 @@ function revokeSA {
     getArgs "credential_path" "${@}"
 
     # Get SA user email
-    _client_mail=$(_gcplib.getValueFromCredential ${credential_path} client_email)
+    _client_mail=$(self getValueFromCredential ${credential_path} client_email)
+    exitOnError "Could not get Service Account information"
 
     echoInfo "Revoking Service Account '${_client_mail}'..."
     gcloud auth revoke ${_client_mail}
@@ -73,5 +75,33 @@ function createCredential {
         ## Create/Download credentials ######
         gcloud iam service-accounts keys create ${credential_path} --iam-account ${sa_mail} --user-output-enabled false
         exitOnError "Failed creating/downloading key for '${sa_mail}'"
+    fi
+}
+
+### Create a service account credential json file
+# usage: createCredential <project> <credential_path> <sa_mail>
+function deleteCredential {
+
+    getArgs "project credential_path sa_mail" "${@}"
+
+    # Check if account is already created
+    if [ -f ${credential_path} ]; then
+        echo "Deleting '${sa_mail}' credential..."
+
+        # Get SA user email
+        _private_key_id=$(self getValueFromCredential ${credential_path} private_key_id)
+        exitOnError "Could not get Service Account information"
+
+        # Revoke account locally
+        gcloud auth revoke ${sa_mail} &> /dev/null
+
+        # Delete local file
+        rm ${credential_path} &> /dev/null
+
+        # Delete key on SA
+        gcloud --quiet iam service-accounts keys delete ${_private_key_id} --iam-account ${sa_mail}
+        exitOnError "Failed to delete the key"
+    else
+        exitOnError "Credential file ${credential_path} not found", -1
     fi
 }

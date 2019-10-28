@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Verify Dependencies
-verifyDeps gcloud
+verifyDeps gcloud || return ${?}
 
 # Import sub-modules
-importSubModules gae.sh iam.sh api.sh auth.sh
+importSubModules gae iam api auth firestore storage
 
 ### Validate and set the requested project ###
 # usage: useProject <project_id>
-function useProject {
+function useProject() {
 
     getArgs "project" "${@}"
     

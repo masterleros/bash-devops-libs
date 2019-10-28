@@ -26,6 +26,9 @@ function tokenReplaceFromFile {
     # Get tokens
     tokens=($(echo ${content} | egrep -o '\$\{([a-zA-Z0-9_]+)\}'))
 
+    # Sort and make tokens unique in the list
+    tokens=($(echo "${tokens[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+
     # Replace each var if exists
     retval=0
     for token in ${tokens[@]}; do
@@ -33,7 +36,7 @@ function tokenReplaceFromFile {
         var=$(echo ${token} | egrep -o '([a-zA-Z0-9_]+)')
         if [ "${!var}" ]; then
             content=${content//$token/${!var}}
-        else
+        elif [[ "${continue}" != "true" ]]; then
             echoError "Variable '${var}' is not defined!"
             ((retval+=1))
         fi
@@ -48,16 +51,16 @@ function tokenReplaceFromFile {
 }
 
 ### This function will replace from a file to file
-# usage: tokenReplaceInFile <path_source> [path_target]
-function tokenReplaceInFile {
+# usage: tokenReplaceToFile <path_source> <path_target> [continue<true>]
+function tokenReplaceToFile {
 
-    getArgs "path_source @path_target" "${@}"
+    getArgs "path_source path_target &continue" "${@}"
 
     # If not specified file, use source as target
     if [ ! "${path_target}" ]; then path_target=${path_source}; fi
 
     # Replace tokens, if not present, fail
-    utilslib.tokenReplaceFromFile ${path_source} > ${path_target}
+    utilslib.tokenReplaceFromFile ${path_source} ${continue} > ${path_target}
 }
 
 ### Execute a command until success within a retries ###

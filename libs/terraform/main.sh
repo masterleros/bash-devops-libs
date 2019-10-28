@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Verify Dependencies
-verifyDeps terraform
+verifyDeps terraform || return ${?}
 
 ### Synchronize a GIT repository with current code
 # usage: apply <terraform path>
