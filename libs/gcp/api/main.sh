@@ -1,6 +1,6 @@
 ### Validate a role of current user ###
-# usage: enableAPI <api_domain>
-function enableAPI {
+# usage: enable <api_domain>
+function enable {
 
     getArgs "project api" "${@}"
 

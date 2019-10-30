@@ -1,14 +1,20 @@
-### Function to deploy a gae app ###
-# usage: gae_deploy <yaml> [version]
-function gae_deploy {
+# Import dependencies
+do.import utils.tokens
 
-    getArgs "yaml &version" "${@}"    
+### Function to deploy a gae app ###
+# usage: deploy <path> [version]
+function deploy {
+
+    getArgs "path &version" "${@}"
     
-    # Check if file exists
-    [ -f ${yaml} ] || exitOnError "File '${yaml}' not found"
+    # Detokenize the file
+    echoInfo "Creating detokenized yaml..."
+    local detokenizedFile="$(dirname ${path})/detokenized_$(basename ${path})"
+    do.utils.tokens.replaceFromFileToFile ${path} ${detokenizedFile} true
+    exitOnError "It was not possible to replace all the tokens in '${path}', please check if values were exported."
 
     # Get service name
-    service=$(cat ${yaml} | grep -e ^service: | awk '{print $NF}')
+    service=$(cat ${detokenizedFile} | grep -e ^service: | awk '{print $NF}')
     [ ${service} ] || service="default"
 
     # If it is requesting a specific version
@@ -26,11 +32,15 @@ function gae_deploy {
         fi
 
         # Deploy specific version
-        gcloud --quiet app deploy ${yaml} --version ${version}
+        gcloud --quiet app deploy ${detokenizedFile} --version ${version}
     
     else 
         # Deploy with no version defined
-        gcloud --quiet app deploy ${yaml}
+        gcloud --quiet app deploy ${detokenizedFile}
     fi
     exitOnError "Failed to deploy the application"
+
+    # Remove tokenized yamls
+    echoInfo "Removing detokenized yaml..."
+    rm ${detokenizedFile}
 }

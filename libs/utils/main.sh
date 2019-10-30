@@ -7,60 +7,10 @@ function showTitle {
     getArgs "text" "${@}"
 
     len=$(echo "# ${text} #"| wc -c)
-    separator=$(eval printf '\#%.0s' {2..$len})
-    echoInfo $separator
+    separator=$(eval printf '\#%.0s' {2..${len}})
+    echoInfo ${separator}
     echoInfo "# ${text} #"
-    echoInfo $separator
-}
-
-### This function will echo the content of a file with tokens updated to values ###
-# usage: tokenReplaceFromFile <path_to_file> [continue<true>]
-function tokenReplaceFromFile {
-
-    getArgs "file &continue" "${@}"
-    
-    # Check if file exists
-    [ -f ${file} ] || exitOnError "File '${file}' not found"
-    content=$(cat ${file})
-
-    # Get tokens
-    tokens=($(echo ${content} | egrep -o '\$\{([a-zA-Z0-9_]+)\}'))
-
-    # Sort and make tokens unique in the list
-    tokens=($(echo "${tokens[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
-
-    # Replace each var if exists
-    retval=0
-    for token in ${tokens[@]}; do
-        # If variable is defined, replace
-        var=$(echo ${token} | egrep -o '([a-zA-Z0-9_]+)')
-        if [ "${!var}" ]; then
-            content=${content//$token/${!var}}
-        elif [[ "${continue}" != "true" ]]; then
-            echoError "Variable '${var}' is not defined!"
-            ((retval+=1))
-        fi
-    done
-
-    # If is not set to continue
-    if [[ "${continue}" != "true" ]]; then
-        exitOnError "Some tokens could not be replaced" ${retval} 
-    fi
-
-    echo "${content}"
-}
-
-### This function will replace from a file to file
-# usage: tokenReplaceToFile <path_source> <path_target> [continue<true>]
-function tokenReplaceToFile {
-
-    getArgs "path_source path_target &continue" "${@}"
-
-    # If not specified file, use source as target
-    if [ ! "${path_target}" ]; then path_target=${path_source}; fi
-
-    # Replace tokens, if not present, fail
-    utilslib.tokenReplaceFromFile ${path_source} ${continue} > ${path_target}
+    echoInfo ${separator}
 }
 
 ### Execute a command until success within a retries ###
