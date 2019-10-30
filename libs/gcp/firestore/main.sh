@@ -1,6 +1,6 @@
 ### Validate if the project is firestore enabled ###
-# usage: firestoreEnabledProject <project>
-function firestoreEnabledProject {
+# usage: enabledProject <project>
+function enabledProject {
     getArgs "project" "${@}"
     gcloud --quiet --project=${project} beta firestore operations list > /dev/null
     return ${?}

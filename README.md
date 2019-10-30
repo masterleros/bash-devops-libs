@@ -6,10 +6,12 @@ DevOps Libs is a set of common functionatilities and templates to accelerate Dev
 ## Folder Structure
 ``` sh
 ├── libs              	    (Libraries folder)
-│   ├── utils               (Additional utils library)
-│   ├── gcp                 (Example: GCP library)
+│   ├── utils/main.sh       (Additional utils library)
+│   ├── gcp/main.sh         (Example: GCP library)
 │   ...
-│   └── base.sh             (Base functions library)
+│   ├── core.sh             (Core functions library)
+│   ├── lib.sh              (lib importer contextualizer)
+│   └── main.sh             (DevOps lib functions, i.e: do.import)
 ├── gitlab                  (GitLab templates folders)
 │   ├── .base-template.yml  (Basic GitLab DevOps Libs template)
 │   └── .gcp-template.yml   (Example: GitLab DevOps GCP Libs templates)
@@ -56,8 +58,8 @@ variables:
 example_module:
   extends: .base-template
   script:
-    - importLibs <lib1> <lib2> ... <libN>
-    - libXlib.<function> <arg1> <arg2> ... <argN>
+    - do.import <lib1> <lib2> ... <libN>
+    - do.libX.<function> <arg1> <arg2> ... <argN>
 ```
 
 **B.** Use library for local executions**
@@ -69,10 +71,10 @@ example_module:
 source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
 
 # Import required lib
-importLibs gcp
+do.import gcp
 
 # Consume the lib
-gcplib.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+do.gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 ```
 
 **.gitlab-ci.yml**
@@ -85,17 +87,19 @@ example_module:
 > **Tip:** You can use the library in offline mode (use previous downloaded library) by using: `source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh offline`
 
 ## Operation Mode
-DevOps Liberary have 3 operations modes:
+DevOps Liberary have 4 operations modes:
 
   - **A. Auto (default)** - This mode will attempt to download the liraries if not found locally
   - **B. Online** - This mode will download and update the libraries on all executions
   - **C. Offline** - This Mode will use available libraries, if any is not found, it will fail.
+  - **D. local** - Same as `Online` but will copy libraries from a local folder instead of download from GIT (usefull for lib development and testing). To use local mode, you need to set the variable `DEVOPS_LIBS_LOCAL_MODE_PATH` to the root folder of the library.
 
 You can force the operation mode in the inclusion of the library:
 ``` yaml
 #!/bin/bash
 source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh offline # or online
 ```
+> **Tip:** To change default operation mode, update `DEVOPS_LIBS_DEFAULT_MODE` value in `devops-libs.sh`
 
 ## GitLab Pipeline Requirements
 > **Obs:** Templates are definitions of `before_script` and in some cases `after_script`, please be sure you don't need to implement your own mentioned sections as GitLab does not support both (template and custom) section to be merged and only one will be executed.

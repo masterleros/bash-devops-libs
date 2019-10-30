@@ -1,2 +1,4 @@
-!my_script.sh
 *.*
+!sample-script.sh
+!run-tests.sh
+!test-*.sh
