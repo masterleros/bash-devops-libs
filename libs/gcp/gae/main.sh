@@ -1,7 +1,7 @@
 # Import dependencies
 do.import utils.tokens
 
-set +x
+#set +x
 ### Function to deploy a gae app ###
 # usage: deploy <path> [version]
 function deploy {
@@ -33,11 +33,11 @@ function deploy {
         fi
 
         # Deploy specific version
-        gcloud --quiet app deploy ${detokenizedFile} --version ${version}
+        gcloud --quiet --verbosity=debug app deploy ${detokenizedFile} --version ${version}
     
     else 
         # Deploy with no version defined
-        gcloud --quiet app deploy ${detokenizedFile}
+        gcloud --quiet --verbosity=debug app deploy ${detokenizedFile}
     fi
     exitOnError "Failed to deploy the application"
 
@@ -46,4 +46,4 @@ function deploy {
     rm ${detokenizedFile}
 }
 
-set -x
+#set -x
