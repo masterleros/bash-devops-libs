@@ -1,7 +1,7 @@
 # Import dependencies
 do.import utils.tokens
 
-set -x
+set +x
 ### Function to deploy a gae app ###
 # usage: deploy <path> [version]
 function deploy {
@@ -46,4 +46,4 @@ function deploy {
     rm ${detokenizedFile}
 }
 
-set +x
+set -x
