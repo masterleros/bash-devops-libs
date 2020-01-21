@@ -6,8 +6,8 @@ function findDefinitions() {
     FUNCTIONS_FOLDER=${1}
     CF_DEFINITIONS_FILE=${2}
 
-    CF_DEF_FILES=($(find ${FUNCTIONS_FOLDER} -iname ${CF_DEFINITIONS_FILE} -printf '%P\n' | sort))
-    CF_DEF_FILES=($(find . -iname cf-definitions.conf -printf '%P\n' | sort))
+    #CF_DEF_FILES=($(find ${FUNCTIONS_FOLDER} -iname ${CF_DEFINITIONS_FILE} -printf '%P\n' | sort))
+    CF_DEF_FILES=($(find ${FUNCTIONS_FOLDER} -iname ${CF_DEFINITIONS_FILE} | sort))
     [ "${#CF_DEF_FILES[@]}" -eq 0 ] && exitOnError "Unable to locate any configuration file (${CF_DEFINITIONS_FILE}) to deploy the cloud function. File should be availabel under <ROOTDIR>/functions/<folder>/" -1
    
 }
@@ -17,13 +17,13 @@ function getDefinitions() {
     echo ${CF_DEF_FILES[@]}
 }
 
-function deploy() {
+#function deploy() {
     # to be defined
-}
+#}
 
-function prepareForDeploy() {
+#function prepareForDeploy() {
 
-    getArgs "FUNCTIONS_FOLDER CF_DEFINITIONS_FILE" ${@}
-    findDefinitions
+    #getArgs "FUNCTIONS_FOLDER CF_DEFINITIONS_FILE" ${@}
+    #findDefinitions
     
-}
+#}
