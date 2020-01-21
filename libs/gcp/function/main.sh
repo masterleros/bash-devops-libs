@@ -18,7 +18,7 @@ function getDefinitions() {
 }
 
 function deploy() {
-
+# to be defined
 }
 
 function prepareForDeploy() {
