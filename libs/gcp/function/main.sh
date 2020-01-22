@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Import required libs
-do.import utils.tokens utils.configs
-
 ### Find all Cloud Function definition files ###
 # usage: findDefinitions <absolute functions folder path> <cloud function definition filename>
 function findDefinitions() {
@@ -46,14 +43,16 @@ function getDefinitions() {
 ### Prepare for Deploying Cloud Function ###
 # usage: prepareForDeploy <functions folder> <aditional parameters array list>
 function prepareForDeploy() {
+    # Import required libs
+    do.import utils.tokens utils.configs
 
     getArgs "FUNCTIONS_FOLDER CF_DEFINITIONS_FILE ENV_YML_SOURCE_FILE" "${@}"
 
     # Find all Cloud Function definition files
-    findDefinitions ${FUNCTIONS_FOLDER} ${CF_DEFINITIONS_FILE}
+    do.gcp.function.findDefinitions ${FUNCTIONS_FOLDER} ${CF_DEFINITIONS_FILE}
 
-    # Retrieving the definition files found do.gcp.function.
-    CF_DEFINITIONS_FILES=($(getDefinitions))
+    # Retrieving the definition files found
+    CF_DEFINITIONS_FILES=($(do.gcp.function.getDefinitions))
 
     for cfDefFiles in ${CF_DEFINITIONS_FILES[@]}; do
         CF_ROOTDIR=$(dirname ${cfDefFiles})
@@ -74,9 +73,9 @@ function prepareForDeploy() {
         exitOnError "Fail to replace variables in '${CF_ROOTDIR}/detokenized-env.yaml'"
 
         # Deploy Function
-        deploy ${CF_NAME} ${CF_PARAMETERS}
+        do.gcp.function.deploy ${CF_NAME} ${CF_PARAMETERS}
 
         # Set IAM allowing users to invoke function
-        applyIAMPolicy ${CF_NAME}
+        do.gcp.function.applyIAMPolicy ${CF_NAME}
     done
 }
