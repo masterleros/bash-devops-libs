@@ -3,13 +3,13 @@
 ### Find all Cloud Function definition files ###
 # usage: findFiles <absolute functions folder path> <cloud function definition filename> <function name for callback> <additional args>
 function findFiles() {
-    getArgs "path file func &@args" "${@}"
+    getArgs "path file func" "${@}"
 
     filesFound=($(find ${path} -iname ${file} | sort))
     [ "${#filesFound[@]}" -eq 0 ] && exitOnError "Unable to locate any configuration file (${file}) to deploy the cloud function. File should be availabel under ${path}/<folder>/" -1
 
     for fileFound in ${filesFound[@]}; do
-        ${func} ${fileFound} "${args[@]}"
+        ${func} ${fileFound}
     done
 }
 
