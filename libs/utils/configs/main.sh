@@ -22,6 +22,5 @@ function getParametersFromFile() {
 
     [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
 
-    variable=$(cat ${1} | grep "\--")
     eval "$(echo ${variable}='$(cat ${1} | grep "\--")')"
 }
