@@ -12,8 +12,20 @@ function findDefinitions() {
    
 }
 
+### Apply the IAM Policy to the function ###
+# usage: applyIAMPolicy <function name>
+function applyIAMPolicy {
+    getArgs "cfName" "${@}"
+    # Set IAM allowing users to invoke function
+    gcloud functions add-iam-policy-binding ${cfName} \
+    --quiet \
+    --member="allUsers" \
+    --role="roles/cloudfunctions.invoker"
+    exitOnError "Failed to apply IAM policy to ${cfName}"
+}
+
 ### Deploy Cloud Function ###
-# usage: deploy <function name> <aditional parameters>
+# usage: deploy <function name> <aditional parameters array list>
 function deploy() {
     getArgs "cfName @parameters" "${@}"
     echo "gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password"
