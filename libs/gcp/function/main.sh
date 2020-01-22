@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Import required libs
-do.import do.utils.tokens utils.configs
-
 ### Find all Cloud Function definition files ###
 # usage: findDefinitions <absolute functions folder path> <cloud function definition filename>
 function findDefinitions() {
@@ -46,6 +43,9 @@ function getDefinitions() {
 ### Prepare for Deploying Cloud Function ###
 # usage: prepareForDeploy <functions folder> <aditional parameters array list>
 function prepareForDeploy() {
+    # Import required libs
+    do.import do.utils.tokens utils.configs
+
     getArgs "FUNCTIONS_FOLDER CF_DEFINITIONS_FILE ENV_YML_SOURCE_FILE" "${@}"
 
     # Find all Cloud Function definition files
