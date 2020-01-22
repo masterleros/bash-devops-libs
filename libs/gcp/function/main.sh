@@ -15,8 +15,8 @@ function findDefinitions() {
 ### Deploy Cloud Function ###
 # usage: deploy <function name> <aditional parameters>
 function deploy() {
-    getArgs "cfName parameters" "${@}"
-    echo "gcloud functions deploy ${cfName} ${parameters} | grep -vi password"
+    getArgs "cfName @parameters" "${@}"
+    echo "gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password"
     #exitOnError "Failed to deploy GCP Function ${cfName}"
 }
 
