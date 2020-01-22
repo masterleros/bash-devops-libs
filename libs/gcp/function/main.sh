@@ -33,4 +33,7 @@ function deploy() {
 
     echo "gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password"
     #exitOnError "Failed to deploy GCP Function ${cfName}"
+
+    # Set IAM allowing users to invoke function
+    self applyIAMPolicy ${CF_NAME}
 }
