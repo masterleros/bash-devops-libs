@@ -1,14 +1,16 @@
 #!/bin/bash
 
 ### Find all Cloud Function definition files ###
-# usage: findDefinitions <absolute functions folder path> <cloud function definition filename>
-function findDefinitions() {
-    getArgs "FUNCTIONS_FOLDER CF_DEFINITIONS_FILE" "${@}"
+# usage: findFiles <absolute functions folder path> <cloud function definition filename> <function name for callback> <additional args>
+function findFiles() {
+    getArgs "path file func @args" "${@}"
 
-    #CF_DEF_FILES=($(find ${FUNCTIONS_FOLDER} -iname ${CF_DEFINITIONS_FILE} -printf '%P\n' | sort))
-    CF_DEF_FILES=($(find ${FUNCTIONS_FOLDER} -iname ${CF_DEFINITIONS_FILE} | sort))
-    [ "${#CF_DEF_FILES[@]}" -eq 0 ] && exitOnError "Unable to locate any configuration file (${CF_DEFINITIONS_FILE}) to deploy the cloud function. File should be availabel under ${FUNCTIONS_FOLDER}/<folder>/" -1
-   
+    filesFound=($(find ${path} -iname ${file} | sort))
+    [ "${#filesFound[@]}" -eq 0 ] && exitOnError "Unable to locate any configuration file (${file}) to deploy the cloud function. File should be availabel under ${path}/<folder>/" -1
+
+    for fileFound in ${filesFound[@]}; do
+        ${func} ${fileFound} "${args[@]}"
+    done
 }
 
 ### Apply the IAM Policy to the function ###
@@ -31,51 +33,4 @@ function deploy() {
 
     echo "gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password"
     #exitOnError "Failed to deploy GCP Function ${cfName}"
-}
-
-### Returns all Cloud Function definition files found in findDefinitions function ###
-# usage: getDefinitions
-function getDefinitions() {
-    [ "${#CF_DEF_FILES[@]}" -eq 0 ] && exitOnError "No definitions available. Please, make sure to call the do.gcp.function.findDefinitions before this one" -1
-    echo ${CF_DEF_FILES[@]}
-}
-
-### Prepare for Deploying Cloud Function ###
-# usage: prepareForDeploy <functions folder> <aditional parameters array list>
-function prepareForDeploy() {
-    # Import required libs
-    do.import utils.tokens utils.configs
-
-    getArgs "FUNCTIONS_FOLDER CF_DEFINITIONS_FILE ENV_YML_SOURCE_FILE" "${@}"
-
-    # Find all Cloud Function definition files
-    do.gcp.function.findDefinitions ${FUNCTIONS_FOLDER} ${CF_DEFINITIONS_FILE}
-
-    # Retrieving the definition files found
-    CF_DEFINITIONS_FILES=($(do.gcp.function.getDefinitions))
-
-    for cfDefFiles in ${CF_DEFINITIONS_FILES[@]}; do
-        CF_ROOTDIR=$(dirname ${cfDefFiles})
-        CF_FILE=$(basename ${cfDefFiles})
-
-        # Get the cf_definition.conf file and replace variables by final values
-        do.utils.tokens.replaceFromFileToFile ${CF_ROOTDIR}/${CF_FILE} ${CF_ROOTDIR}/${CF_FILE}
-        exitOnError "Fail to replace variables in '${CF_ROOTDIR}/${CF_FILE}'"
-
-        # Parse the config file and extract required info
-        do.utils.configs.getValuesFromFile ${CF_ROOTDIR}/${CF_FILE} CF_NAME
-
-        # Extracting the additional parameters for Cloud Functions Deploy
-        do.utils.configs.getParametersFromFile ${CF_ROOTDIR}/${CF_FILE} CF_PARAMETERS
-
-        # Tokenize template environment variables file
-        do.utils.tokens.replaceFromFileToFile ${CF_ROOTDIR}/${ENV_YML_SOURCE_FILE} ${CF_ROOTDIR}/detokenized-env.yml
-        exitOnError "Fail to replace variables in '${CF_ROOTDIR}/detokenized-env.yaml'"
-
-        # Deploy Function
-        do.gcp.function.deploy ${CF_NAME} ${CF_PARAMETERS}
-
-        # Set IAM allowing users to invoke function
-        do.gcp.function.applyIAMPolicy ${CF_NAME}
-    done
 }
