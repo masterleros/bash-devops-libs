@@ -44,7 +44,7 @@ function getDefinitions() {
 # usage: prepareForDeploy <functions folder> <aditional parameters array list>
 function prepareForDeploy() {
     # Import required libs
-    do.import do.utils.tokens utils.configs
+    do.import utils.tokens utils.configs
 
     getArgs "FUNCTIONS_FOLDER CF_DEFINITIONS_FILE ENV_YML_SOURCE_FILE" "${@}"
 
