@@ -1,20 +1,20 @@
 #!/bin/bash
 
 ### Find all Cloud Function definition files ###
-# usage: findFiles <absolute functions folder path> <cloud function definition filename> <function name for callback> <additional args>
+# usage: findFiles <absolute_functions_folder_path> <cloud_function_definition_filename> <callback_function_name>
 function findFiles() {
-    getArgs "path file func" "${@}"
+    getArgs "path file callback" "${@}"
 
     filesFound=($(find ${path} -iname ${file} | sort))
     [ "${#filesFound[@]}" -eq 0 ] && exitOnError "Unable to locate any configuration file (${file}) to deploy the cloud function. File should be availabel under ${path}/<folder>/" -1
 
     for fileFound in ${filesFound[@]}; do
-        ${func} ${fileFound}
+        ${callback} ${fileFound}
     done
 }
 
 ### Apply the IAM Policy to the function ###
-# usage: applyIAMPolicy <function name>
+# usage: applyIAMPolicy <cloud_function_name>
 function applyIAMPolicy {
     getArgs "cfName" "${@}"
 
@@ -27,12 +27,12 @@ function applyIAMPolicy {
 }
 
 ### Deploy Cloud Function ###
-# usage: deploy <function name> <aditional parameters array list>
+# usage: deploy <function name> <aditional_parameters_array_list>
 function deploy() {
     getArgs "cfName @parameters" "${@}"
 
-    echo "gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password"
-    #exitOnError "Failed to deploy GCP Function ${cfName}"
+    gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password
+    exitOnError "Failed to deploy GCP Function ${cfName}"
 
     # Set IAM allowing users to invoke function
     self applyIAMPolicy ${CF_NAME}
