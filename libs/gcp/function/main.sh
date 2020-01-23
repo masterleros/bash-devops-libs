@@ -8,6 +8,6 @@ verifyDeps gcloud || return ${?}
 function deploy() {
     getArgs "cfName @parameters" "${@}"
 
-    echo "gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password"
-    #exitOnError "Failed to deploy GCP Function ${cfName}"
+    gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password
+    exitOnError "Failed to deploy GCP Function ${cfName}"
 }
