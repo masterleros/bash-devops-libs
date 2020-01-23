@@ -1,8 +1,8 @@
 #!/bin/bash
 
-### Get values of variables from file and set them into the given variable names ###
-# usage: getValuesFromFile <file> <var1> <var2> ... <varN>
-function getValuesFromFile() {
+### Set variables from file's values and set them into the given variable names ###
+# usage: setVariablesFromFile <file> <var1> <var2> ... <varN>
+function setVariablesFromFile() {
      getArgs "file @vars" "${@}"
 
      [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
@@ -13,4 +13,14 @@ function getValuesFromFile() {
           echoInfo "Setting ${_var} = '${_temp}'"
           eval "$(echo ${_var}='${_temp}')"
      done
+}
+
+### Get arguments starting with placeholder "--" from a given file and assign the arguments as string to a given variable name ###
+# usage: getAllArgsFromFile <file>
+function getAllArgsFromFile() {
+    getArgs "file" "${@}"
+
+    [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
+
+    _return=($(cat ${file} | grep "\--"))
 }
