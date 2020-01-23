@@ -15,12 +15,12 @@ function getValuesFromFile() {
      done
 }
 
-### Get parameters starting with placeholder "--" from a given file and assign the parameters as string to a given variable name ###
-# usage: getParametersFromFile <file> <variable_to_be_assigned>
-function getParametersFromFile() {
-    getArgs "file variable" "${@}"
+### Get arguments starting with placeholder "--" from a given file and assign the arguments as string to a given variable name ###
+# usage: getAllArgsFromFile <file>
+function getAllArgsFromFile() {
+    getArgs "file" "${@}"
 
     [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
 
-    eval "$(echo ${variable}='$(cat ${file} | grep "\--")')"
+    _return=($(cat ${file} | grep "\--"))
 }

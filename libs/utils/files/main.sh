@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ### Find all files in a folder and execute a callback function ###
-# usage: findFiles <absolute_root_folder_path> <filename> <callback_function>
-function findFiles() {
+# usage: findAndCallback <absolute_root_folder_path> <filename> <callback_function>
+function findAndCallback() {
     getArgs "path file callback &@args" "${@}"
 
     filesFound=($(find ${path} -iname ${file} | sort))
