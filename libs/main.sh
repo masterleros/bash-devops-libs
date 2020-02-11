@@ -90,19 +90,24 @@ function import() {
             echoInfo "DEVOPS Library '${_lib}' already imported!"
         else
             # Check if it is in online mode to copy/update libs
-            if [[ "${DOLIBS_MODE}" == "online" || "${DOLIBS_MODE}" == "local" ]]; then
+            #if [[ "${DOLIBS_MODE}" == "online" || "${DOLIBS_MODE}" == "local" ]]; then
+            if [[ "${DOLIBS_MODE}" == "local" ]]; then
                 # Include the lib
                 self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
                 exitOnError "It was not possible to import the library files '${_libTmpPath}'"
             # Check if the lib is available locally
             elif [ ! -f "${_libMain}" ]; then
+                # If in online mode
+                if [[ "${DOLIBS_MODE}" == "online" ]]; then
+                    echoInfo "ONLINE MODE - '${_lib}' is not installed, cloning code..."                
+                    devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir}
+                    exitOnError "It was not possible to clone the library code"                    
                 # In in auto mode
-                if [[ ${DOLIBS_MODE} == "auto" && ! -f "${_libTmpMain}" ]]; then
+                elif [[ ${DOLIBS_MODE} == "auto" && ! -f "${_libTmpMain}" ]]; then
                     echoInfo "AUTO MODE - '${_lib}' is not installed neither found in cache, cloning code..."
 
                     # Try to clone the lib code
                     devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir}
-
                     exitOnError "It was not possible to clone the library code"
                 fi
 
