@@ -19,7 +19,7 @@ if [[ "${BASH}" != "/bin/bash" ]]; then echo "Current OS is not running on bash 
 
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_DEFAULT_MODE="auto"
-DOLIBS_BRANCH="master"
+DOLIBS_BRANCH="feature/cleanup"
 DOLIBS_REPO="github.com:masterleros/bash-devops-libs.git"
 ### DEVOPS LIBS DEFINITIONS ###
 export DOLIBS_MODE="${DOLIBS_DEFAULT_MODE}"
