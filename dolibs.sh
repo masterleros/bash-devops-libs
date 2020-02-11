@@ -19,7 +19,7 @@ export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 ### DEVOPS LIBS BRANCH ###
 DOLIBS_DEFAULT_MODE="auto"
 DOLIBS_BRANCH="master"
-DOLIBS_REPO="github.com:masterleros/bash-devops-libs.git"
+DOLIBS_REPO="github.com/masterleros/bash-devops-libs.git"
 ### DEVOPS LIBS DEFINITIONS ###
 
 # Validate OS
@@ -46,7 +46,7 @@ function devOpsLibsClone() {
 
         # Get the code
         if [ ! -d ${DOLIBS_TMP_DIR} ]; then
-            git clone -b ${DOLIBS_BRANCH} --single-branch git@${DOLIBS_REPO} ${DOLIBS_TMP_DIR}
+            git clone -b ${DOLIBS_BRANCH} --single-branch https://git@${DOLIBS_REPO} ${DOLIBS_TMP_DIR}
         else
             git -C ${DOLIBS_TMP_DIR} pull
         fi
