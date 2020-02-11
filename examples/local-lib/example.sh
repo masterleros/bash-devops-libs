@@ -12,20 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
-
-# Set the custom remote lib source
-do.addCustomGitSource customlib "github.com:masterleros/bash-devops-libs.git" master
-exitOnError
-do.import customlib.utils
+# Enable dolibs (clone to /tmp)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp
 
 # Set the custom lib source
 do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
-exitOnError
+
+# Import the required lib from custom namespace
 do.import local.utils
 
-### YOUR CODE ###
-do.customlib.utils.showTitle "External lib import test!"
-do.local.utils.showTitle "Local lib import test!"
-### YOUR CODE ###
+# Use the needed lib
+do.local.utils.showTitle "Hello DevOps Libs!"

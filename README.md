@@ -100,23 +100,42 @@ do.definitions.customFunct "${MY_PROJECT_DESCRIPTION}"
 # Output: My arg is: 'My cool project!'
 ```
 
+## Local Libraries
+
+To include local libraries, you can use the function `do.addLocalSource` to add a local folder as source of libs in the `local` namespace:
+
+**example.sh**
+``` sh
+# Enable dolibs (clone to /tmp)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp
+
+# Set the custom lib source
+do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
+
+# Import the required lib from custom namespace
+do.import local.utils
+
+# Use the needed lib
+do.local.utils.showTitle "Hello DevOps Libs!"
+```
+
 ## External Libraries
 
-To include external libraries, you can use the function `do.addCustomSource` to add an external GIT source, then name it as a new namespace:
+To include external libraries, you can use the function `do.addCustomGitSource` to add an external GIT source, then name it as a new namespace:
 
 **example.sh**
 ``` sh
 # Enable dolibs (clone to /tmp)
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
-# Set the custom lib namespace and source (optionally the branch)
-do.addCustomSource "mycustomlib" "github.com:masterleros/bash-devops-libs.git" "branch"
+# Set the custom lib source
+do.addCustomGitSource myremotelib "github.com:masterleros/bash-devops-libs.git" master
 
-# Import the required lib
-do.import mycustomlib.utils
+# Import the required lib from custom namespace
+do.import myremotelib.utils
 
 # Use the needed lib
-do.mycustomlib.utils.showTitle "Hello DevOps Libs!"
+do.myremotelib.utils.showTitle "Hello DevOps Libs!"
 ```
 
 ## Available libraries
