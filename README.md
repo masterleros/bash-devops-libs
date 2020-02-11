@@ -65,8 +65,8 @@ do.gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 ## Operation Mode
 DevOps Liberary have 4 operations modes:
 
-  - **A. Auto (default)** - This mode will attempt to download the liraries if not found locally
-  - **B. Online** - This mode will download and update the libraries on all executions
+  - **A. Auto (default)** - This mode will download the libraries if not found locally of if remote code has changed.
+  - **B. Online** - This mode will download and update the libraries on all executions.
   - **C. Offline** - This Mode will use available libraries, if any is not found, it will fail.
   - **D. local** - Same as `Online` but will copy libraries from a local folder instead of download from GIT (usefull for lib development and testing).
 
@@ -109,7 +109,7 @@ To include local libraries, you can use the function `do.addLocalSource` to add 
 # Enable dolibs (clone to /tmp)
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp
 
-# Set the custom lib source
+# Set the local lib source
 do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
 
 # Import the required lib from custom namespace
@@ -128,8 +128,8 @@ To include external libraries, you can use the function `do.addCustomGitSource` 
 # Enable dolibs (clone to /tmp)
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
-# Set the custom lib source
-do.addCustomGitSource myremotelib "github.com:masterleros/bash-devops-libs.git" master
+# Set the external lib source
+do.addCustomGitSource myremotelib "github.com/masterleros/bash-devops-libs.git" master
 
 # Import the required lib from custom namespace
 do.import myremotelib.utils

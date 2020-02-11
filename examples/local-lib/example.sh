@@ -15,7 +15,7 @@
 # Enable dolibs (clone to /tmp)
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp
 
-# Set the custom lib source
+# Set the local lib source
 do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
 
 # Import the required lib from custom namespace

@@ -68,8 +68,9 @@ function import() {
         else
             local _libSpace=(${_lib//./ })
             local _libDir=${_lib/./\/}
+            local _libPath=${DOLIBS_DIR}/${_libDir}
 
-            # If it not a local lib
+            # If it is a local custom lib
             if [[ ${_libSpace} == "local" ]]; then
                 # Get local config position
                 assign _customPos=self _valueInArray local "${DOLIBS_CUSTOM_NAMESPACE[@]}"
@@ -77,8 +78,9 @@ function import() {
 
                 local _libDir=${_libDir/${_libSpace}\//}
                 local _libPath=${DOLIBS_CUSTOM_REPO[${_customPos}]}/${_libDir}
-                local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
-            else
+            
+            # If offline mode use current folders, else check remote
+            elif [[ "${DOLIBS_MODE}" != "offline" ]]; then
 
                 # Check if it is a custom lib
                 assign _customPos=self _valueInArray ${_libSpace} "${DOLIBS_CUSTOM_NAMESPACE[@]}"
@@ -94,57 +96,72 @@ function import() {
                     local _gitRepo=${DOLIBS_REPO}
                     local _gitBranch=${DOLIBS_BRANCH}
                     local _gitDir=${DOLIBS_TMP_DIR}
-                    local _libRootParentDir=${DOLIBS_DIR}
-                    local _libPath=${DOLIBS_DIR}/${_libDir}
+                    local _libRootParentDir=${DOLIBS_DIR}                    
                 fi
                 
-                # Lib location
-                local _gitStatus=${_libRootParentDir}/devops-libs.status            
-                local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
+                # Cloned Lib location
+                local _gitStatus=${_libRootParentDir}/devops-libs.status
+                local _gitTmpStatus=${_gitDir}/devops-libs.status
                 local _libTmpPath=${_gitDir}/libs/${_libDir}
                 local _libTmpMain=${_libTmpPath}/${DOLIBS_MAIN_FILE}
 
-                # Check if it is in online mode to copy/update libs
+                # LOCAL
                 if [[ "${DOLIBS_MODE}" == "local" ]]; then
-                    # Include the lib
+                    # Import the lib
                     self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
                     exitOnError "It was not possible to import the library files '${_libTmpPath}'"
                 
-                # If branch has changed, force update
-                elif [[ ! -f "${_gitStatus}" || "$(cat ${_gitStatus} | grep branch | awk -F : '{print $NF}')" != "${_gitBranch}" ]]; then
-                
-                    echoInfo "FORCED MODE - '${_lib}' branch has changed, cloning code..."                
-                    devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_gitStatus}
-                    exitOnError "It was not possible to clone the library code"                      
+                # ONLINE (allways clone)
+                elif [[ "${DOLIBS_MODE}" == "online" ]]; then
 
-                    # Include the lib
+                    # Try to clone the lib code
+                    devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_gitTmpStatus}
+                    exitOnError "It was not possible to clone the library code"
+                                    
+                    # Import the lib
                     self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
                     exitOnError "It was not possible to import the library files '${_libTmpPath}'"
 
-                # Check if the lib is available locally
-                elif [ ! -f "${_libMain}" ]; then
+                    # Update git status
+                    cp ${_gitTmpStatus} ${_gitStatus}
+                    exitOnError "It was not possible to update git status file '${_gitStatus}'"
 
-                    # If in online mode
-                    if [[ "${DOLIBS_MODE}" == "online" ]]; then
-                        echoInfo "ONLINE MODE - '${_lib}' is not installed, cloning code..."                
-                        devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_gitStatus}
-                        exitOnError "It was not possible to clone the library code"                    
-                    # In in auto mode
-                    elif [[ ${DOLIBS_MODE} == "auto" && ! -f "${_libTmpMain}" ]]; then
-                        echoInfo "AUTO MODE - '${_lib}' is not installed neither found in cache, cloning code..."
+                # AUTO (clone when changes are detected)
+                elif [[ "${DOLIBS_MODE}" == "auto" ]]; then
+
+                    # Get git statuses
+                    local _currentHash=$([ ! -f "${_gitTmpStatus}" ] || cd ${_gitDir} && git rev-parse HEAD)
+                    local _remoteHash=$([ ! -f "${_gitTmpStatus}" ] || cd ${_gitDir} && git rev-parse origin/${_gitBranch})
+
+                    # Code not cloned / Changed detected
+                    if [[ ! -f "${_gitTmpStatus}" || "${_currentHash}" != "${_remoteHash}" ]]; then
+
+                        echoInfo "AUTO MODE - '${_lib}' has changed, cloning code..."
 
                         # Try to clone the lib code
-                        devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_gitStatus}
+                        devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_gitTmpStatus}
                         exitOnError "It was not possible to clone the library code"
+
+                        # Import the lib
+                        self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
+                        exitOnError "It was not possible to import the library files '${_libTmpPath}'"                        
                     fi
 
-                    # Include the lib
-                    self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
-                    exitOnError "It was not possible to import the library files '${_libTmpPath}'"
+                    # If not found locally or branch has changed, import
+                    if [[ ! -f "${_gitStatus}" || "$(cat ${_gitTmpStatus})" != "$(cat ${_gitStatus})" ]]; then
+
+                        self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
+                        exitOnError "It was not possible to import the library files '${_libTmpPath}'"
+
+                        # Update git status
+                        cp ${_gitTmpStatus} ${_gitStatus}
+                        exitOnError "It was not possible to update git status file '${_gitStatus}'"                        
+                    fi
                 fi
             fi
 
             # local CURRENT_LIB_FUNC=${FUNCNAME##*.}
+            local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
             local _libContext='local CURRENT_LIB=${FUNCNAME%.*}; CURRENT_LIB=${CURRENT_LIB#*.};
                                local CURRENT_LIB_DIR='${_libRootParentDir}'/${CURRENT_LIB/./\/}'
 
@@ -202,7 +219,7 @@ function addCustomGitSource() {
     getArgs "_namespace _url &_branch" "${@}"
 
     # Check if in local mode
-    [[ ${DOLIBS_MODE} != 'local' ]] || exitOnError "Custom remote sources are not supported in local mode!"
+    [[ ${DOLIBS_MODE} != 'local' && ${DOLIBS_MODE} != 'offline' ]] || exitOnError "Custom remote sources are not supported in '${DOLIBS_MODE}' mode!"
     [[ ${_namespace} != "local" ]] || exitOnError "Namespace 'local' is reserved for local sources!"
 
     self _addCustomSource ${_namespace} ${_url} ${_branch}    

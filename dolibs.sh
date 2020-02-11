@@ -20,7 +20,7 @@ if [[ "${BASH}" != "/bin/bash" ]]; then echo "Current OS is not running on bash 
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_DEFAULT_MODE="auto"
 DOLIBS_BRANCH="feature/cleanup"
-DOLIBS_REPO="github.com:masterleros/bash-devops-libs.git"
+DOLIBS_REPO="github.com/masterleros/bash-devops-libs.git"
 ### DEVOPS LIBS DEFINITIONS ###
 export DOLIBS_MODE="${DOLIBS_DEFAULT_MODE}"
 export DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"
@@ -36,7 +36,7 @@ while [ "${1}" != "" ]; do
         # dolibs root folder    
         "-f") export DOLIBS_ROOTDIR=${2}; shift 2;;
         # Local mode folder
-        "-l") export DOLIBS_LOCAL_MODE_DIR=${2}; shift 2;;
+        "-l") export DOLIBS_LOCAL_MODE_DIR="$(cd ${2}/ >/dev/null 2>&1 && pwd)"; shift 2;;        
         *) echo "OPTION: '${1}' not recognized"; exit -1;;
     esac
 done
@@ -67,16 +67,16 @@ function devOpsLibsClone() {
 
         # Get the code
         if [ ! -d ${GIT_DIR} ]; then
-            git clone -b ${GIT_BRANCH} --single-branch git@${GIT_REPO} ${GIT_DIR}
+            git clone -b ${GIT_BRANCH} --single-branch https://git@${GIT_REPO} ${GIT_DIR}
         else
             git -C ${GIT_DIR} pull
         fi
 
         # Update retrieved lib status
-        mkdir -p $(dirname ${GIT_STATUS})
+        #mkdir -p $(dirname ${GIT_STATUS})
         cat << EOF > ${GIT_STATUS}
 branch:${GIT_BRANCH}
-hash:$(git rev-parse HEAD)
+hash:$(cd ${GIT_DIR}; git rev-parse HEAD)
 updated:$(date)
 user:$(git config user.name)
 email:$(git config user.email)
@@ -114,7 +114,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         if [ ! -d ${DOLIBS_LOCAL_MODE_DIR} ]; then echo 'ERROR: invalid local path to clone!' >&2; exit -1; fi
         export DOLIBS_TMP_DIR=${DOLIBS_LOCAL_MODE_DIR}
         export DOLIBS_MODE='local'
-        echo "Using Local mode from '${DOLIBS_LOCAL_MODE_DIR}'"        
+        # echo "Using Local mode from '${DOLIBS_LOCAL_MODE_DIR}'"        
     # Check if operation mode was specified
     elif [ ! ${DOLIBS_MODE} ]; then # Set default mode case not provided
         if [ "${CI}" ]; then
@@ -138,8 +138,13 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     #########################################################
 
     # Show using branch
-    echo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE})"
-    echo "---> Lib Folder: '${DOLIBS_ROOTDIR}'"
+    if [[ ${DOLIBS_MODE} == 'offline' ]]; then 
+        echo "---> DevOps Libs (${DOLIBS_MODE}) <---"
+    elif [[ ${DOLIBS_MODE} == 'local' ]]; then 
+        echo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"
+    else
+        echo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_MODE_DIR}' (${DOLIBS_MODE}) <---"
+    fi
 
     # Check if in on line mode
     if [[ ${DOLIBS_MODE} == 'online' || ${DOLIBS_MODE} == 'local' ]]; then
