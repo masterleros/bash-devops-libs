@@ -12,11 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp)
+#!/bin/bash
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
-# Import the required lib
-do.import utils
+# Set the custom lib source
+do.addCustomSource customlib "github.com:masterleros/bash-devops-libs.git" master
 
-# Use the needed lib
-do.utils.showTitle "Hello DevOps Libs!"
+# Import the required lib from custom namespace
+do.import customlib.utils
+
+### YOUR CODE ###
+do.customlib.utils.showTitle "Custom lib import test!"
+### YOUR CODE ###

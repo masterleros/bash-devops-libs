@@ -14,11 +14,8 @@
 
 #!/bin/bash
 
-####### TEST PREPARATION #######
 TESTS_DIR="tests"
-export DOLIBS_LOCAL_MODE_DIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 CURRENT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd)"
-####### TEST PREPARATION #######
 
 ### Print a nice title ###
 # usage: _showTestTitle "text"
