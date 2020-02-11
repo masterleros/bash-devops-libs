@@ -3,19 +3,6 @@
 ## Introduction
 DevOps Libs is a set of common functionatilities and templates to accelerate DevOps setup processes
 
-## Folder Structure
-``` sh
-├── libs              	    (Libraries folder)
-│   ├── utils/main.sh       (Additional utils library)
-│   ├── gcp/main.sh         (Example: GCP library)
-│   ...
-│   ├── core.sh             (Core functions library)
-│   ├── lib.sh              (lib importer contextualizer)
-│   └── main.sh             (DevOps lib functions, i.e: do.import)
-├── gitlab                  (GitLab templates folders)
-└── dolibs.sh               (DevOps Libs entry point)
-```
-
 ### Using Libraries
 In order to use this library (i.e: local execution or in GitLab Pipeline) you need to include the DevOps Libs in your project.
 
