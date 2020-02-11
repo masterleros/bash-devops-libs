@@ -93,8 +93,13 @@ EOF
         cp ${DOLIBS_TMP_DIR}/libs/*.* ${DOLIBS_DIR}
         cp ${DOLIBS_TMP_DIR}/libs/.gitignore ${DOLIBS_DIR}
 
+        # Copy license
+        cp ${DOLIBS_TMP_DIR}/LICENSE ${DOLIBS_DIR}/LICENSE
+        cp ${DOLIBS_TMP_DIR}/NOTICE ${DOLIBS_DIR}/NOTICE
+
         # Copy the DevOps Libs help
-        cp ${DOLIBS_TMP_DIR}/README.md ${DOLIBS_DIR}/../DEVOPS-LIBS.md    
+        cp ${DOLIBS_TMP_DIR}/README.md ${DOLIBS_DIR}/README.md
+        cp ${DOLIBS_TMP_DIR}/libs/README.md ${DOLIBS_DIR}/DEVELOPMENT.md
     fi
 
     [ ${set_e_enabled} ] || set +e # Disable set e
