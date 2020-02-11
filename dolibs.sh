@@ -65,9 +65,9 @@ function devOpsLibsClone() {
         ### Clone / update the libraries ###
         echo "Retrieving DevOps Libs code from '${GIT_REPO}'..."
 
-        # Get the code
-        if [ ! -d ${GIT_DIR} ]; then
-            git clone -b ${GIT_BRANCH} --single-branch https://git@${GIT_REPO} ${GIT_DIR}
+        # Get the code        
+        if [ ! -d ${GIT_DIR} ]; then            
+            git clone -b ${GIT_BRANCH} --single-branch https://git@${GIT_REPO} ${GIT_DIR}            
         else
             git -C ${GIT_DIR} pull
         fi
@@ -82,24 +82,6 @@ user:$(git config user.name)
 email:$(git config user.email)
 hostname:$(hostname)
 EOF
-    fi
-
-    # If it is the main lib
-    if [[ ${DOLIBS_REPO} == ${GIT_REPO} ]]; then    
-        echo "Installing Core library code...."
-
-        ### Create dir and copy the Core lib inside the project ###
-        mkdir -p ${DOLIBS_DIR}
-        cp ${DOLIBS_TMP_DIR}/libs/*.* ${DOLIBS_DIR}
-        cp ${DOLIBS_TMP_DIR}/libs/.gitignore ${DOLIBS_DIR}
-
-        # Copy license
-        cp ${DOLIBS_TMP_DIR}/LICENSE ${DOLIBS_DIR}/LICENSE
-        cp ${DOLIBS_TMP_DIR}/NOTICE ${DOLIBS_DIR}/NOTICE
-
-        # Copy the DevOps Libs help
-        cp ${DOLIBS_TMP_DIR}/README.md ${DOLIBS_DIR}/README.md
-        cp ${DOLIBS_TMP_DIR}/libs/README.md ${DOLIBS_DIR}/DEVELOPMENT.md
     fi
 
     [ ${set_e_enabled} ] || set +e # Disable set e
@@ -137,7 +119,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             export DOLIBS_MODE='online'; 
         elif [[ $(cat ${DOLIBS_STATUS} | grep branch | awk -F : '{print $NF}') != ${DOLIBS_BRANCH} ]]; then
             echo "DevOps Lib Branch has changed! forcing online mode..."
-            export DOLIBS_MODE='online'         
+            export DOLIBS_MODE='online'
         fi
     fi
     #########################################################
@@ -146,14 +128,32 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     if [[ ${DOLIBS_MODE} == 'offline' ]]; then 
         echo "---> DevOps Libs (${DOLIBS_MODE}) <---"
     elif [[ ${DOLIBS_MODE} == 'local' ]]; then 
-        echo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"
+        echo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_MODE_DIR}' (${DOLIBS_MODE}) <---"        
     else
-        echo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_MODE_DIR}' (${DOLIBS_MODE}) <---"
+        echo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
     fi
 
     # Check if in on line mode
     if [[ ${DOLIBS_MODE} == 'online' || ${DOLIBS_MODE} == 'local' ]]; then
         devOpsLibsClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_TMP_DIR} ${DOLIBS_STATUS}
+
+        # If it is the main lib
+        #if [[ ${DOLIBS_REPO} == ${GIT_REPO} ]]; then    
+        echo "Installing Core library code...."
+
+        ### Create dir and copy the Core lib inside the project ###
+        mkdir -p ${DOLIBS_DIR}
+        cp ${DOLIBS_TMP_DIR}/libs/*.* ${DOLIBS_DIR}
+        cp ${DOLIBS_TMP_DIR}/libs/.gitignore ${DOLIBS_DIR}
+
+        # Copy license
+        cp ${DOLIBS_TMP_DIR}/LICENSE ${DOLIBS_DIR}/LICENSE
+        cp ${DOLIBS_TMP_DIR}/NOTICE ${DOLIBS_DIR}/NOTICE
+
+        # Copy the DevOps Libs help
+        cp ${DOLIBS_TMP_DIR}/README.md ${DOLIBS_DIR}/README.md
+        cp ${DOLIBS_TMP_DIR}/libs/README.md ${DOLIBS_DIR}/DEVELOPMENT.md
+        #fi        
     fi
 
     ### Include DevOps Libs ###

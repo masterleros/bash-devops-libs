@@ -16,7 +16,10 @@
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
 # Import the required lib
-do.import utils
+do.import utils utils utils
+
+# Optionally you can import all libs from the specified folder at once
+# do.recursiveImport ../..
 
 # Use the needed lib
 do.utils.showTitle "Hello DevOps Libs!"

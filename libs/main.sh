@@ -23,12 +23,12 @@ function _importLibFiles() {
     # Check if the lib is available from download
     if [ -f ${_libTmpMain} ]; then
         # Create lib dir and copy
-        mkdir -p ${_libPath} && cp -r ${_libTmpPath}/* ${_libPath}
+        mkdir -p ${_libPath} && cp -r ${_libTmpPath}/* ${_libPath}        
         exitOnError "Could not copy the '${_lib}' library files"
         return 0        
     fi
     
-    echoError "DEVOPS Library '${_lib}' not found! (was it downloaded already?)"
+    echoError "DEVOPS Library '${_lib}' not found! (was it downloaded already? / needs do.addCustomGitSource?)"
     return 1
 }
 
@@ -46,6 +46,14 @@ function _valueInArray() {
         ((_pos+=1))
     done
     return -1
+}
+
+### Get a value from a config file
+# usage: _configInFile <file> <key>
+function _configInFile() {
+    getArgs "_file _key" "${@}"
+    _return=$(cat ${_file} | grep ${_key} | cut -d':' -f2-)
+    return $?
 }
 
 ### Import DevOps Libs ###
@@ -66,31 +74,33 @@ function import() {
 
         # If not imported yet
         else
-            local _libSpace=(${_lib//./ })
+            local _libNamespace=(${_lib//./ })
             local _libDir=${_lib/./\/}
             local _libPath=${DOLIBS_DIR}/${_libDir}
 
             # If it is a local custom lib
-            if [[ ${_libSpace} == "local" ]]; then
+            if [[ ${_libNamespace} == "local" ]]; then
                 # Get local config position
                 assign _customPos=self _valueInArray local "${DOLIBS_CUSTOM_NAMESPACE[@]}"
-                exitOnError "It was not possible to find a local lib configuration"
+                exitOnError "The 'local' library was not configured (needs do.addLocalSource?)"
 
-                local _libDir=${_libDir/${_libSpace}\//}
+                local _libDir=${_libDir/${_libNamespace}\//}
                 local _libPath=${DOLIBS_CUSTOM_REPO[${_customPos}]}/${_libDir}
+                local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
             
             # If offline mode use current folders, else check remote
             elif [[ "${DOLIBS_MODE}" != "offline" ]]; then
 
-                # Check if it is a custom lib
-                assign _customPos=self _valueInArray ${_libSpace} "${DOLIBS_CUSTOM_NAMESPACE[@]}"
-                if [[ ${?} -eq 0 ]]; then            
-                    local _gitRepo=${DOLIBS_CUSTOM_REPO[${_customPos}]} 
-                    local _gitBranch=${DOLIBS_CUSTOM_BRANCH[${_customPos}]}
-                    local _gitDir=${DOLIBS_CUSTOM_TMP_DIR[${_customPos}]}
-                    local _libRootParentDir=${DOLIBS_DIR}/${_libSpace}
-                    local _libDir=${_libDir/${_libSpace}\//}
-                    local _libPath=${DOLIBS_DIR}/${_libSpace}/${_libDir}
+                # if it's an external sourced lib
+                local _sourceConfig=${DOLIBS_DIR}/${_libNamespace}/source.cfg
+                if [ -f ${_sourceConfig} ]; then
+                    # Get remote config
+                    assign _gitRepo=self _configInFile ${_sourceConfig} DOLIBS_CUSTOM_REPO
+                    assign _gitBranch=self _configInFile ${_sourceConfig} DOLIBS_CUSTOM_BRANCH
+                    assign _gitDir=self _configInFile ${_sourceConfig} DOLIBS_CUSTOM_TMP_DIR
+                    local _libRootParentDir=${DOLIBS_DIR}/${_libNamespace}
+                    local _libDir=${_libDir/${_libNamespace}\//}
+                    local _libPath=${DOLIBS_DIR}/${_libNamespace}/${_libDir}
                 # Else is an internal lib
                 else
                     local _gitRepo=${DOLIBS_REPO}
@@ -100,6 +110,7 @@ function import() {
                 fi
                 
                 # Cloned Lib location
+                local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
                 local _gitStatus=${_libRootParentDir}/devops-libs.status
                 local _gitTmpStatus=${_gitDir}/devops-libs.status
                 local _libTmpPath=${_gitDir}/libs/${_libDir}
@@ -142,13 +153,13 @@ function import() {
                         devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_gitTmpStatus}
                         exitOnError "It was not possible to clone the library code"
 
-                        # Import the lib
+                        # Import the lib                        
                         self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
                         exitOnError "It was not possible to import the library files '${_libTmpPath}'"                        
                     fi
 
                     # If not found locally or branch has changed, import
-                    if [[ ! -f "${_gitStatus}" || "$(cat ${_gitTmpStatus})" != "$(cat ${_gitStatus})" ]]; then
+                    if [[ ! -f "${_libMain}" || ! -f "${_gitStatus}" || "$(cat ${_gitTmpStatus})" != "$(cat ${_gitStatus})" ]]; then
 
                         self _importLibFiles ${_lib} ${_libPath} ${_libTmpPath} ${_libTmpMain}
                         exitOnError "It was not possible to import the library files '${_libTmpPath}'"
@@ -160,8 +171,7 @@ function import() {
                 fi
             fi
 
-            # local CURRENT_LIB_FUNC=${FUNCNAME##*.}
-            local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
+            # local CURRENT_LIB_FUNC=${FUNCNAME##*.}            
             local _libContext='local CURRENT_LIB=${FUNCNAME%.*}; CURRENT_LIB=${CURRENT_LIB#*.};
                                local CURRENT_LIB_DIR='${_libRootParentDir}'/${CURRENT_LIB/./\/}'
 
@@ -204,12 +214,15 @@ function _addCustomSource() {
     # Set default branch case not specified
     if [ ! "${_branch}" ]; then _branch="master"; fi
     
-    # Add the custom repo
-    local _pos=${#DOLIBS_CUSTOM_NAMESPACE[@]}
-    DOLIBS_CUSTOM_NAMESPACE[${_pos}]="${_namespace}"
-    DOLIBS_CUSTOM_REPO[${_pos}]="${_url}"
-    DOLIBS_CUSTOM_BRANCH[${_pos}]="${_branch}"
-    DOLIBS_CUSTOM_TMP_DIR[${_pos}]="${DOLIBS_DIR}/.libtmp/custom/${_namespace}/${_branch}"
+    # Write the file with the data
+    local _libPath=${DOLIBS_DIR}/${_namespace}
+    mkdir -p  ${_libPath}
+    cat << EOF > ${_libPath}/source.cfg
+DOLIBS_CUSTOM_NAMESPACE:${_namespace}
+DOLIBS_CUSTOM_REPO:${_url}
+DOLIBS_CUSTOM_BRANCH:${_branch}
+DOLIBS_CUSTOM_TMP_DIR:${DOLIBS_DIR}/.libtmp/custom/${_namespace}/${_branch}
+EOF
 }
 
 # Function to add a custom lib git repository source
@@ -241,4 +254,36 @@ function addLocalSource() {
     # Add local source
     self _addCustomSource "local" ${_path}
     echoInfo "Added local source '${_path}'"
+}
+
+# Function to look for and import automatically all dolibs usages in the files
+# Usage: recursiveImport <path>
+function recursiveImport() {
+
+    getArgs "_path" "${@}"
+
+    # Look for custom sources
+    local _gitSources=$(find ${_path} -name "*.sh" -type f -print -exec cat {} \; \
+                       | egrep -o '^([[:space:]])*do.addCustomGitSource .*' \
+                       | sort -u)
+
+    # Configure each git source found
+    for _gitSource in "${_gitSources[@]}"; do        
+        eval "${_gitSource}"
+    done
+
+    # Look into files for imports
+    local _libs=$(find ${_path} -name "*.sh" -type f -print -exec cat {} \; \
+                | egrep -o 'do.import([[:space:]]{1,}([[:alnum:]]|\.){1,}){1,}' \
+                | egrep -v 'local.' \
+                | cut -d' ' -f2- \
+                | tr ' ' '\n' \
+                | sort -u \
+                | paste -s -d' ')
+
+    exitOnError "It was not possible to get the required libraries"
+
+    # Import each library
+    echoInfo "Found libraries: ${_libs}"
+    do.import ${_libs}
 }
