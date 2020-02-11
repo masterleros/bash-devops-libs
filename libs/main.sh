@@ -37,43 +37,55 @@ function _importLibFiles() {
 function _valueInArray() {
     getArgs "_value &@_values" "${@}"
     local _val
+    local _pos=0
     for _val in "${_values[@]}"; do
-        if [[ "${_val}" == "${_value}" ]]; then return 1; fi
+        if [[ "${_val}" == "${_value}" ]]; then 
+            _return=${_pos}
+            return 0;
+        fi
+        ((_pos+=1))
     done
-    return 0
-}
-
-### Set the context for a function
-# usage: _setContext <namespace>.<funcName>
-function _setContext() {
-    # Set context vars
-    local CURRENT_LIB=${FUNCNAME%.*}; CURRENT_LIB=${CURRENT_LIB#*.}
-    local CURRENT_LIB_FUNC=${FUNCNAME##*.}
-    local CURRENT_LIB_DIR=${DOLIBS_DIR}/${CURRENT_LIB/./\/}
-    # echo "Set context for ${1} (lib: ${CURRENT_LIB} - func: ${CURRENT_LIB_FUNC} - dir: ${CURRENT_LIB_DIR})"
+    return -1
 }
 
 ### Import DevOps Libs ###
 # Usage: import <lib1> <lib2> ... <libN>
 function import() {
 
-    # local CURRENT_LIB_FUNC=${FUNCNAME##*.}
-    local _libContext='local CURRENT_LIB=${FUNCNAME%.*}; CURRENT_LIB=${CURRENT_LIB#*.};
-                    local CURRENT_LIB_DIR=${DOLIBS_DIR}/${CURRENT_LIB/./\/}'
-
     # For each lib
     local _result=0
     while [ "${1}" ]; do
+        
+        # Current lib
         local _lib="${1}"
+        local _libSpace=(${_lib//./ })
         local _libDir=${_lib/./\/}
         local _libPath=${DOLIBS_DIR}/${_libDir}
         local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
-        local _libTmpPath=${DOLIBS_TMP_DIR}/libs/${_libDir}
+
+        # Check if it is a custom lib
+        assign _customPos=self _valueInArray ${_libSpace} "${DOLIBS_CUSTOM_SPACE[@]}"                    
+        if [[ ${?} -eq 0 ]]; then            
+            local _gitRepo=${DOLIBS_CUSTOM_REPO[${_pos}]} 
+            local _gitBranch=${DOLIBS_CUSTOM_BRANCH[${_pos}]}
+            local _gitDir=${DOLIBS_CUSTOM_TMP_DIR[${_pos}]}
+        else
+            local _gitRepo=${DOLIBS_REPO}
+            local _gitBranch=${DOLIBS_BRANCH}
+            local _gitDir=${DOLIBS_TMP_DIR}
+        fi
+
+        # Lib main file
+        local _libTmpPath=${_gitDir}/libs/${_libDir}
         local _libTmpMain=${_libTmpPath}/${DOLIBS_MAIN_FILE}
 
+        # local CURRENT_LIB_FUNC=${FUNCNAME##*.}
+        local _libContext='local CURRENT_LIB=${FUNCNAME%.*}; CURRENT_LIB=${CURRENT_LIB#*.};
+                        local CURRENT_LIB_DIR='${DOLIBS_DIR}'/${CURRENT_LIB/./\/}'
+
         # if lib was already imported
-        self _valueInArray ${_lib} "${DOLIBS_IMPORTED[@]}"        
-        if [[ ${?} -ne 0 ]]; then
+        self _valueInArray ${_lib} "${DOLIBS_IMPORTED[@]}"
+        if [[ ${?} -eq 0 ]]; then
             echoInfo "DEVOPS Library '${_lib}' already imported!"
         else
             # Check if it is in online mode to copy/update libs
@@ -85,10 +97,11 @@ function import() {
             elif [ ! -f "${_libMain}" ]; then
                 # In in auto mode
                 if [[ ${DOLIBS_MODE} == "auto" && ! -f "${_libTmpMain}" ]]; then
-                    echoInfo "AUTO MODE - '${_lib}' is not installed neither found in cache, cloning code"
+                    echoInfo "AUTO MODE - '${_lib}' is not installed neither found in cache, cloning code..."
 
-                    # Try to clone the lib code                
-                    devOpsLibsClone
+                    # Try to clone the lib code
+                    devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir}
+                    
                     exitOnError "It was not possible to clone the library code"
                 fi
 
@@ -126,3 +139,25 @@ function import() {
     # Case any libs was not found, exit with error
     exitOnError "Some DevOps Libraries were not found!" ${_result}
 }
+
+# Function to add a custom lib repository source
+# Usage: addCustomSource <names> <git_url> <optional_branch>
+function addCustomSource() {
+    getArgs "_name _url &_branch" "${@}"
+
+    # Check if in local mode
+    [[ ${DOLIBS_MODE} != 'local' ]] || exitOnError "Custom remote sources are not supported in local mode!"
+
+    # Set default branch case not specified
+    if [ ! "${_branch}" ]; then _branch="master"; fi
+    
+    # Add the custom repo
+    local _pos=${#DOLIBS_CUSTOM_SPACE[@]}
+    DOLIBS_CUSTOM_SPACE[${_pos}]="${_name}"
+    DOLIBS_CUSTOM_REPO[${_pos}]="${_url}"
+    DOLIBS_CUSTOM_BRANCH[${_pos}]="${_branch}"
+    DOLIBS_CUSTOM_TMP_DIR[${_pos}]="${DOLIBS_DIR}/.libtmp/custom/${_name}/${_branch}"
+
+    echoInfo "Added custom lib source '${_name}'"
+}
+

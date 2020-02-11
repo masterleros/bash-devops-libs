@@ -97,6 +97,8 @@ do.myfunc.my_public_function
 # Hi from my other function!
 ```
 
+> **Note:** `$(dirname ${BASH_SOURCE[0]})` will make the path to be respected even if you execute the script from other working folder.
+
 ## Implementation example:
 
 **libs/myfuncs/main.sh**

@@ -21,8 +21,9 @@ include:
     file: '/pipelines/gitlab/.base-template.yml'
 
 variables:
+  DEVOPS_LIBS_DIR: "${CI_PROJECT_DIR}/"
   DEVOPS_LIBS_BRANCHES_DEFINITION: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
-  GOOGLE_APPLICATION_CREDENTIALS: "${CI_PROJECT_DIR}/automation/credentials/credential.json"
+  GOOGLE_APPLICATION_CREDENTIALS: "${CI_PROJECT_DIR}/credentials/credential.json"
 
 stages:
   - Prepare

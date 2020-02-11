@@ -18,8 +18,6 @@
 TESTS_DIR="tests"
 export DOLIBS_LOCAL_MODE_DIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 CURRENT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd)"
-rm -rf ${CURRENT_DIR}/${TESTS_DIR}/devops-libs
-cp ${DOLIBS_LOCAL_MODE_DIR}/dolibs.sh ${CURRENT_DIR}/${TESTS_DIR}/dolibs.sh
 ####### TEST PREPARATION #######
 
 ### Print a nice title ###

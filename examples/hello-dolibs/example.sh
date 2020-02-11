@@ -1,5 +1,5 @@
-# Enable dolibs
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
+# Enable dolibs (clone to /tmp)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
 # Import the required lib
 do.import utils

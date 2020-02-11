@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/dolibs.sh
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
 # Import required libs
 do.import utils # add your required libs

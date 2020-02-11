@@ -44,7 +44,7 @@
       # .gcp-template.terraform before_script
 
       # Import DevOps Libs and convert environment variables
-      source ${CI_PROJECT_DIR}/automation/dolibs.sh
+      source ${DEVOPS_LIBS_DIR}/dolibs.sh
       do.import gitlab
       do.gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
 
@@ -72,7 +72,7 @@
       # .gcp-template before_script
 
       # Import DevOps Libs and convert environment variables
-      source ${CI_PROJECT_DIR}/automation/dolibs.sh
+      source ${DEVOPS_LIBS_DIR}/dolibs.sh
       do.import gitlab
       do.gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
 
@@ -93,7 +93,7 @@
     - | 
       # .gcp-template after_script
      
-      source ${CI_PROJECT_DIR}/automation/dolibs.sh offline
+      source ${DEVOPS_LIBS_DIR}/dolibs.sh offline
 
       # Reimport as after script process is other than before_script/script
       do.import gcp

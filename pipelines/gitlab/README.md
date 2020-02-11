@@ -13,7 +13,7 @@ gcp_module:
   image: google/cloud-sdk:latest  
   extends: .gcp-template
   variables:
-    GOOGLE_APPLICATION_CREDENTIALS: "automation/credentials/credential.json"
+    GOOGLE_APPLICATION_CREDENTIALS: "credentials/credential.json"
   script:
     - <gcloud command>
   tag:

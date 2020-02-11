@@ -13,20 +13,40 @@
 #    limitations under the License.
 
 #!/bin/bash
-export DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"
-export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
-
-### DEVOPS LIBS BRANCH ###
-DOLIBS_DEFAULT_MODE="auto"
-DOLIBS_BRANCH="master"
-DOLIBS_REPO="github.com:masterleros/bash-devops-libs.git"
-### DEVOPS LIBS DEFINITIONS ###
 
 # Validate OS
 if [[ "${BASH}" != "/bin/bash" ]]; then echo "Current OS is not running on bash interpreter" >&2; exit -1; fi
 
+### DEVOPS LIBS DEFINITIONS ###
+DOLIBS_DEFAULT_MODE="auto"
+DOLIBS_BRANCH="master"
+DOLIBS_REPO="github.com:masterleros/bash-devops-libs.git"
+### DEVOPS LIBS DEFINITIONS ###
+export DOLIBS_MODE="${DOLIBS_DEFAULT_MODE}"
+export DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"
+### DEVOPS LIBS DEFINITIONS ###
+
+# DevOps libs options
+while [ "${1}" != "" ]; do
+    case "${1}" in
+        # clone branch
+        "-b") DOLIBS_BRANCH=${2}; shift 2;;
+        # clone mode
+        "-m") export DOLIBS_MODE=${2}; shift 2;;    
+        # dolibs root folder    
+        "-f") export DOLIBS_ROOTDIR=${2}; shift 2;;
+        # Local mode folder
+        "-l") export DOLIBS_LOCAL_MODE_DIR=${2}; shift 2;;
+        *) echo "OPTION: '${1}' not recognized"; exit -1;;
+    esac
+done
+
 # Function to clone the lib
 function devOpsLibsClone() {
+
+    GIT_REPO=${1}
+    GIT_BRANCH=${2}
+    GIT_DIR=${3}
 
     # Check and enable set e
     set_e_enabled=${-//[^e]/}
@@ -42,35 +62,41 @@ function devOpsLibsClone() {
         fi
 
         ### Clone / update the libraries ###
-        echo "Retrieving DevOps Libs code from '${DOLIBS_REPO}'..."
+        echo "Retrieving DevOps Libs code from '${GIT_REPO}'..."
 
         # Get the code
-        if [ ! -d ${DOLIBS_TMP_DIR} ]; then
-            git clone -b ${DOLIBS_BRANCH} --single-branch git@${DOLIBS_REPO} ${DOLIBS_TMP_DIR}
+        if [ ! -d ${GIT_DIR} ]; then
+            git clone -b ${GIT_BRANCH} --single-branch git@${GIT_REPO} ${GIT_DIR}
         else
-            git -C ${DOLIBS_TMP_DIR} pull
+            git -C ${GIT_DIR} pull
         fi
 
-        # Update retrieved lib status
-        cat << EOF > ${DOLIBS_STATUS}
-branch:${DOLIBS_BRANCH}
+        # If it is the main lib
+        if [[ ${DOLIBS_REPO} == ${GIT_REPO} ]]; then
+            # Update retrieved lib status
+            cat << EOF > ${DOLIBS_STATUS}
+branch:${GIT_BRANCH}
 hash:$(git rev-parse HEAD)
 updated:$(date)
 user:$(git config user.name)
 email:$(git config user.email)
 hostname:$(hostname)
 EOF
+        fi
     fi
 
-    echo "Installing Core library code...."
+    # If it is the main lib
+    if [[ ${DOLIBS_REPO} == ${GIT_REPO} ]]; then    
+        echo "Installing Core library code...."
 
-    ### Create dir and copy the Core lib inside the project ###
-    mkdir -p ${DOLIBS_DIR}
-    cp ${DOLIBS_TMP_DIR}/libs/*.* ${DOLIBS_DIR}
-    cp ${DOLIBS_TMP_DIR}/libs/.gitignore ${DOLIBS_DIR}
+        ### Create dir and copy the Core lib inside the project ###
+        mkdir -p ${DOLIBS_DIR}
+        cp ${DOLIBS_TMP_DIR}/libs/*.* ${DOLIBS_DIR}
+        cp ${DOLIBS_TMP_DIR}/libs/.gitignore ${DOLIBS_DIR}
 
-    # Copy the DevOps Libs help
-    cp ${DOLIBS_TMP_DIR}/README.md ${DOLIBS_DIR}/../DEVOPS-LIBS.md
+        # Copy the DevOps Libs help
+        cp ${DOLIBS_TMP_DIR}/README.md ${DOLIBS_DIR}/../DEVOPS-LIBS.md    
+    fi
 
     [ ${set_e_enabled} ] || set +e # Disable set e
 }
@@ -79,7 +105,6 @@ EOF
 if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
     ###############################
-    export DOLIBS_MODE=${1}
     export DOLIBS_DIR="${DOLIBS_ROOTDIR}/devops-libs"
     export DOLIBS_TMP_DIR="${DOLIBS_DIR}/.libtmp/${DOLIBS_BRANCH}"
     export DOLIBS_STATUS="${DOLIBS_DIR}/devops-libs.status"
@@ -114,11 +139,12 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     #########################################################
 
     # Show using branch
-    echo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"
+    echo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE})"
+    echo "---> Lib Folder: '${DOLIBS_ROOTDIR}'"
 
     # Check if in on line mode
     if [[ ${DOLIBS_MODE} == 'online' || ${DOLIBS_MODE} == 'local' ]]; then
-        devOpsLibsClone
+        devOpsLibsClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_TMP_DIR}
     fi
 
     ### Include DevOps Libs ###
