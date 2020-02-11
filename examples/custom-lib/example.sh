@@ -2,7 +2,7 @@
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f .
 
 # Set the custom lib source
-do.addCustomSource "mycustomlib" "github.com:masterleros/bash-devops-libs.git"
+do.addCustomSource mycustomlib "github.com:masterleros/bash-devops-libs.git" master
 
 # Import the required lib
 do.import mycustomlib.utils

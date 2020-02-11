@@ -47,6 +47,7 @@ function devOpsLibsClone() {
     GIT_REPO=${1}
     GIT_BRANCH=${2}
     GIT_DIR=${3}
+    GIT_STATUS=${4}
 
     # Check and enable set e
     set_e_enabled=${-//[^e]/}
@@ -71,10 +72,9 @@ function devOpsLibsClone() {
             git -C ${GIT_DIR} pull
         fi
 
-        # If it is the main lib
-        if [[ ${DOLIBS_REPO} == ${GIT_REPO} ]]; then
-            # Update retrieved lib status
-            cat << EOF > ${DOLIBS_STATUS}
+        # Update retrieved lib status
+        mkdir -p $(dirname ${GIT_STATUS})
+        cat << EOF > ${GIT_STATUS}
 branch:${GIT_BRANCH}
 hash:$(git rev-parse HEAD)
 updated:$(date)
@@ -82,7 +82,6 @@ user:$(git config user.name)
 email:$(git config user.email)
 hostname:$(hostname)
 EOF
-        fi
     fi
 
     # If it is the main lib
@@ -144,7 +143,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
     # Check if in on line mode
     if [[ ${DOLIBS_MODE} == 'online' || ${DOLIBS_MODE} == 'local' ]]; then
-        devOpsLibsClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_TMP_DIR}
+        devOpsLibsClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_TMP_DIR} ${DOLIBS_STATUS}
     fi
 
     ### Include DevOps Libs ###
