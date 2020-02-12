@@ -17,6 +17,7 @@
 # returns: User e-mail
 function getCurrentUser() {
     _return=$(gcloud --quiet config list account --format "value(core.account)")
+    [ "${_return}" ]
     return ${?}
 }
 
