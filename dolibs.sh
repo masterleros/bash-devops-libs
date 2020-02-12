@@ -23,7 +23,7 @@ DOLIBS_REPO="github.com/masterleros/bash-devops-libs.git"
 ### DEVOPS LIBS DEFINITIONS ###
 
 # Validate OS
-if [[ "${BASH}" != "/bin/bash" ]]; then echo "Current OS is not running on bash interpreter" >&2; exit -1; fi
+if [[ "${BASH}" != *"/bash" ]]; then echo "--- Current OS is not running on bash interpreter ---" >&2; exit -1; fi
 
 # Function to clone the lib
 function devOpsLibsClone() {
