@@ -22,6 +22,6 @@ verifyDeps gcloud || return ${?}
 function deploy() {
     getArgs "cfName @parameters" "${@}"
 
-    gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password
+    gcloud functions deploy ${cfName} "${parameters[@]}" | grep -vi password
     exitOnError "Failed to deploy GCP Function ${cfName}"
 }
