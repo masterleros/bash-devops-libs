@@ -22,9 +22,9 @@ function showTitle {
 
     len=$(echo "# ${text} #"| wc -c)
     separator=$(eval printf '\#%.0s' {2..${len}})
-    echoInfo ${separator}
-    echoInfo "# ${text} #"
-    echoInfo ${separator}
+    echo "      ${separator}"
+    echo "      # ${text} #"
+    echo "      ${separator}"
 }
 
 ### Execute a command until success within a retries ###
