@@ -188,7 +188,7 @@ function getArgs() {
 # Usage: _createLibFunctions <lib alias> <func1> <func2> ... <funcN>
 function _createLibFunctions() {
 
-    getArgs "&_libAlias &_funcHeader @_libFuncts" "${@}"
+    getArgs "&_libAlias &_funcHeader &@_libFuncts" "${@}"
 
     # Make as part of do namespace
     local _libAlias="do"$([ ! "${_libAlias}" ] || echo ".${_libAlias}")
