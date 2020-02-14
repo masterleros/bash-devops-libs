@@ -14,6 +14,48 @@
 
 #!/bin/bash
 
+### Show a info text
+# usage: echoInfo <text>
+function echoInfo() {
+    local IFS=$'\n'
+    local _text="${1/'\n'/$'\n'}"
+    local _lines=(${_text})
+    local _textToPrint="INFO:  "
+    for _line in "${_lines[@]}"; do
+        echo "${_textToPrint} ${_line}"
+        _textToPrint="       "
+    done
+}
+
+### Show a test in the stderr
+# usage: echoError <text>
+function echoError() {
+    local IFS=$'\n'
+    local _text="${1/'\n'/$'\n'}"
+    local _lines=(${_text})
+    local _textToPrint="ERROR: "
+    for _line in "${_lines[@]}"; do
+        echo "${_textToPrint} ${_line}" >&2
+        _textToPrint="       "
+    done
+}
+
+### Exit program with text when last exit code is non-zero ###
+# usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
+function exitOnError() {
+    local _errorCode=${2:-$?}
+    local _errorText=${1}
+    if [ "${_errorCode}" -ne 0 ]; then
+        if [ ! -z "${_errorText}" ]; then
+            echoError "${_errorText}"
+        else
+            echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
+        fi
+        echo "Exiting (${_errorCode})..."
+        exit ${_errorCode}
+    fi
+}
+
 # Function to clone the lib
 function devOpsLibsClone() {
 
@@ -32,7 +74,7 @@ function devOpsLibsClone() {
         if [ $(which git &> /dev/null || echo $?) ]; then echo 'Git command not found'; fi
 
         ### Clone / update the libraries ###
-        echo "Retrieving DevOps Libs code from '${GIT_REPO}'..."
+        echoInfo "Retrieving DevOps Libs code from '${GIT_REPO}'..."
 
         # Get the code        
         if [ ! -d ${GIT_DIR} ]; then            
@@ -73,7 +115,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     # Check if operation mode was specified
     elif [ ! ${DOLIBS_MODE} ]; then # Set default mode case not provided
         if [ "${CI}" ]; then
-            echo "DevOps Libs running in GitLab! setting to online mode..."
+            echoInfo "DevOps Libs running in GitLab! setting to online mode..."
             export DOLIBS_MODE='online'
         else
             export DOLIBS_MODE=${DOLIBS_DEFAULT_MODE}
@@ -83,10 +125,10 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     ############## VALIDATE AUTO OPERATION MODE #################
     if [[ ${DOLIBS_MODE} == 'auto' ]]; then    
         if [[ ${DOLIBS_MODE} == 'auto' && ! -f ${DOLIBS_DIR}/core.sh ]]; then 
-            echo "DevOps Libs not found! forcing online mode..."
+            echoInfo "DevOps Libs not found! forcing online mode..."
             export DOLIBS_MODE='online'; 
         elif [[ $(cat ${DOLIBS_STATUS} | grep branch | awk -F : '{print $NF}') != ${DOLIBS_BRANCH} ]]; then
-            echo "DevOps Lib Branch has changed! forcing online mode..."
+            echoInfo "DevOps Lib Branch has changed! forcing online mode..."
             export DOLIBS_MODE='online'
         fi
     fi
@@ -94,11 +136,11 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
     # Show using branch
     if [[ ${DOLIBS_MODE} == 'offline' ]]; then 
-        echo "---> DevOps Libs (${DOLIBS_MODE}) <---"
+        echoInfo "---> DevOps Libs (${DOLIBS_MODE}) <---"
     elif [[ ${DOLIBS_MODE} == 'local' ]]; then 
-        echo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_MODE_DIR}' (${DOLIBS_MODE}) <---"        
+        echoInfo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_MODE_DIR}' (${DOLIBS_MODE}) <---"        
     else
-        echo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
+        echoInfo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
     fi
 
     # Check if in on line mode
@@ -107,7 +149,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
         # If it is the main lib
         #if [[ ${DOLIBS_REPO} == ${GIT_REPO} ]]; then    
-        echo "Installing Core library code...."
+        echoInfo "Installing Core library code...."
 
         ### Create dir and copy the Core lib inside the project ###
         mkdir -p ${DOLIBS_DIR}
@@ -126,10 +168,9 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
     ### Include DevOps Libs ###
     if [ -f ${DOLIBS_DIR}/core.sh ]; then        
-        source ${DOLIBS_DIR}/core.sh
-        if [ $? -ne 0 ]; then echo "Could not import DevOps Libs"; exit 1; fi
+        . ${DOLIBS_DIR}/core.sh
+        exitOnError "Could not import DevOps Libs"
     else
-        echo "Could not find DevOps Libs (offline mode?)"
-        exit 1
+        exitOnError "Could not find DevOps Libs (offline mode?)" 1
     fi
 fi

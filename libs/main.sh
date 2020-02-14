@@ -13,6 +13,7 @@
 #    limitations under the License.
 
 #!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/base.sh
 
 ### Import DevOps Lib files ###
 # Usage: _importLibFiles <lib>
@@ -23,7 +24,8 @@ function _importLibFiles() {
     # Check if the lib is available from download
     if [ -f ${_libTmpMain} ]; then
         # Create lib dir and copy
-        mkdir -p ${_libPath} && cp -r ${_libTmpPath}/* ${_libPath}        
+        #mkdir -p ${_libPath} && cp -r ${_libTmpPath}/* ${_libPath}
+        mkdir -p ${_libPath} && cp ${_libTmpPath}/*.* ${_libPath}
         exitOnError "Could not copy the '${_lib}' library files"
         return 0        
     fi

@@ -13,9 +13,6 @@
 #    limitations under the License.
 
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/base.sh
-
-# Inform
 echoInfo "Loading core library..."
 
 # Verify bash version
@@ -165,7 +162,6 @@ fi
             _libFunctNew=${_libAlias}.${_libFunct##*.}
 
             # Rework the function            
-            #eval "$(echo "${_libFunctNew}() {"; echo ${_funcHeader}; echo 'if [ ${-//[^e]/} ]; then set +e; ${FUNCNAME} '"\"\${@}\""'; _result=${?}; set -e; return ${_result}; fi'; declare -f ${_libFunct} | tail -n +3)"
             eval "$(echo "${_libFunctNew}() {"; echo "${_funcHeader}"; declare -f ${_libFunct} | tail -n +3)"
 
             # Unset old function name
