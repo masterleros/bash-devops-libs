@@ -15,7 +15,7 @@
 #!/bin/bash
 
 # Validate OS
-if [[ "${BASH}" != "/bin/bash" ]]; then echo "Current OS is not running on bash interpreter" >&2; exit -1; fi
+if [[ "${BASH}" != *"/bash" ]]; then echo "Current OS is not running on bash interpreter" >&2; exit -1; fi
 
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_DEFAULT_MODE="auto"
@@ -36,7 +36,9 @@ while [ "${1}" != "" ]; do
         # dolibs root folder    
         "-f") export DOLIBS_ROOTDIR=${2}; shift 2;;
         # Local mode folder
-        "-l") export DOLIBS_LOCAL_MODE_DIR="$(cd ${2}/ >/dev/null 2>&1 && pwd)"; shift 2;;        
+        "-l") export DOLIBS_LOCAL_MODE_DIR="$(cd $(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)/${2} 2>&1 && pwd)"
+            if [ ! -d "${DOLIBS_LOCAL_MODE_DIR}" ]; then echo "Folder '${2}' does not exist!"; exit -1 ;fi
+            shift 2;;
         *) echo "OPTION: '${1}' not recognized"; exit -1;;
     esac
 done
@@ -53,14 +55,10 @@ function devOpsLibsClone() {
     set_e_enabled=${-//[^e]/}
     [ ${set_e_enabled} ] || set -e
 
-    # If clone is local
+    # If clone is not local
     if [ ! "${DOLIBS_LOCAL_MODE_DIR}" ]; then
         # Check if git is present
-        if [ $(which git &> /dev/null || echo $?) ]; then 
-            echo 'Git command not found, trying installation (this may take few minutes)...'
-            apt-get update &>/dev/null
-            apt-get -y install git &>/dev/null
-        fi
+        if [ $(which git &> /dev/null || echo $?) ]; then echo 'Git command not found'; fi
 
         ### Clone / update the libraries ###
         echo "Retrieving DevOps Libs code from '${GIT_REPO}'..."
@@ -91,9 +89,9 @@ EOF
 if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
     ###############################
-    export DOLIBS_DIR="${DOLIBS_ROOTDIR}/devops-libs"
+    export DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
     export DOLIBS_TMP_DIR="${DOLIBS_DIR}/.libtmp/${DOLIBS_BRANCH}"
-    export DOLIBS_STATUS="${DOLIBS_DIR}/devops-libs.status"
+    export DOLIBS_STATUS="${DOLIBS_DIR}/dolibs.status"
     ###############################
 
     # If it was set to use local tmp folder
@@ -157,8 +155,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     fi
 
     ### Include DevOps Libs ###
-    if [ -f ${DOLIBS_DIR}/core.sh ]; then
-        echo "Loading core library..."
+    if [ -f ${DOLIBS_DIR}/core.sh ]; then        
         source ${DOLIBS_DIR}/core.sh
         if [ $? -ne 0 ]; then echo "Could not import DevOps Libs"; exit 1; fi
     else

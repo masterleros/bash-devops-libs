@@ -13,11 +13,20 @@
 #    limitations under the License.
 
 #!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/base.sh
+
+# Inform
+echoInfo "Loading core library..."
+
+# Verify bash version
+awk 'BEGIN { exit ARGV[1] < 4.3 }' ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}
+exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})"
 
 # Check if not being included twice
-if [ "${DOLIBS_CORE_FUNCT}" ]; then 
-    exitOnError "You cannot include twice $(basename ${BASH_SOURCE[0]})" -1
-fi
+[ ! "${DOLIBS_CORE_FUNCT}" ]; exitOnError "You cannot include twice the core library"
+
+# Common library entrypoint validation
+[ -f ${DOLIBS_LIB_FILE} ]; exitOnError "DEVOPS Library '${DOLIBS_LIB_FILE}' not found! (try online mode)"
 
 # Definitions
 export DOLIBS_LIB_FILE=${DOLIBS_DIR}/lib.sh
@@ -77,75 +86,6 @@ function assign() {
     return ${_result}
 }
 
-### Show a info text
-# usage: echoInfo <text>
-function echoInfo() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="INFO:  "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}"
-        _textToPrint="       "
-    done
-}
-
-### Show a test in the stderr
-# usage: echoError <text>
-function echoError() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="ERROR: "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}" >&2
-        _textToPrint="       "
-    done
-}
-
-### Exit program with text when last exit code is non-zero ###
-# usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
-function exitOnError() {
-    local _errorCode=${2:-$?}
-    local _errorText=${1}
-    if [ "${_errorCode}" -ne 0 ]; then
-        if [ ! -z "${_errorText}" ]; then
-            echoError "${_errorText}"
-        else
-            echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
-        fi
-        echo "Exiting (${_errorCode})..."
-        exit ${_errorCode}
-    fi
-}
-
-### Validate defined variables ###
-# usage: validateVars <var1> <var2> ... <varN>
-function validateVars() {
-    local _result=0
-    for var in ${@}; do
-        if [ -z "${!var}" ]; then
-            echoError "Environment varirable '${var}' is not declared!" >&2
-            ((_result+=1))
-        fi
-    done
-    return ${_result}
-}
-
-### dependencies verification ###
-# usage: verifyDeps <dep1> <dep2> ... <depN>
-function verifyDeps() {
-    local _result=0
-    for dep in ${@}; do
-        which ${dep} &> /dev/null
-        if [[ $? -ne 0 ]]; then
-            echoError "Binary dependency '${dep}' not found!" >&2
-            ((_result+=1))
-        fi
-    done
-    return ${_result}
-}
-
 ### get arguments ###
 # usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
 # when a variable name starts with @<var> it will take the rest of values
@@ -185,13 +125,33 @@ function getArgs() {
 }
 
 ### Consume an internal library ###
-# Usage: _createLibFunctions <lib alias> <func1> <func2> ... <funcN>
+# Usage: _createLibFunctions <lib_dir> <lib_alias> <func_header>
 function _createLibFunctions() {
 
-    getArgs "&_libAlias &_funcHeader @_libFuncts" "${@}"
+    getArgs "_libDir &_libAlias" "${@}"
+
+    # Set the function local context
+    local _funcHeader='
+local CURRENT_LIB='${_libAlias}'
+local CURRENT_LIB_DIR='${_libDir}'
+if [ ${-//[^e]/} ]; then 
+    set +e
+    ${FUNCNAME} "${@}"
+    _result=${?}
+    set -e
+    return ${_result}
+fi
+'
 
     # Make as part of do namespace
     local _libAlias="do"$([ ! "${_libAlias}" ] || echo ".${_libAlias}")
+
+    # Import lib functions
+    source ${DOLIBS_LIB_FILE} ${_libAlias} ${_libDir}
+    exitOnError "Error importing '${_libDir}/${DOLIBS_MAIN_FILE}'"
+
+    # Get the lib funcions
+    local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_libAlias} ${_libDir}"' &> /dev/null; typeset -F' | awk '{print $NF}'))    
 
     # Remove Core functions
     for _coreFunc in ${DOLIBS_CORE_FUNCT[@]}; do _libFuncts=("${_libFuncts[@]/${_coreFunc}}"); done
@@ -205,7 +165,8 @@ function _createLibFunctions() {
             _libFunctNew=${_libAlias}.${_libFunct##*.}
 
             # Rework the function            
-            eval "$(echo "${_libFunctNew}() {"; echo ${_funcHeader}; echo 'if [ ${-//[^e]/} ]; then set +e; ${FUNCNAME} '"\"\${@}\""'; _result=${?}; set -e; return ${_result}; fi'; declare -f ${_libFunct} | tail -n +3)"
+            #eval "$(echo "${_libFunctNew}() {"; echo ${_funcHeader}; echo 'if [ ${-//[^e]/} ]; then set +e; ${FUNCNAME} '"\"\${@}\""'; _result=${?}; set -e; return ${_result}; fi'; declare -f ${_libFunct} | tail -n +3)"
+            eval "$(echo "${_libFunctNew}() {"; echo "${_funcHeader}"; declare -f ${_libFunct} | tail -n +3)"
 
             # Unset old function name
             unset -f ${_libFunct}
@@ -220,22 +181,14 @@ function _createLibFunctions() {
     done
 }
 
-# Verify bash version
-awk 'BEGIN { exit ARGV[1] < 4.3 }' ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}
-exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})"
-
-# Export all functions for sub-bash executions
+# Export all core functions for sub-bash executions 
+# so that are not included when listing includes 
+# functions when importing others
 export DOLIBS_CORE_FUNCT=$(typeset -F | awk '{print $NF}')
 for funct in ${DOLIBS_CORE_FUNCT[@]}; do
     export -f ${funct}
 done
 
-# Common library entrypoint validation
-[ -f ${DOLIBS_LIB_FILE} ] || exitOnError "DEVOPS Library '${DOLIBS_LIB_FILE}' not found! (try online mode)" ${?}
+# Import main DevOps Libs functions
+_createLibFunctions ${DOLIBS_DIR}
 
-# Import dolib
-source ${DOLIBS_LIB_FILE} "do" ${DOLIBS_DIR}
-exitOnError "Error importing 'dolib' library"
-
-# Import DevOps Libs functions
-_createLibFunctions "" "" $(bash -c '. '"${DOLIBS_LIB_FILE} "do" ${DOLIBS_DIR}"' &> /dev/null; typeset -F' | awk '{print $NF}')

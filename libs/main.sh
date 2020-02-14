@@ -61,7 +61,6 @@ function _configInFile() {
 function import() {
 
     # For each lib
-    local _result=0
     while [ "${1}" ]; do
         
         # Current lib
@@ -81,12 +80,11 @@ function import() {
             # If it is a local custom lib
             if [[ ${_libNamespace} == "local" ]]; then
                 # Get local config position
-                assign _customPos=self _valueInArray local "${DOLIBS_CUSTOM_NAMESPACE[@]}"
+                [ "${DOLIBS_LOCAL_REPO}" ]
                 exitOnError "The 'local' library was not configured (needs do.addLocalSource?)"
 
                 local _libDir=${_libDir/${_libNamespace}\//}
-                local _libPath=${DOLIBS_CUSTOM_REPO[${_customPos}]}/${_libDir}
-                local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
+                local _libPath=${DOLIBS_LOCAL_REPO}/${_libDir}
             
             # If offline mode use current folders, else check remote
             elif [[ "${DOLIBS_MODE}" != "offline" ]]; then
@@ -111,8 +109,8 @@ function import() {
                 
                 # Cloned Lib location
                 local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
-                local _gitStatus=${_libRootParentDir}/devops-libs.status
-                local _gitTmpStatus=${_gitDir}/devops-libs.status
+                local _gitStatus=${_libRootParentDir}/dolibs.status
+                local _gitTmpStatus=${_gitDir}/dolibs.status
                 local _libTmpPath=${_gitDir}/libs/${_libDir}
                 local _libTmpMain=${_libTmpPath}/${DOLIBS_MAIN_FILE}
 
@@ -171,38 +169,17 @@ function import() {
                 fi
             fi
 
-            # local CURRENT_LIB_FUNC=${FUNCNAME##*.}            
-            local _libContext='local CURRENT_LIB=${FUNCNAME%.*}; CURRENT_LIB=${CURRENT_LIB#*.};
-                               local CURRENT_LIB_DIR='${_libRootParentDir}'/${CURRENT_LIB/./\/}'
-
-            # Check if there was no error importing the lib files
-            if [ ${?} -eq 0 ]; then
-                # Import lib
-                source ${DOLIBS_LIB_FILE} ${_lib} ${_libPath}
-                exitOnError "Error importing '${_libMain}'"
-
-                # Get lib function names
-                local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_lib} ${_libPath}"' &> /dev/null; typeset -F' | awk '{print $NF}'))
-
-                # Create the functions
-                _createLibFunctions ${_lib} "${_libContext}" ${_libFuncts}
-            else 
-                ((_result+=1)); 
-            fi
-
-            # Set as imported
+            # Create the libs and set as imported
+            _createLibFunctions ${_libPath} ${_lib}
             export DOLIBS_IMPORTED+=(${_lib})
 
             # Show import
             echoInfo "Imported Library '${_lib}' (${_funcCount} functions)"
         fi
 
-        # Go to next arg
+        # Go to next arg (lib)
         shift
     done
-
-    # Case any libs was not found, exit with error
-    exitOnError "Some DevOps Libraries were not found!" ${_result}
 }
 
 # Function to add a custom lib source
@@ -252,7 +229,7 @@ function addLocalSource() {
     [[ -d "${_path}" ]] || exitOnError "Library path '${_path}' not found!"
 
     # Add local source
-    self _addCustomSource "local" ${_path}
+    export DOLIBS_LOCAL_REPO=${_path}
     echoInfo "Added local source '${_path}'"
 }
 

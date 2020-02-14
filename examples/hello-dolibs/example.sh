@@ -12,11 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
+# Opt1: Enable dolibs (clone to /tmp)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp # mode auto
+
+# Opt2: Enable dolibs (clone from ../..)
+# source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. # mode local
 
 # Import the required lib
-do.import utils utils utils
+do.import utils
 
 # Optionally you can import all libs from the specified folder at once
 # do.recursiveImport ../..
