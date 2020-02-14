@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 # Opt1: Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp # mode auto
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh #-f /tmp # mode auto
 
 # Opt2: Enable dolibs (clone from ../..)
 # source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. # mode local
