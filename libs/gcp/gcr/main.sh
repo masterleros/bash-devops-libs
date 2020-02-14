@@ -1,0 +1,151 @@
+#    Copyright 2020 Leonardo Andres Morales
+
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+
+#      http://www.apache.org/licenses/LICENSE-2.0
+
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+#!/bin/bash
+
+# Validate required packages
+verifyDeps gcloud docker || return ${?}
+
+# Define the GCloud registry host
+export GCLOUD_DOCKER_REGISTRY_HOST="gcr.io"
+export DOCKER_CONFIG_DIR="${HOME}/.docker"
+export DOCKER_CONFIG_PATH="${DOCKER_CONFIG_DIR}/docker.json"
+export DOCKER_LOCKFILE_PATH="${DOCKER_CONFIG_DIR}/.${GCLOUD_DOCKER_REGISTRY_HOST}.lock"
+
+### Login with current GOOGLE_APPLICATION_CREDENTIALS to GCloud registry
+function dockerLogin() {
+
+    # Check if not already configured gcloud docker helper or
+    # if not, configure docker to push images into Container Registry
+    if [ ! "$([ -f "${HOME}/.docker/config.json" ] && cat "${HOME}/.docker/config.json" | egrep "\"gcr\.io\": \"gcloud\"")" ]; then
+        gcloud --project ${_project_id} --quiet auth configure-docker
+        exitOnError "Docker GCP registry could not be configured"
+    fi
+
+    # Avoid new parallel aware login process
+    return 0
+
+    # TODO
+
+    do.import gcp
+
+    # Check if credential definition is present
+    validateVars GOOGLE_APPLICATION_CREDENTIALS
+    exitOnError "Required credentials not found"
+
+    # Get credential user
+    assign _saUser=do.gcp.getValueFromCredential ${GOOGLE_APPLICATION_CREDENTIALS} client_email
+
+    # Check if gcp lockfile exists
+    if [ -f ${DOCKER_LOCKFILE_PATH} ]; then
+        # Check if locks are live
+
+        # Check if is not logged as required user
+        _loggedUser="$(cat ${DOCKER_LOCKFILE_PATH} | egrep "^gcr_sa=" | cut -d'=' -f2-)"
+        [[ ! "${_loggedUser}" || "${_loggedUser}" != "${_saUser}" ]]
+        exitOnError "'${_loggedUser}' is currently using docker ${GCLOUD_DOCKER_REGISTRY_HOST} registry"
+    fi
+
+    # Docker login to GCloud registry
+    cat ${GOOGLE_APPLICATION_CREDENTIALS} | docker login -u _json_key --password-stdin https://${GCLOUD_DOCKER_REGISTRY_HOST}    
+}
+
+
+### Logoff of current GCloud registry
+function dockerLogoff() {
+    # TODO
+    return 0
+}
+
+### Get the digest of a specific tagged image ###
+# usage: getImageDigest <project_id> <docker_image_name> <docker_image_tag>
+function getImageDigest() {
+    # Get the arguments
+    getArgs "_project_id _docker_image_name _docker_image_tag" "${@}"
+
+    # Login to GCR
+    self dockerLogin
+
+    # Create the image tag and retrieve the digest
+    DOCKER_IMAGE="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}"
+    _return=$(gcloud container images list-tags ${DOCKER_IMAGE} --filter="TAGS=${_docker_image_tag}" --format="get(digest)")
+    _result=${?}
+
+    # Docker Logoff from GCloud registry
+    self dockerLogoff
+
+    return ${_result}
+}
+
+### Get the digest of a specific tagged image ###
+# usage: getFullDigestTag <project_id> <docker_image_name> <docker_image_tag>
+function getFullDigestTag() {
+    # Get the arguments
+    getArgs "_project_id _docker_image_name _docker_image_tag" "${@}"
+
+    # Get the image tag digest
+    assign _tagDigest=self getImageDigest ${_project_id} ${_docker_image_name} ${_docker_image_tag}
+    _result=${?}
+
+    # Return the full image digest tag
+    _return="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}@${_tagDigest}"
+    return ${_result}
+}
+
+### Build a docker image and publish to the GCP Container Registry ###
+# usage: buildAndPublish <project_id> <docker_dir> <docker_file> <docker_image_name> <docker_build_args>
+function buildAndPublish() {
+
+    # Get the arguments
+    getArgs "_project_id _docker_dir _docker_file _docker_image_name &@_docker_build_args" "${@}"
+
+    # Create the full image tag
+    DOCKER_IMAGE_TAG_LATEST="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}:latest"
+
+    # Login to GCR
+    self dockerLogin
+
+    # Build Image
+    docker build -t ${DOCKER_IMAGE_TAG_LATEST} -f ${_docker_file} "${_docker_build_args[@]}" ${_docker_dir}
+    exitOnError "It was not possible to build docker image '${DOCKER_IMAGE_TAG_LATEST}'"
+
+    # Publish Image
+    docker push ${DOCKER_IMAGE_TAG_LATEST}
+    exitOnError "It was not possible to push docker image '${DOCKER_IMAGE_TAG_LATEST}'"
+
+    # Check if custom version can be created based on GIT branch
+    DOCKER_IMAGE_VERSION=$(which git &>/dev/null | git rev-parse --abbrev-ref HEAD | sed "s#/\|_\|\.#-#g" | tr '[:upper:]' '[:lower:]')
+    if [ "${DOCKER_IMAGE_VERSION}" ]; then
+
+        # Create the full image tag
+        DOCKER_IMAGE_TAG_CUSTOM="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}:${DOCKER_IMAGE_VERSION}"
+
+        # Tag the custom version
+        docker tag ${DOCKER_IMAGE_TAG_LATEST} ${DOCKER_IMAGE_TAG_CUSTOM}
+        exitOnError "It was not possible to tag the custom version '${DOCKER_IMAGE_TAG_CUSTOM}'"
+
+        # Publish Image
+        docker push ${DOCKER_IMAGE_TAG_CUSTOM}
+        exitOnError "It was not possible to push docker image '${DOCKER_IMAGE_TAG_CUSTOM}'"
+
+        # Clean up local custom image
+        docker rmi "${DOCKER_IMAGE_TAG_CUSTOM}"
+    fi
+
+    # Docker Logoff from GCloud registry
+    self dockerLogoff
+
+    # Clean up local image
+    docker rmi "${DOCKER_IMAGE_TAG_LATEST}"
+}

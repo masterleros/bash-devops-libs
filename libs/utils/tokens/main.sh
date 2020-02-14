@@ -16,7 +16,7 @@
 
 ### This function will echo the tokens found in a file ###
 # usage: get <data>
-function get {
+function get() {
 
     getArgs "@data" "${@}"
 
@@ -29,7 +29,7 @@ function get {
 
 ### This function will echo the tokens names found in a file ###
 # usage: getNames <data>
-function getNames {
+function getNames() {
 
     getArgs "@data" "${@}"
 
@@ -43,7 +43,7 @@ function getNames {
 
 ### This function will echo the content of a file with tokens updated to values ###
 # usage: replaceFromFile <path_to_file> [errors<true>]
-function replaceFromFile {
+function replaceFromFile() {
 
     getArgs "file &errors" "${@}"
 
@@ -73,7 +73,7 @@ function replaceFromFile {
 
 ### This function will replace from a file to file
 # usage: replaceFromFileToFile <path_source> <path_target> [errors<true>]
-function replaceFromFileToFile {
+function replaceFromFileToFile() {
 
     getArgs "path_source path_target &errors" "${@}"
 
