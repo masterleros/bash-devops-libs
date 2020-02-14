@@ -27,9 +27,12 @@ function buildAndPublish() {
     # Create the full image tag
     DOCKER_IMAGE_TAG_LATEST="gcr.io/${_project_id}/${_docker_image_name}:latest"
 
-    # Configure docker to push images into Container Registry
-    gcloud --project ${_project_id} --quiet auth configure-docker
-    exitOnError "Docker GCP registry could not be configured"
+    # Check if not already configured gcloud docker helper or
+    # if not, configure docker to push images into Container Registry
+    if [ ! "$([ -f "${HOME}/.docker/config.json" ] && cat "${HOME}/.docker/config.json" | egrep "\"gcr\.io\": \"gcloud\"")" ]; then
+        gcloud --project ${_project_id} --quiet auth configure-docker
+        exitOnError "Docker GCP registry could not be configured"
+    fi
 
     # Build Image
     docker build -t ${DOCKER_IMAGE_TAG_LATEST} -f ${_docker_file} "${_docker_build_args[@]}" ${_docker_dir}
