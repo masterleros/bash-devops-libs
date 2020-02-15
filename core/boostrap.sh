@@ -63,25 +63,22 @@ function devOpsLibsClone() {
 
     local GIT_REPO=${1}
     local GIT_BRANCH=${2}
-    local GIT_DIR=${2}
+    local GIT_DIR=${3}
     local LIB_ROOT_DIR=${4}
     local SOURCE_STATE="${LIB_ROOT_DIR}/.source.state"
-
-    echo "-----> GIT_DIR = ${GIT_DIR}"
-    exit
 
     # Get the code        
     if [ ! -d ${GIT_DIR} ]; then            
         echoInfo "Cloning DevOps Libs code from '${GIT_REPO}'..."
-        git clone -b ${GIT_BRANCH} --single-branch https://git@github.com/${GIT_REPO}.git ${GIT_DIR}
+        git clone -b ${GIT_BRANCH} --single-branch https://git@github.com/${GIT_REPO}.git ${GIT_DIR} >/dev/null
     else
         echoInfo "Updating DevOps Libs code from '${GIT_REPO}'..."
-        git -C ${GIT_DIR} pull
+        git -C ${GIT_DIR} pull >/dev/null
     fi
 
     # Update retrieved lib status
-    mkdir -p ${LIB_DIR}
-    cat << EOF > ${LIB_STATE}
+    mkdir -p ${LIB_ROOT_DIR}
+    cat << EOF > ${SOURCE_STATE}
 GIT_DIR:${GIT_DIR}
 GIT_BRANCH:${GIT_BRANCH}
 GIT_HASH:$(cd ${GIT_DIR}; git rev-parse HEAD)
@@ -158,7 +155,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         # GIT mode
         else
             # Set the Source folder
-            DOLIBS_SOURCE_DIR="${DOLIBS_TMPDIR}/core/${BRANCH}"
+            DOLIBS_SOURCE_DIR="${DOLIBS_TMPDIR}/core/${DOLIBS_BRANCH}"
 
             # Check if git is present
             which git &> /dev/null || exitOnError "Git command not found"            

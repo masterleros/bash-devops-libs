@@ -16,8 +16,8 @@
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
 # Import required libs
-do.import utils # add your required libs
+do.use utils # add your required libs
 
 ### YOUR CODE ###
-do.utils.showTitle "Hello World!"
+utils.showTitle "Hello World!"
 ### YOUR CODE ###

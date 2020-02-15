@@ -111,7 +111,9 @@ function getArgs() {
         fi
     done
 
-    exitOnError "Invalid arguments at '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})\nUsage: ${FUNCNAME[1]} \"$(echo ${_args[@]})\"" ${_result}
+    #echo "BASH_SOURCE ${BASH_SOURCE[@]}"
+    #echo "BASH_LINENO ${BASH_LINENO[@]}"    
+    exitOnError "Invalid arguments at '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})\nUsage: ${FUNCNAME[1]} \"$(echo ${_args[@]})\"" ${_result}    
 }
 
 ### Consume an internal library ###
@@ -174,7 +176,7 @@ fi
 # Export all values required for sub-processes
 # be able to use the core lib
 export DOLIBS_DIR=${DOLIBS_DIR}
-export DOLIBS_TMPDIR=${DOLIBS_DIR}
+export DOLIBS_TMPDIR=${DOLIBS_TMPDIR}
 export DOLIBS_LIB_FILE=${DOLIBS_CORE_DIR}/lib.sh
 export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
 

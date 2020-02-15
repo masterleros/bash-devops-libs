@@ -37,7 +37,8 @@ function import() {
             local _libPathDir=${_lib/./\/}
             local _libRootDir=${DOLIBS_DIR}/${_libNamespace}
             local _libSourceConfig=${_libRootDir}/.source.cfg            
-            [ -f "${_libSourceConfig}" ] || exitOnError "Source configuration not found for ${_lib}"
+
+            [ -f "${_libSourceConfig}" ] || exitOnError "Source configuration '${_libSourceConfig}' not found for '${_lib}'"
 
             # Get source type
             assign sourceType=self configInFile ${_libSourceConfig} TYPE
@@ -55,20 +56,25 @@ function import() {
 
                 # If is a git source
                 elif [[ "${sourceType}" == "GIT" ]]; then                    
-                    assign _gitRepo=self configInFile ${_sourceConfig} SOURCE_REPO
-                    assign _gitBranch=self configInFile ${_sourceConfig} SOURCE_BRANCH
-                    assign _libSubDir=self configInFile ${_sourceConfig} SOURCE_LIB_SUBDIR
+                    assign _gitRepo=self configInFile ${_libSourceConfig} SOURCE_REPO
+                    assign _gitBranch=self configInFile ${_libSourceConfig} SOURCE_BRANCH
+                    assign _libSubDir=self configInFile ${_libSourceConfig} SOURCE_LIB_SUBDIR
                     local _gitDir="${DOLIBS_TMPDIR}/${_libNamespace}/${_gitBranch}"
                     local _libSourceDir=${_gitDir}/${_libSubDir}
 
                     # if the lib is outdated, clone it
                     if devOpsLibsOutDated ${_libRootDir}; then
-                        devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_libSourceDir} ${_libRootDir}
+                        devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_libRootDir}
                     fi      
                 fi
 
-                # import files                
-                importLibFiles ${_libSourceDir}/${_libPathDir} ${_libDir}/${_libPathDir}
+                # If is not at the root level, add the sub-namespaces as sub-folders
+                if [[ "${_libPathDir}" != "${_libNamespace}" ]]; then
+                    _libSourceDir=${_libSourceDir}/${_libPathDir/${_libNamespace}\//}
+                fi
+
+                # import files
+                importLibFiles ${_libSourceDir} ${_libDir}/${_libPathDir}
             fi
 
             # Create the libs and set as imported
@@ -85,10 +91,10 @@ function import() {
 }
 
 # Function to add a lib git repository source
-# Usage: addGitSource <namespace> <git_url> <optional_branch>
+# Usage: addGitSource <namespace> <git_url> <git_branch> <lib_subdir> 
 function addGitSource() {
 
-    getArgs "_namespace _gitUrl _libSubDir &_branch" "${@}"
+    getArgs "_namespace _gitUrl _branch _libSubDir" "${@}"
 
     # Set default branch case not specified
     [ ! "${_branch}" ] || local _branch="master"
@@ -152,7 +158,7 @@ function use() {
 
     # Add all namespaces
     for _namespace in ${_namespaces[@]}; do
-        self addLocalSource "${_namespace}" "${DOLIBS_SOURCE_LIBS_DIR}"
+        self addLocalSource "${_namespace}" "${DOLIBS_SOURCE_LIBS_DIR}/${_namespace}"
     done
 
     # Import libs from embedded sources

@@ -16,16 +16,16 @@
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
 # Set the custom remote lib source
-do.addGitSource customlib "masterleros/bash-devops-libs" master
+do.addGitSource gitlib "masterleros/bash-devops-libs" master libs
 exitOnError
-do.import customlib.utils
+do.import gitlib.utils
 
 # Set the custom lib source
-do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
+do.addLocalSource locallib $(dirname ${BASH_SOURCE[0]})/../../libs
 exitOnError
-do.import local.utils
+do.import locallib.utils
 
 ### YOUR CODE ###
-do.customlib.utils.showTitle "External lib import test!"
-do.local.utils.showTitle "Local lib import test!"
+gitlib.utils.showTitle "External lib import test!"
+locallib.utils.showTitle "Local lib import test!"
 ### YOUR CODE ###

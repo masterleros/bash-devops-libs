@@ -23,7 +23,6 @@ DOLIBS_BRANCH="feature/boostrap"
 DOLIBS_REPO="masterleros/bash-devops-libs"
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"
-DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 ### DEVOPS LIBS DEFINITIONS ###
 
 # DevOps libs options
@@ -45,6 +44,7 @@ done
 
 # Assign the dolibs root folder
 DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
+DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
 # Clone the lib code if required
 if [[ ! -f ${DOLIBS_DIR}/boostrap.sh || ${DOLIBS_MODE} == "online" ]]; then    
