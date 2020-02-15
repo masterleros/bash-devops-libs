@@ -162,8 +162,6 @@ function use() {
     # List namespaces
     local _namespaces=($(echo ${@} | tr ' ' '\n' | cut -d'.' -f1 | uniq))
 
-    echo "_namespace ${_namespace}"
-
     # Add all namespaces
     for _namespace in ${_namespaces[@]}; do        
         # If not in mode offline
