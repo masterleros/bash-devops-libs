@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 # Verify Dependencies
-verifyDeps terraform || return ${?}
+do.verifyDeps terraform || return ${?}
 
 ### Init terraform plan
 # usage: init <terraform path>
@@ -53,7 +53,7 @@ function createBackEndGCP() {
     getArgs "terraform_path bucket prefix" "${@}"
 
     # Validate required vars and dependencies
-    validateVars GOOGLE_APPLICATION_CREDENTIALS
+    do.validateVars GOOGLE_APPLICATION_CREDENTIALS
     exitOnError "'GOOGLE_APPLICATION_CREDENTIALS' Variable must be set for backend configuration"
 
     # Create backend config

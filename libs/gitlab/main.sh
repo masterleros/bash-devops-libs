@@ -67,7 +67,7 @@ function promoteToBranch() {
     getArgs "branch" "${@}"
 
     # Check if key was set
-    validateVars GITLAB_USER_PRIVATE_KEY
+    do.validateVars GITLAB_USER_PRIVATE_KEY
     exitOnError
 
     do.import git

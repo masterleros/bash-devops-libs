@@ -15,7 +15,7 @@
 #!/bin/bash
 
 # Verify Dependencies
-verifyDeps firebase || return ${?}
+do.verifyDeps firebase || return ${?}
 
 # Set firebase options
 if [ "${FIREBASE_TOKEN}" ]; then FIREBASE_OPTS="--non-interactive --token ${FIREBASE_TOKEN}"; fi

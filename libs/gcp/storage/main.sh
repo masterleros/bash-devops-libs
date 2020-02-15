@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 # Verify Dependencies
-verifyDeps gsutil
+do.verifyDeps gsutil
 
 ### Check bucket exists ###
 # usage: validateBucket <project> <bucket>

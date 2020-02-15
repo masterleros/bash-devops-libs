@@ -40,3 +40,27 @@ function verifyDeps() {
     done
     return ${_result}
 }
+
+### Check if a value exists in an array ###
+# usage: valueInArray <value> <array>
+function valueInArray() {
+    getArgs "_value &@_values" "${@}"
+    local _val
+    local _pos=0
+    for _val in "${_values[@]}"; do
+        if [[ "${_val}" == "${_value}" ]]; then 
+            _return=${_pos}
+            return 0;
+        fi
+        ((_pos+=1))
+    done
+    return -1
+}
+
+### Get a value from a config file
+# usage: configInFile <file> <key>
+function configInFile() {
+    getArgs "_file _key" "${@}"
+    _return=$(cat ${_file} | grep ${_key} | cut -d':' -f2-)
+    return $?
+}

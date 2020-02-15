@@ -13,14 +13,17 @@
 #    limitations under the License.
 
 #!/bin/bash
+
+# Include the header
 CURRENT_LIB=${1}
 CURRENT_LIB_DIR=${2}
+CURRENT_LIB_ENTRYPOINT=${3}
 
 # Include main code
-source ${CURRENT_LIB_DIR}/${DOLIBS_MAIN_FILE} || return ${?}
+. ${CURRENT_LIB_ENTRYPOINT} || return ${?}
 
-# # Include the footer
-if [ $(basename ${0}) == $(basename ${BASH_SOURCE[0]}) ]; then 
-    getArgs "function &@args" "${@}"
-    ${function} "${args[@]}"
-fi
+# Include the footer (deprecated)
+# if [ $(basename ${0}) == $(basename ${BASH_SOURCE[0]}) ]; then 
+#     getArgs "function &@args" "${@}"
+#     ${function} "${args[@]}"
+# fi

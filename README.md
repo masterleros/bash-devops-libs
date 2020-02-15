@@ -109,7 +109,7 @@ do.local.utils.showTitle "Hello DevOps Libs!"
 
 ## External Libraries
 
-To include external libraries, you can use the function `do.addCustomGitSource` to add an external GIT source, then name it as a new namespace:
+To include external libraries, you can use the function `do.addGitSource` to add an external GIT source, then name it as a new namespace:
 
 **example.sh**
 ``` sh
@@ -117,7 +117,7 @@ To include external libraries, you can use the function `do.addCustomGitSource` 
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
 
 # Set the external lib source
-do.addCustomGitSource myremotelib "github.com/masterleros/bash-devops-libs.git" master
+do.addGitSource myremotelib "github.com/masterleros/bash-devops-libs.git" master
 
 # Import the required lib from custom namespace
 do.import myremotelib.utils

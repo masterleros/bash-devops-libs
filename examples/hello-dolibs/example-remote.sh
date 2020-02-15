@@ -12,14 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp -l ../..
+# Enable dolibs
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp # mode auto
 
-# Set the custom lib source
-do.addGitSource myremotelib "masterleros/bash-devops-libs" feature/cleanup
-
-# Import the required lib from custom namespace
-do.import myremotelib.utils
+# Import the required lib
+do.import utils
 
 # Use the needed lib
-do.myremotelib.utils.showTitle "Hello DevOps Libs!"
+do.utils.showTitle "Hello DevOps Libs online!"

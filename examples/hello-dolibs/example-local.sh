@@ -12,17 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Opt1: Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp # mode auto
-
-# Opt2: Enable dolibs (clone from ../..)
-# source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. # mode local
+# Enable dolibs (copy from ../..)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp -l ../.. # source local
 
 # Import the required lib
-do.import utils
-
-# Optionally you can import all libs from the specified folder at once
-# do.recursiveImport ../..
+do.use utils utils.tokens gcp gcp.some
 
 # Use the needed lib
-do.utils.showTitle "Hello DevOps Libs!"
+utils.showTitle "Hello DevOps Libs from local!"

@@ -10,10 +10,10 @@ When you develop a new library, some steps should be followed:
 2. Verify the required dependencies for your execution, example:
     ``` sh
     # Validate available variables (if applicable) and return if error
-    validateVars <var1> <var2> ... <varN> || return ${?}
+    do.validateVars <var1> <var2> ... <varN> || return ${?}
 
     # Verify Dependencies (if applicable) and return if error
-    verifyDeps <dep1> <dep2> ... <depN> || return ${?}
+    do.verifyDeps <dep1> <dep2> ... <depN> || return ${?}
     ```
 
 3. Include your files:
@@ -106,10 +106,10 @@ do.myfunc.my_public_function
 #!/bin/bash
 
 # Validate Variables
-validateVars example_var || return ${?}
+do.validateVars example_var || return ${?}
 
 # Verify Dependencies
-verifyDeps example_dep || return ${?}
+do.verifyDeps example_dep || return ${?}
 
 # Import sub-modules
 source ${CURRENT_LIB_DIR}/additional_functions.sh || return ${?}

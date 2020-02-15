@@ -15,7 +15,7 @@
 #!/bin/bash
 
 # Verify Dependencies
-verifyDeps kubectl || return ${?}
+do.verifyDeps kubectl || return ${?}
 
 ### Deploy YAML file ###
 # usage deployYaml <file.yaml>

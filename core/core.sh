@@ -22,13 +22,6 @@ exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0
 # Check if not being included twice
 [ ! "${DOLIBS_CORE_FUNCT}" ]; exitOnError "You cannot include twice the core library"
 
-# Common library entrypoint validation
-[ -f ${DOLIBS_LIB_FILE} ]; exitOnError "DEVOPS Library '${DOLIBS_LIB_FILE}' not found! (try online mode)"
-
-# Definitions
-export DOLIBS_LIB_FILE=${DOLIBS_DIR}/lib.sh
-export DOLIBS_MAIN_FILE="main.sh"
-
 ### Consume an internal library ###
 # Usage: self <function> <args>
 function self() {
@@ -122,14 +115,14 @@ function getArgs() {
 }
 
 ### Consume an internal library ###
-# Usage: _createLibFunctions <lib_dir> <lib_alias> <func_header>
+# Usage: _createLibFunctions <_lib> <lib_dir>
 function _createLibFunctions() {
 
-    getArgs "_libDir &_libAlias" "${@}"
+    getArgs "_lib _libDir" "${@}"
 
     # Set the function local context
     local _funcHeader='
-local CURRENT_LIB='${_libAlias}'
+local CURRENT_LIB='${_lib}'
 local CURRENT_LIB_DIR='${_libDir}'
 if [ ${-//[^e]/} ]; then 
     set +e
@@ -140,15 +133,16 @@ if [ ${-//[^e]/} ]; then
 fi
 '
 
-    # Make as part of do namespace
-    local _libAlias="do"$([ ! "${_libAlias}" ] || echo ".${_libAlias}")
-
-    # Import lib functions
-    source ${DOLIBS_LIB_FILE} ${_libAlias} ${_libDir}
-    exitOnError "Error importing '${_libDir}/${DOLIBS_MAIN_FILE}'"
+    # Check the lib entrypoint
+    local _libEntrypoint=${_libDir}/${DOLIBS_MAIN_FILE}
+    [ -f "${_libEntrypoint}" ] || exitOnError "It was not posible to find '${_lib}' entrypoint at '${_libEntrypoint}'"
 
     # Get the lib funcions
-    local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_libAlias} ${_libDir}"' &> /dev/null; typeset -F' | awk '{print $NF}'))    
+    local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_lib} ${_libDir} ${_libEntrypoint}"' &> /dev/null; typeset -F' | awk '{print $NF}'))    
+
+    # Import lib functions
+    source ${DOLIBS_LIB_FILE} ${_lib} ${_libDir} ${_libEntrypoint}
+    exitOnError "Error importing '${_libEntrypoint}'"
 
     # Remove Core functions
     for _coreFunc in ${DOLIBS_CORE_FUNCT[@]}; do _libFuncts=("${_libFuncts[@]/${_coreFunc}}"); done
@@ -159,7 +153,7 @@ fi
         # If function is not already imported
         if [[ ${_libFunct} != "do."* ]]; then
             # New lib name
-            _libFunctNew=${_libAlias}.${_libFunct##*.}
+            _libFunctNew=${_lib}.${_libFunct##*.}
 
             # Rework the function            
             eval "$(echo "${_libFunctNew}() {"; echo "${_funcHeader}"; declare -f ${_libFunct} | tail -n +3)"
@@ -177,6 +171,13 @@ fi
     done
 }
 
+# Export all values required for sub-processes
+# be able to use the core lib
+export DOLIBS_DIR=${DOLIBS_DIR}
+export DOLIBS_TMPDIR=${DOLIBS_DIR}
+export DOLIBS_LIB_FILE=${DOLIBS_CORE_DIR}/lib.sh
+export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
+
 # Export all core functions for sub-bash executions 
 # so that are not included when listing includes 
 # functions when importing others
@@ -186,5 +187,4 @@ for funct in ${DOLIBS_CORE_FUNCT[@]}; do
 done
 
 # Import main DevOps Libs functions
-_createLibFunctions ${DOLIBS_DIR}
-
+_createLibFunctions "do" ${DOLIBS_CORE_DIR}

@@ -15,7 +15,7 @@
 #!/bin/bash
 
 # Verify Dependencies
-verifyDeps gcloud || return ${?}
+do.verifyDeps gcloud || return ${?}
 
 ### Set the requested project and then get credentials for the cluster ###
 # usage: loginCluster <cluster_name> <zone> <gcp_project_id>
