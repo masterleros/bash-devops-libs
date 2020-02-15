@@ -16,7 +16,7 @@
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp # mode auto
 
 # Import the required lib
-do.import utils
+do.use utils
 
 # Use the needed lib
-do.utils.showTitle "Hello DevOps Libs online!"
+utils.showTitle "Hello DevOps Libs online!"

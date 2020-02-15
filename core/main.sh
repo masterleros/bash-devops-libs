@@ -35,7 +35,7 @@ function import() {
             # Get lib information            
             local _libNamespace=(${_lib//./ })
             local _libPathDir=${_lib/./\/}
-            local _libRootDir=${DOLIBS_DIR}/${_libNamespace}
+            local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
             local _libSourceConfig=${_libRootDir}/.source.cfg            
 
             [ -f "${_libSourceConfig}" ] || exitOnError "Source configuration '${_libSourceConfig}' not found for '${_lib}'"
@@ -48,7 +48,7 @@ function import() {
                 assign _libDir=self configInFile ${_libSourceConfig} LIB_DIR
             else
                 # Local dir will be on dolibs
-                local _libDir=${DOLIBS_DIR}
+                local _libDir=${DOLIBS_LIBS_DIR}
 
                 # If is a local source
                 if [[ "${sourceType}" == "LOCAL" ]]; then
@@ -96,11 +96,11 @@ function addGitSource() {
 
     getArgs "_namespace _gitUrl _branch _libSubDir" "${@}"
 
-    # Set default branch case not specified
-    [ ! "${_branch}" ] || local _branch="master"
+    # Check namespace
+    [[ ${_namespace} != "do" ]] || exitOnError "Namespace '${_namespace}' is reserved"
     
     # Write the file with the data
-    local _libPath=${DOLIBS_DIR}/${_namespace}
+    local _libPath=${DOLIBS_LIBS_DIR}/${_namespace}
     mkdir -p  ${_libPath}
     cat << EOF > ${_libPath}/.source.cfg
 TYPE:GIT
@@ -119,8 +119,11 @@ function addLocalSource() {
 
     getArgs "_namespace _path" "${@}"
     
+    # Check namespace
+    [[ ${_namespace} != "do" ]] || exitOnError "Namespace '${_namespace}' is reserved"
+
     # Write the file with the data
-    local _libPath=${DOLIBS_DIR}/${_namespace}
+    local _libPath=${DOLIBS_LIBS_DIR}/${_namespace}
     mkdir -p  ${_libPath}
     cat << EOF > ${_libPath}/.source.cfg
 TYPE:LOCAL
@@ -136,9 +139,12 @@ EOF
 function addLocalLib() {
 
     getArgs "_namespace _path" "${@}"
-    
+
+    # Check namespace
+    [[ ${_namespace} != "do" ]] || exitOnError "Namespace '${_namespace}' is reserved"
+
     # Write the file with the data
-    local _libPath=${DOLIBS_DIR}/${_namespace}
+    local _libPath=${DOLIBS_LIBS_DIR}/${_namespace}
     mkdir -p  ${_libPath}
     cat << EOF > ${_libPath}/.source.cfg
 TYPE:OFFLINE
@@ -156,9 +162,16 @@ function use() {
     # List namespaces
     local _namespaces=($(echo ${@} | tr ' ' '\n' | cut -d'.' -f1 | uniq))
 
+    echo "_namespace ${_namespace}"
+
     # Add all namespaces
-    for _namespace in ${_namespaces[@]}; do
-        self addLocalSource "${_namespace}" "${DOLIBS_SOURCE_LIBS_DIR}/${_namespace}"
+    for _namespace in ${_namespaces[@]}; do        
+        # If not in mode offline
+        if [[ ${DOLIBS_MODE} == offline ]]; then
+            self addLocalLib "${_namespace}" "${DOLIBS_LIBS_DIR}"
+        else
+            self addLocalSource "${_namespace}" "${DOLIBS_SOURCE_LIBS_DIR}/${_namespace}"
+        fi
     done
 
     # Import libs from embedded sources

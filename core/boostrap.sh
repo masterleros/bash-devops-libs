@@ -141,11 +141,11 @@ fi
 # If Core library was not yet loaded
 if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
+    # core folder
+    DOLIBS_CORE_DIR=${DOLIBS_DIR}/core        
+
     # If not working offline
     if [[ ${DOLIBS_MODE} != 'offline' ]]; then
-        
-        # core folder
-        DOLIBS_CORE_DIR=${DOLIBS_DIR}/core        
 
         # Local mode
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
@@ -177,7 +177,9 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
             # import core lib files
             importLibFiles ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}
-            cp ${DOLIBS_SOURCE_CORE_DIR}/.gitignore ${DOLIBS_CORE_DIR}
+
+            # Copy the gitignore
+            cp ${DOLIBS_SOURCE_DIR}/.gitignore ${DOLIBS_DIR}
 
             # Copy license
             cp ${DOLIBS_SOURCE_DIR}/LICENSE ${DOLIBS_CORE_DIR}/LICENSE

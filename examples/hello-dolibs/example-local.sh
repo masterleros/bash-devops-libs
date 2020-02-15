@@ -12,11 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (copy from ../..)
+# Enable dolibs (use from ../../libs)
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp -l ../.. # source local
 
 # Import the required lib
-do.use utils utils.tokens gcp gcp.some
+do.use utils
 
 # Use the needed lib
 utils.showTitle "Hello DevOps Libs from local!"

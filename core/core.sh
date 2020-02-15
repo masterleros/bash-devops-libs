@@ -175,9 +175,12 @@ fi
 
 # Export all values required for sub-processes
 # be able to use the core lib
+export DOLIBS_MODE=${DOLIBS_MODE}
 export DOLIBS_DIR=${DOLIBS_DIR}
+export DOLIBS_ROOTDIR=${DOLIBS_ROOTDIR}
 export DOLIBS_TMPDIR=${DOLIBS_TMPDIR}
 export DOLIBS_LIB_FILE=${DOLIBS_CORE_DIR}/lib.sh
+export DOLIBS_LIBS_DIR=${DOLIBS_DIR}/libs
 export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
 
 # Export all core functions for sub-bash executions 

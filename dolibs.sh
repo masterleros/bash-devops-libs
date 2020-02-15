@@ -22,7 +22,8 @@ DOLIBS_MODE="auto"
 DOLIBS_BRANCH="feature/boostrap"
 DOLIBS_REPO="masterleros/bash-devops-libs"
 ### DEVOPS LIBS DEFINITIONS ###
-DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"
+DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"/
+DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
 ### DEVOPS LIBS DEFINITIONS ###
 
 # DevOps libs options
@@ -32,8 +33,8 @@ while [ "${1}" != "" ]; do
         "--online") DOLIBS_MODE='online'; shift 1;;
         "--auto") DOLIBS_MODE='auto'; shift 1;;
         "--offline") DOLIBS_MODE='offline'; shift 1;;
-        # dolibs root folder    
-        "-f") DOLIBS_ROOTDIR=${2}; shift 2;;
+        # dolibs folder    
+        "-f") DOLIBS_DIR=${2}; shift 2;;
         # Local source folder (default is git)
         "-l") DOLIBS_LOCAL_SOURCE_DIR="$(cd $(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)/${2} 2>&1 && pwd)"
             if [ ! -d "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then echo "Folder '${2}' does not exist!"; exit -1 ;fi
@@ -42,34 +43,40 @@ while [ "${1}" != "" ]; do
     esac
 done
 
-# Assign the dolibs root folder
-DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
+# Assign the dolibs temp folder
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
-# Clone the lib code if required
-if [[ ! -f ${DOLIBS_DIR}/boostrap.sh || ${DOLIBS_MODE} == "online" ]]; then    
+# If not mode offline
+if [[ ${DOLIBS_MODE} != "offline" ]]; then
+    # Clone the boostrap if in online mode or it does not exist (auto mode)
+    if [[ ${DOLIBS_MODE} != "online" || ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
 
-    # Create the lib folder
-    [ -d ${DOLIBS_DIR} ] || mkdir -p ${DOLIBS_DIR}
-    # If there is a problem, exit
-    if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to create the lib folder, exiting..."; exit -1; fi    
+        # Create the lib folder
+        [ -d ${DOLIBS_DIR}/core ] || mkdir -p ${DOLIBS_DIR}/core
+        # If there is a problem, exit
+        if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to create the lib folder, exiting..."; exit -1; fi    
 
-    # Get the boostrap    
-    if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
-        cp ${DOLIBS_LOCAL_SOURCE_DIR}/core/boostrap.sh ${DOLIBS_DIR}/boostrap.sh
-    else
-        curl -s --fail https://raw.githubusercontent.com/${DOLIBS_REPO}/${DOLIBS_BRANCH}/core/boostrap.sh -o ${DOLIBS_DIR}/boostrap.sh
+        # Get the boostrap    
+        if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
+            cp ${DOLIBS_LOCAL_SOURCE_DIR}/core/boostrap.sh ${DOLIBS_DIR}/core/boostrap.sh
+        else
+            curl -s --fail https://raw.githubusercontent.com/${DOLIBS_REPO}/${DOLIBS_BRANCH}/core/boostrap.sh -o ${DOLIBS_DIR}/core/boostrap.sh
+        fi
+
+        # If there is a problem, exit
+        if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to retrieve the boostraper, exiting..."; exit -1; fi
     fi
-
-    # If there is a problem, exit
-    if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to retrieve the boostraper, exiting..."; exit -1; fi
 fi
 
 # Check and enable set e and if is, disable
 # set_e_enabled=${-//[^e]/}
 # [ ${set_e_enabled} ] || set -e
 
-# Execute the boostrap
-. ${DOLIBS_DIR}/boostrap.sh
+# Execute the boostrap if is present
+if [[ ! -f ${DOLIBS_DIR}/core/boostrap.sh ]]; then
+    echo "It was not possible to find the boostrap in '${DOLIBS_DIR}/core' (offline mode?)"
+    exit -1
+fi
+. ${DOLIBS_DIR}/core/boostrap.sh
 
 #[ ${set_e_enabled} ] || set +e # Disable set e if was enabled

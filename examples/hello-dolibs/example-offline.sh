@@ -12,4 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-.libtmp/
+# Enable dolibs (offline)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f ../.. --offline
+
+# Import the required lib
+do.use utils
+
+# Use the needed lib
+utils.showTitle "Hello DevOps Libs from local!"
