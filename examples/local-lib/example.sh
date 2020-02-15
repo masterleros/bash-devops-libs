@@ -12,8 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp/dolibs
 
 # Set the local lib source
 do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs

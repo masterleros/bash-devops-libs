@@ -13,4 +13,4 @@
 #    limitations under the License.
 
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs

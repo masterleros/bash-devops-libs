@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs
 
 # Set the custom remote lib source
 do.addGitSource gitlib "masterleros/bash-devops-libs" master libs

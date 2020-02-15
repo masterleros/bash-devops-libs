@@ -94,8 +94,8 @@ To include local libraries, you can use the function `do.addLocalSource` to add 
 
 **example.sh**
 ``` sh
-# Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp/dolibs
 
 # Set the local lib source
 do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
@@ -114,7 +114,7 @@ To include external libraries, you can use the function `do.addGitSource` to add
 **example.sh**
 ``` sh
 # Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs
 
 # Set the external lib source
 do.addGitSource myremotelib "github.com/masterleros/bash-devops-libs.git" master

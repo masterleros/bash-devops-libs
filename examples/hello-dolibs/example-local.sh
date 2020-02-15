@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 # Enable dolibs (use from ../../libs)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp -l ../.. # source local
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs -l ../.. # source local
 
 # Import the required lib
 do.use utils
