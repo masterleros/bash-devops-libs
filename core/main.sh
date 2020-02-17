@@ -50,20 +50,17 @@ function import() {
                 # Update lib dir to the offline folder
                 assign _libDir=self configInFile ${_libSourceConfig} LIB_DIR                                
                 _libDir=${_libDir}/${_libPathDir}
-            # ONLINE mode
-            elif [[ "${DOLIBS_MODE}" == "online" ]]; then              
-                local _needInstall=true
             # AUTO mode
             elif [[ "${DOLIBS_MODE}" == "auto" ]]; then                
                 # If the lib is not integral, needs to update
                 if libNotIntegral ${_libDir}; then
-                    echoInfo "It was not possible to check '${_lib}'integrity, trying to get its code..."
+                    echoInfo "It was not possible to check '${_lib}' lib integrity, trying to get its code..."
                     local _needInstall=true
                 fi
             fi
 
             # If needs clone
-            if [[ "${_needInstall}" == "true" ]]; then
+            if [[ "${DOLIBS_MODE}" == "online" || "${_needInstall}" == "true" ]]; then
 
                 # If is a local source
                 if [[ "${sourceType}" == "LOCAL" ]]; then
@@ -89,7 +86,7 @@ function import() {
                 fi
 
                 # import files
-                if libSourceUpdated ${_libSourceDir} ${_libDir}; then
+                if libSourceUpdated ${_libSourceDir} ${_libDir} || libNotIntegral ${_libDir}; then
                     echoInfo "Installing '${_lib}' code...."
                     libImportFiles ${_libSourceDir} ${_libDir}
                 fi
