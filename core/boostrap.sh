@@ -118,10 +118,6 @@ function libSourceUpdated() {
     local SOURCE_DIR=${1}
     local LIB_DIR=${2}
 
-    echo "---------- DIFF ----------"
-    echo $(cd ${SOURCE_DIR}; find -maxdepth 1 -type f -exec diff {} ${LIB_DIR}/{} \; 2>&1)
-    echo "---------- DIFF ----------"
-
     # Validate source and lib folder differences
     [ "$(cd ${SOURCE_DIR}; find -maxdepth 1 -type f -exec diff {} ${LIB_DIR}/{} \; 2>&1)" ]
 }
