@@ -112,6 +112,9 @@ function libGitOutDated() {
     # Get git remote hash
     local GIT_ORIGIN_HASH=$(cd ${GIT_DIR} && git fetch && git rev-parse origin/${GIT_BRANCH})
 
+    echo "GIT_ORIGIN_HASH ${GIT_ORIGIN_HASH}"
+    echo "GIT_HASH ${GIT_HASH}"
+
     # Return result
     [[ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]    
 }
