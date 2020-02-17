@@ -49,7 +49,7 @@ DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 # If not mode offline
 if [[ ${DOLIBS_MODE} != "offline" ]]; then
     # Clone the boostrap if in online mode or it does not exist (auto mode)
-    if [[ ${DOLIBS_MODE} != "online" || ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
+    #if [[ ${DOLIBS_MODE} == "online" || ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
 
         # Create the lib folder
         [ -d ${DOLIBS_DIR} ] || mkdir -p ${DOLIBS_DIR}
@@ -65,7 +65,7 @@ if [[ ${DOLIBS_MODE} != "offline" ]]; then
 
         # If there is a problem, exit
         if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to retrieve the boostraper, exiting..."; exit -1; fi
-    fi
+    #fi
 fi
 
 # Check and enable set e and if is, disable
