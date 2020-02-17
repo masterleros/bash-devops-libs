@@ -103,7 +103,7 @@ function libGitOutDated() {
     [ -f "${SOURCE_STATE}" ] || return 0
 
     # If source dos not exist
-    [ -f "${GIT_DIR}" ] || return 0
+    [ -d "${GIT_DIR}" ] || return 0
 
     # Get local status
     local GIT_BRANCH=$(cat ${SOURCE_STATE} | grep GIT_BRANCH | cut -d':' -f2-)    
