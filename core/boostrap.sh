@@ -97,21 +97,19 @@ function libGitOutDated() {
     local LIB_ROOT_DIR=${1}
     local SOURCE_STATE="${LIB_ROOT_DIR}/.source.state"
 
-    # If an state exists
-    if [ -f "${SOURCE_STATE}" ]; then
-        # Get local status
-        local GIT_BRANCH=$(cat ${SOURCE_STATE} | grep GIT_BRANCH | cut -d':' -f2-)
-        local GIT_DIR=$(cat ${SOURCE_STATE} | grep GIT_DIR | cut -d':' -f2-)
-        local GIT_HASH=$(cat ${SOURCE_STATE} | grep GIT_HASH | cut -d':' -f2-)
+    # If state dos not exist
+    if [ ! -f "${SOURCE_STATE}" ]; then return 0; fi
 
-        # Get git remote hash
-        local GIT_ORIGIN_HASH=$([ ! -d "${GIT_DIR}" ] || cd ${GIT_DIR} && git rev-parse origin/${GIT_BRANCH})
+    # Get local status
+    local GIT_BRANCH=$(cat ${SOURCE_STATE} | grep GIT_BRANCH | cut -d':' -f2-)
+    local GIT_DIR=$(cat ${SOURCE_STATE} | grep GIT_DIR | cut -d':' -f2-)
+    local GIT_HASH=$(cat ${SOURCE_STATE} | grep GIT_HASH | cut -d':' -f2-)
 
-        # Return result
-        [[ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]
-    fi
+    # Get git remote hash
+    local GIT_ORIGIN_HASH=$([ ! -d "${GIT_DIR}" ] || cd ${GIT_DIR} && git rev-parse origin/${GIT_BRANCH})
 
-    return 0
+    # Return result
+    [[ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]    
 }
 
 ### Function to indicate if the source if different than the lib ###
@@ -151,18 +149,16 @@ function libNotIntegral() {
     local LIB_DIR=${1}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
 
-    # If an state exists
-    if [ -f "${LIB_SHASUM_PATH}" ]; then
-        local LIB_SHASUM=$(cat ${LIB_SHASUM_PATH} | grep SHASUM | cut -d':' -f2-)
+    # If sha does not exist exist
+    if [ ! -f "${LIB_SHASUM_PATH}" ]; then return 0; fi
 
-        # Calculate        
-        CALCULATED_SHASUM=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
+    local LIB_SHASUM=$(cat ${LIB_SHASUM_PATH} | grep SHASUM | cut -d':' -f2-)
 
-        # Return result
-        [[ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]]        
-    fi
+    # Calculate        
+    CALCULATED_SHASUM=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
 
-    return 0
+    # Return result
+    [[ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]]        
 }
 
 # Show operation mode
