@@ -102,16 +102,16 @@ function libGitOutDated() {
         # Get local status
         local GIT_BRANCH=$(cat ${SOURCE_STATE} | grep GIT_BRANCH | cut -d':' -f2-)
         local GIT_DIR=$(cat ${SOURCE_STATE} | grep GIT_DIR | cut -d':' -f2-)
-        local GIT_HASH=$(cat ${SOURCE_STATE} | grep GIT_DIR | cut -d':' -f2-)
+        local GIT_HASH=$(cat ${SOURCE_STATE} | grep GIT_HASH | cut -d':' -f2-)
 
         # Get git remote hash
         local GIT_ORIGIN_HASH=$([ ! -d "${GIT_DIR}" ] || cd ${GIT_DIR} && git rev-parse origin/${GIT_BRANCH})
 
         # Return result
-        [[ "${GIT_ORIGIN_HASH}" == "${GIT_HASH}" ]]
+        [[ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]
     fi
 
-    return 0
+    return -1
 }
 
 ### Function to indicate if the source if different than the lib ###
