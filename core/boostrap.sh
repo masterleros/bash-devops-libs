@@ -58,8 +58,8 @@ function exitOnError() {
 }
 
 ### Function to clone the lib code ###
-# usage: devOpsLibsClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
-function devOpsLibsClone() {
+# usage: libGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
+function libGitClone() {
 
     local GIT_REPO=${1}
     local GIT_BRANCH=${2}
@@ -69,10 +69,10 @@ function devOpsLibsClone() {
 
     # Get the code        
     if [ ! -d ${GIT_DIR} ]; then            
-        echoInfo "Cloning DevOps Libs code from '${GIT_REPO}'..."
+        echoInfo "Cloning Libs code from '${GIT_REPO}'..."
         git clone -b ${GIT_BRANCH} --single-branch https://git@github.com/${GIT_REPO}.git ${GIT_DIR} >/dev/null
     else
-        echoInfo "Updating DevOps Libs code from '${GIT_REPO}'..."
+        echoInfo "Updating Libs code from '${GIT_REPO}'..."
         git -C ${GIT_DIR} pull >/dev/null
     fi
 
@@ -91,8 +91,8 @@ EOF
 }
 
 ### Function to indicate if the lib code is outdated ###
-# usage: devOpsLibsOutDated <LIB_ROOT_DIR>
-function devOpsLibsOutDated() {
+# usage: libGitOutDated <LIB_ROOT_DIR>
+function libGitOutDated() {
 
     local LIB_ROOT_DIR=${1}
     local SOURCE_STATE="${LIB_ROOT_DIR}/.source.state"
@@ -114,12 +114,23 @@ function devOpsLibsOutDated() {
     return 0
 }
 
-### Import DevOps Lib files ###
-# Usage: importLibFiles <SOURCE_DIR> <LIB_DIR>
-function importLibFiles() {
+### Function to indicate if the source if different than the lib ###
+# usage: libsSourceUpdated <SOURCE_DIR> <LIB_DIR>
+function libsSourceUpdated() {
+    local SOURCE_DIR=${1}
+    local LIB_DIR=${2}
+
+    # Validate source and lib folder differences
+    [ "$(cd ${SOURCE_DIR}; find -maxdepth 1 -type f -exec diff {} ${LIB_DIR}/{} \; 2>&1)" ]
+}
+
+### Import Lib files ###
+# Usage: libImportFiles <SOURCE_DIR> <LIB_DIR>
+function libImportFiles() {
     
     local SOURCE_DIR=${1}
     local LIB_DIR=${2}
+    local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
 
     # Check if the lib entrypoint exists
     [ -f ${SOURCE_DIR}/${DOLIBS_MAIN_FILE} ] || exitOnError "Library source '${SOURCE_DIR}' not found! (does it need add source?)"
@@ -127,6 +138,31 @@ function importLibFiles() {
     # Create lib dir and copy
     mkdir -p ${LIB_DIR} && cp ${SOURCE_DIR}/*.* ${LIB_DIR}
     exitOnError "Could not import the '${LIB}' library files"
+
+    # Add the checksum file
+    shasum=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
+    echo "SHASUM:${shasum}" > ${LIB_SHASUM_PATH}
+}
+
+### Check if the libs files are valid ###
+# Usage: libIntegrity <LIB_DIR>
+function libIntegrity() {
+    
+    local LIB_DIR=${1}
+    local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
+
+    # If an state exists
+    if [ -f "${LIB_SHASUM_PATH}" ]; then
+        local LIB_SHASUM=$(cat ${LIB_SHASUM_PATH} | grep SHASUM | cut -d':' -f2-)
+
+        # Calculate        
+        CALCULATED_SHASUM=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
+
+        # Return result
+        [[ "${LIB_SHASUM}" == "${CALCULATED_SHASUM}" ]]        
+    fi
+
+    return -1
 }
 
 # Show operation mode
@@ -151,7 +187,6 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
             # Set the Source folder
             DOLIBS_SOURCE_DIR=${DOLIBS_LOCAL_SOURCE_DIR}
-            NEEDS_INSTALL='true'
         # GIT mode
         else
             # Set the Source folder
@@ -161,9 +196,8 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             which git &> /dev/null || exitOnError "Git command not found"            
 
             # If the lib is outdated, clone it
-            if devOpsLibsOutDated ${DOLIBS_CORE_DIR}; then
-                devOpsLibsClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_SOURCE_DIR} ${DOLIBS_CORE_DIR}
-                NEEDS_INSTALL='true'
+            if libGitOutDated ${DOLIBS_CORE_DIR}; then
+                libGitClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_SOURCE_DIR} ${DOLIBS_CORE_DIR}
             fi
         fi
 
@@ -171,12 +205,12 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core
 
         # If it is needed to install/update the lib
-        if [ "${NEEDS_INSTALL}" ]; then
+        if libsSourceUpdated ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}; then
 
             echoInfo "Installing Core library code...."
 
             # import core lib files
-            importLibFiles ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}
+            libImportFiles ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}
 
             # Copy the gitignore
             cp ${DOLIBS_SOURCE_DIR}/.gitignore ${DOLIBS_DIR}
@@ -185,13 +219,13 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             cp ${DOLIBS_SOURCE_DIR}/LICENSE ${DOLIBS_CORE_DIR}/LICENSE
             cp ${DOLIBS_SOURCE_DIR}/NOTICE ${DOLIBS_CORE_DIR}/NOTICE
 
-            # Copy the DevOps Libs help
+            # Copy the Libs help
             cp ${DOLIBS_SOURCE_DIR}/README.md ${DOLIBS_CORE_DIR}/README.md
             cp ${DOLIBS_SOURCE_DIR}/libs/README.md ${DOLIBS_CORE_DIR}/DEVELOPMENT.md
         fi
     fi
 
-    ### Include DevOps Libs ###
+    ### Include Libs ###
     if [ -f ${DOLIBS_CORE_DIR}/core.sh ]; then        
         . ${DOLIBS_CORE_DIR}/core.sh
         exitOnError "Could not import DevOps Libs"
@@ -199,3 +233,8 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         exitOnError "Could not find DevOps Libs (offline mode?)" 1
     fi
 fi
+
+# Check required binaries
+# git
+# diff
+# shasum

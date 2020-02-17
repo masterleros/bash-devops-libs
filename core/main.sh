@@ -63,8 +63,8 @@ function import() {
                     local _libSourceDir=${_gitDir}/${_libSubDir}
 
                     # if the lib is outdated, clone it
-                    if devOpsLibsOutDated ${_libRootDir}; then
-                        devOpsLibsClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_libRootDir}
+                    if libGitOutDated ${_libRootDir}; then
+                        libGitClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_libRootDir}
                     fi      
                 fi
 
@@ -74,7 +74,9 @@ function import() {
                 fi
 
                 # import files
-                importLibFiles ${_libSourceDir} ${_libDir}/${_libPathDir}
+                if libsSourceUpdated ${_libSourceDir} ${_libDir}/${_libPathDir}; then
+                    libImportFiles ${_libSourceDir} ${_libDir}/${_libPathDir}
+                fi
             fi
 
             # Create the libs and set as imported
