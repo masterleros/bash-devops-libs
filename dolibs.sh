@@ -60,7 +60,7 @@ if [[ ${DOLIBS_MODE} != "offline" ]]; then
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
             cp ${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh ${DOLIBS_DIR}/boostrap.sh
         else
-            curl -s --fail https://raw.githubusercontent.com/${DOLIBS_REPO}/${DOLIBS_BRANCH}/boostrap.sh -o ${DOLIBS_DIR}/boostrap.sh
+            curl -H 'Cache-Control: no-cache' -s --fail https://raw.githubusercontent.com/${DOLIBS_REPO}/${DOLIBS_BRANCH}/boostrap.sh -o ${DOLIBS_DIR}/boostrap.sh
         fi
 
         # If there is a problem, exit
