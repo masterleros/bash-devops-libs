@@ -111,7 +111,7 @@ function libGitOutDated() {
         [[ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]
     fi
 
-    return -1
+    return 0
 }
 
 ### Function to indicate if the source if different than the lib ###
@@ -145,8 +145,8 @@ function libImportFiles() {
 }
 
 ### Check if the libs files are valid ###
-# Usage: libIntegrity <LIB_DIR>
-function libIntegrity() {
+# Usage: libNotIntegral <LIB_DIR>
+function libNotIntegral() {
     
     local LIB_DIR=${1}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
@@ -159,10 +159,10 @@ function libIntegrity() {
         CALCULATED_SHASUM=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
 
         # Return result
-        [[ "${LIB_SHASUM}" == "${CALCULATED_SHASUM}" ]]        
+        [[ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]]        
     fi
 
-    return -1
+    return 0
 }
 
 # Show operation mode
