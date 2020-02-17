@@ -139,7 +139,7 @@ function libImportFiles() {
     
     # Create lib dir and copy
     mkdir -p ${LIB_DIR} && cp ${SOURCE_DIR}/*.* ${LIB_DIR}
-    exitOnError "Could not import the '${LIB}' library files"
+    exitOnError "Could not import the '${SOURCE_DIR}' library files"
 
     # Add the checksum file
     shasum=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
@@ -154,12 +154,12 @@ function libNotIntegral() {
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
 
     # If sha does not exist exist
-    if [ ! -f "${LIB_SHASUM_PATH}" ]; then return 0; fi
+    [ -f "${LIB_SHASUM_PATH}" ] || return 0
 
     local LIB_SHASUM=$(cat ${LIB_SHASUM_PATH} | grep SHASUM | cut -d':' -f2-)
 
     # Calculate        
-    CALCULATED_SHASUM=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
+    local CALCULATED_SHASUM=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
 
     # Return result
     [[ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]]        

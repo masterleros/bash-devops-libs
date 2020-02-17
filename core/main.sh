@@ -37,18 +37,33 @@ function import() {
             local _libPathDir=${_lib/./\/}
             local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
             local _libSourceConfig=${_libRootDir}/.source.cfg            
+            local _libDir=${DOLIBS_LIBS_DIR}/${_libPathDir}
+            local _needInstall=false
 
             [ -f "${_libSourceConfig}" ] || exitOnError "Source configuration '${_libSourceConfig}' not found for '${_lib}'"
 
             # Get source type
             assign sourceType=self configInFile ${_libSourceConfig} TYPE
 
-            # If it is in offline mode
+            # OFFLINE mode
             if [[ "${sourceType}" == "OFFLINE" ]]; then
-                assign _libDir=self configInFile ${_libSourceConfig} LIB_DIR
-            else
-                # Local dir will be on dolibs
-                local _libDir=${DOLIBS_LIBS_DIR}
+                # Update lib dir to the offline folder
+                assign _libDir=self configInFile ${_libSourceConfig} LIB_DIR                                
+                _libDir=${_libDir}/${_libPathDir}
+            # ONLINE mode
+            elif [[ "${DOLIBS_MODE}" == "online" ]]; then              
+                local _needInstall=true
+            # AUTO mode
+            elif [[ "${DOLIBS_MODE}" == "auto" ]]; then                
+                # If the lib is not integral, needs to update
+                if libNotIntegral ${_libDir}; then
+                    echoInfo "It was not possible to check '${_lib}'integrity, trying to get its code..."
+                    local _needInstall=true
+                fi
+            fi
+
+            # If needs clone
+            if [[ "${_needInstall}" == "true" ]]; then
 
                 # If is a local source
                 if [[ "${sourceType}" == "LOCAL" ]]; then
@@ -74,13 +89,14 @@ function import() {
                 fi
 
                 # import files
-                if libSourceUpdated ${_libSourceDir} ${_libDir}/${_libPathDir}; then
-                    libImportFiles ${_libSourceDir} ${_libDir}/${_libPathDir}
+                if libSourceUpdated ${_libSourceDir} ${_libDir}; then
+                    echoInfo "Installing '${_lib}' code...."
+                    libImportFiles ${_libSourceDir} ${_libDir}
                 fi
             fi
 
             # Create the libs and set as imported
-            _createLibFunctions ${_lib} ${_libDir}/${_libPathDir}
+            _createLibFunctions ${_lib} ${_libDir}
             export DOLIBS_IMPORTED+=(${_lib})
 
             # Show import
