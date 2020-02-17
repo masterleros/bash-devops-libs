@@ -105,7 +105,7 @@ function libGitOutDated() {
     local GIT_DIR=$(cat ${SOURCE_STATE} | grep GIT_DIR | cut -d':' -f2-)
     local GIT_HASH=$(cat ${SOURCE_STATE} | grep GIT_HASH | cut -d':' -f2-)
 
-    # Get git remote hash
+    # Get git remote hash - TEST
     local GIT_ORIGIN_HASH=$([ ! -d "${GIT_DIR}" ] || cd ${GIT_DIR} && git rev-parse origin/${GIT_BRANCH})
 
     # Return result
