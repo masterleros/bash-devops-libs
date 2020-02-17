@@ -52,15 +52,15 @@ if [[ ${DOLIBS_MODE} != "offline" ]]; then
     if [[ ${DOLIBS_MODE} != "online" || ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
 
         # Create the lib folder
-        [ -d ${DOLIBS_DIR}/core ] || mkdir -p ${DOLIBS_DIR}/core
+        [ -d ${DOLIBS_DIR} ] || mkdir -p ${DOLIBS_DIR}
         # If there is a problem, exit
         if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to create the lib folder, exiting..."; exit -1; fi    
 
         # Get the boostrap
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
-            cp ${DOLIBS_LOCAL_SOURCE_DIR}/core/boostrap.sh ${DOLIBS_DIR}/core/boostrap.sh
+            cp ${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh ${DOLIBS_DIR}/boostrap.sh
         else
-            curl -s --fail https://raw.githubusercontent.com/${DOLIBS_REPO}/${DOLIBS_BRANCH}/core/boostrap.sh -o ${DOLIBS_DIR}/core/boostrap.sh
+            curl -s --fail https://raw.githubusercontent.com/${DOLIBS_REPO}/${DOLIBS_BRANCH}/boostrap.sh -o ${DOLIBS_DIR}/boostrap.sh
         fi
 
         # If there is a problem, exit
@@ -73,11 +73,11 @@ fi
 # [ ${set_e_enabled} ] || set -e
 
 # Execute the boostrap if is present
-if [[ ! -f ${DOLIBS_DIR}/core/boostrap.sh ]]; then
-    echo "ERROR: It was not possible to find the boostrap in '${DOLIBS_DIR}/core' (offline mode?)"
+if [[ ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
+    echo "ERROR: It was not possible to find the boostrap in '${DOLIBS_DIR}' (offline mode?)"
     exit -1
 fi
 
-. ${DOLIBS_DIR}/core/boostrap.sh
+. ${DOLIBS_DIR}/boostrap.sh
 
 #[ ${set_e_enabled} ] || set +e # Disable set e if was enabled
