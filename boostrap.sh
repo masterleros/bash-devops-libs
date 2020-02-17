@@ -70,10 +70,10 @@ function libGitClone() {
     # Get the code        
     if [ ! -d ${GIT_DIR} ]; then            
         echoInfo "Cloning Libs code from '${GIT_REPO}'..."
-        git clone -b ${GIT_BRANCH} --single-branch https://git@github.com/${GIT_REPO}.git ${GIT_DIR} >/dev/null
+        git clone -q -b ${GIT_BRANCH} --single-branch https://git@github.com/${GIT_REPO}.git ${GIT_DIR}
     else
         echoInfo "Updating Libs code from '${GIT_REPO}'..."
-        git -C ${GIT_DIR} pull >/dev/null
+        git -C ${GIT_DIR} pull -q
     fi
     exitOnError "It was not possible to clone the GIT code"
 
@@ -110,7 +110,7 @@ function libGitOutDated() {
     local GIT_HASH=$(cat ${SOURCE_STATE} | grep GIT_HASH | cut -d':' -f2-)
 
     # Get git remote hash
-    local GIT_ORIGIN_HASH=$(cd ${GIT_DIR} && git fetch && git rev-parse origin/${GIT_BRANCH})
+    local GIT_ORIGIN_HASH=$(cd ${GIT_DIR} && git fetch -q && git rev-parse origin/${GIT_BRANCH})
 
     # Return result
     [[ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]    
