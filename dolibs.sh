@@ -77,6 +77,7 @@ if [[ ! -f ${DOLIBS_DIR}/core/boostrap.sh ]]; then
     echo "ERROR: It was not possible to find the boostrap in '${DOLIBS_DIR}/core' (offline mode?)"
     exit -1
 fi
+
 . ${DOLIBS_DIR}/core/boostrap.sh
 
 #[ ${set_e_enabled} ] || set +e # Disable set e if was enabled
