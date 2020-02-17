@@ -74,7 +74,7 @@ function import() {
                 fi
 
                 # import files
-                if libsSourceUpdated ${_libSourceDir} ${_libDir}/${_libPathDir}; then
+                if libSourceUpdated ${_libSourceDir} ${_libDir}/${_libPathDir}; then
                     libImportFiles ${_libSourceDir} ${_libDir}/${_libPathDir}
                 fi
             fi

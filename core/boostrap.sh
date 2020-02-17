@@ -115,8 +115,8 @@ function libGitOutDated() {
 }
 
 ### Function to indicate if the source if different than the lib ###
-# usage: libsSourceUpdated <SOURCE_DIR> <LIB_DIR>
-function libsSourceUpdated() {
+# usage: libSourceUpdated <SOURCE_DIR> <LIB_DIR>
+function libSourceUpdated() {
     local SOURCE_DIR=${1}
     local LIB_DIR=${2}
 
@@ -205,7 +205,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core
 
         # If it is needed to install/update the lib
-        if libsSourceUpdated ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}; then
+        if libSourceUpdated ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}; then
 
             echoInfo "Installing Core library code...."
 
