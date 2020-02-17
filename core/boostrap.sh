@@ -75,6 +75,7 @@ function libGitClone() {
         echoInfo "Updating Libs code from '${GIT_REPO}'..."
         git -C ${GIT_DIR} pull >/dev/null
     fi
+    exitOnError "It was not possible to clone the GIT code"
 
     # Update retrieved lib status
     mkdir -p ${LIB_ROOT_DIR}
@@ -95,18 +96,21 @@ EOF
 function libGitOutDated() {
 
     local LIB_ROOT_DIR=${1}
+    local GIT_DIR=${2}
     local SOURCE_STATE="${LIB_ROOT_DIR}/.source.state"
 
     # If state dos not exist
-    if [ ! -f "${SOURCE_STATE}" ]; then return 0; fi
+    [ -f "${SOURCE_STATE}" ] || return 0
+
+    # If source dos not exist
+    [ -f "${GIT_DIR}" ] || return 0
 
     # Get local status
-    local GIT_BRANCH=$(cat ${SOURCE_STATE} | grep GIT_BRANCH | cut -d':' -f2-)
-    local GIT_DIR=$(cat ${SOURCE_STATE} | grep GIT_DIR | cut -d':' -f2-)
+    local GIT_BRANCH=$(cat ${SOURCE_STATE} | grep GIT_BRANCH | cut -d':' -f2-)    
     local GIT_HASH=$(cat ${SOURCE_STATE} | grep GIT_HASH | cut -d':' -f2-)
 
     # Get git remote hash
-    local GIT_ORIGIN_HASH=$([ ! -d "${GIT_DIR}" ] || cd ${GIT_DIR} && git fetch && git rev-parse origin/${GIT_BRANCH})
+    local GIT_ORIGIN_HASH=$(cd ${GIT_DIR} && git fetch && git rev-parse origin/${GIT_BRANCH})
 
     # Return result
     [[ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]    
@@ -192,7 +196,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             which git &> /dev/null || exitOnError "Git command not found"            
 
             # If the lib is outdated, clone it
-            if libGitOutDated ${DOLIBS_CORE_DIR}; then
+            if libGitOutDated ${DOLIBS_CORE_DIR} ${DOLIBS_SOURCE_DIR}; then
                 libGitClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_SOURCE_DIR} ${DOLIBS_CORE_DIR}
             fi
         fi

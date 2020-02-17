@@ -63,7 +63,7 @@ function import() {
                     local _libSourceDir=${_gitDir}/${_libSubDir}
 
                     # if the lib is outdated, clone it
-                    if libGitOutDated ${_libRootDir}; then
+                    if libGitOutDated ${_libRootDir} ${_gitDir}; then
                         libGitClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_libRootDir}
                     fi      
                 fi
