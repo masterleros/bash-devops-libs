@@ -70,7 +70,7 @@ function promoteToBranch() {
     do.validateVars GITLAB_USER_PRIVATE_KEY
     exitOnError
 
-    do.import git
+    do.use git
 
     # Set current user and email
     git config --local user.name "${GITLAB_USER_NAME}"

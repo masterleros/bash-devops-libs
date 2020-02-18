@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 # Import dependencies
-do.import utils.tokens
+do.use utils.tokens
 
 ### Function to deploy a gae app ###
 # usage: deploy <path> [version]
@@ -24,7 +24,7 @@ function deploy {
     # Detokenize the file
     echoInfo "Creating detokenized yaml..."
     local detokenizedFile="$(dirname ${path})/detokenized_$(basename ${path})"
-    do.utils.tokens.replaceFromFileToFile ${path} ${detokenizedFile} true
+    utils.tokens.replaceFromFileToFile ${path} ${detokenizedFile} true
     exitOnError "It was not possible to replace all the tokens in '${path}', please check if values were exported."
 
     # Get service name

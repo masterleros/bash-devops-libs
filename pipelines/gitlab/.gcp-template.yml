@@ -24,9 +24,9 @@
   extends: .gcp-template.docker
   script:
     - do.validateVars REMOTE_REPO
-    - do.import git
+    - do.use git
     - git config --local credential.helper gcloud.sh
-    - do.git.sync ${REMOTE_REPO} ${REMOTE_BRANCH}
+    - git.sync ${REMOTE_REPO} ${REMOTE_BRANCH}
 
 # GCP Terraform template
 .gcp-template.terraform-docker:
@@ -45,8 +45,8 @@
 
       # Import DevOps Libs and convert environment variables
       source ${DEVOPS_LIBS_DIR}/dolibs.sh
-      do.import gitlab
-      do.gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
+      do.use gitlab
+      gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
 
       # Validate required vars and dependencies
       do.validateVars GCP_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
@@ -56,7 +56,7 @@
       echo "${GCP_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}      
 
       # Import Terraform lib
-      do.import terraform
+      do.use terraform
 
   after_script:
     - | 
@@ -73,21 +73,21 @@
 
       # Import DevOps Libs and convert environment variables
       source ${DEVOPS_LIBS_DIR}/dolibs.sh
-      do.import gitlab
-      do.gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
+      do.use gitlab
+      gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
 
       # Validate required vars and dependencies
       do.validateVars GCP_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
 
       # Import GCP lib
-      do.import gcp
+      do.use gcp
 
       # Install credential and set SA as active
       mkdir -p $(dirname ${GOOGLE_APPLICATION_CREDENTIALS})
       echo "${GCP_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Activate the Service Account from credential
-      do.gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
   after_script:
     - | 
@@ -96,10 +96,10 @@
       source ${DEVOPS_LIBS_DIR}/dolibs.sh offline
 
       # Reimport as after script process is other than before_script/script
-      do.import gcp
+      do.use gcp
 
       # Revoke service account
-      do.gcp.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+      gcp.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
 
       # Delete installed credential
       rm -f ${GOOGLE_APPLICATION_CREDENTIALS}

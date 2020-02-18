@@ -44,6 +44,7 @@ function import() {
 
             # Get source type
             assign sourceType=self configInFile ${_libSourceConfig} TYPE
+            [ ${sourceType} ] || exitOnError "It was not possible to read 'TYPE' source configuration" -1
 
             # OFFLINE mode
             if [[ "${sourceType}" == "OFFLINE" ]]; then
@@ -52,33 +53,26 @@ function import() {
                 _libDir=${_libDir}/${_libPathDir}
             # AUTO mode
             elif [[ "${DOLIBS_MODE}" == "auto" ]]; then                
-                # If the lib is not integral, needs to update
+                # If the lib is not integral, it needs to update
                 if libNotIntegral ${_libDir}; then
-                    echoInfo "It was not possible to check '${_lib}' lib integrity, trying to get its code..."
+                    echoInfo "It was not possible to check '${_lib}' lib integrity, updating..."
+                    local _needInstall=true
+                fi
+            # ONLINE mode
+            elif [[ "${DOLIBS_MODE}" == "online" ]]; then
+                # If the source code was updated, it needs to update
+                if libSourceUpdated ${_libSourceDir} ${_libDir}; then
+                    echoInfo "Source dir changed, updating..."
                     local _needInstall=true
                 fi
             fi
 
             # If needs clone
-            if [[ "${DOLIBS_MODE}" == "online" || "${_needInstall}" == "true" ]]; then
+            if [[ "${_needInstall}" == "true" ]]; then
 
-                # If is a local source
-                if [[ "${sourceType}" == "LOCAL" ]]; then
-                    assign _libSourceDir=self configInFile ${_libSourceConfig} SOURCE_DIR
-
-                # If is a git source
-                elif [[ "${sourceType}" == "GIT" ]]; then                    
-                    assign _gitRepo=self configInFile ${_libSourceConfig} SOURCE_REPO
-                    assign _gitBranch=self configInFile ${_libSourceConfig} SOURCE_BRANCH
-                    assign _libSubDir=self configInFile ${_libSourceConfig} SOURCE_LIB_SUBDIR
-                    local _gitDir="${DOLIBS_TMPDIR}/${_libNamespace}/${_gitBranch}"
-                    local _libSourceDir=${_gitDir}/${_libSubDir}
-
-                    # if the lib is outdated, clone it
-                    if libGitOutDated ${_libRootDir} ${_gitDir}; then
-                        libGitClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_libRootDir}
-                    fi      
-                fi
+                # Get the source folder
+                assign _libSourceDir=self configInFile ${_libSourceConfig} SOURCE_DIR
+                [ ${_libSourceDir} ] || exitOnError "It was not possible to read 'SOURCE_DIR' source configuration" -1
 
                 # If is not at the root level, add the sub-namespaces as sub-folders
                 if [[ "${_libPathDir}" != "${_libNamespace}" ]]; then
@@ -86,10 +80,7 @@ function import() {
                 fi
 
                 # import files
-                if libSourceUpdated ${_libSourceDir} ${_libDir} || libNotIntegral ${_libDir}; then
-                    echoInfo "Installing '${_lib}' code...."
-                    libImportFiles ${_libSourceDir} ${_libDir}
-                fi
+                libImportFiles ${_libSourceDir} ${_libDir} ${_lib}
             fi
 
             # Create the libs and set as imported
@@ -105,69 +96,89 @@ function import() {
     done
 }
 
-# Function to add a lib git repository source
-# Usage: addGitSource <namespace> <git_url> <git_branch> <lib_subdir> 
-function addGitSource() {
+# Function to add a source
+# Usage: _addSource <type> <namespace> <data>
+function _addSource() {
 
-    getArgs "_namespace _gitUrl _branch _libSubDir" "${@}"
+    getArgs "_sourceType _libNamespace _libRootDir _data" "${@}"
 
     # Check namespace
-    [[ ${_namespace} != "do" ]] || exitOnError "Namespace '${_namespace}' is reserved"
-    
-    # Write the file with the data
-    local _libPath=${DOLIBS_LIBS_DIR}/${_namespace}
-    mkdir -p  ${_libPath}
-    cat << EOF > ${_libPath}/.source.cfg
-TYPE:GIT
-NAMESPACE:${_namespace}
-SOURCE_REPO:${_gitUrl}
-SOURCE_BRANCH:${_branch}
-SOURCE_LIB_SUBDIR:${_libSubDir}
-EOF
+    [[ ${_libNamespace} != "do" ]] || exitOnError "Namespace '${_libNamespace}' is reserved"
 
-    echoInfo "Added GIT lib '${_namespace}'"
+    local _sourcePath=${_libRootDir}/.source.cfg
+
+    # Write the file with the data    
+    mkdir -p ${_libRootDir} && 
+    echo "TYPE:${_sourceType}" > ${_sourcePath} &&
+    echo "NAMESPACE:${_libNamespace}" >> ${_sourcePath} &&
+    echo "${_data}" >> ${_sourcePath}
+
+    exitOnError "It was not possible to add the '${_libNamespace}' (${_sourceType}) source"
+
+    echoInfo "Added '${_libNamespace}' lib source (${_sourceType})"
+}
+
+# Function to add a lib git repository source
+# Usage: addGitSource <namespace> <git_repo> <git_branch> <lib_subdir> 
+function addGitSource() {
+
+    getArgs "_libNamespace _gitRepo _gitBranch _libSubDir" "${@}"
+
+    # Create the source data
+    local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
+    local _gitDir=${DOLIBS_TMPDIR}/${_libNamespace}/${_gitBranch}    
+    local _data="SOURCE_REPO:${_gitRepo}
+SOURCE_BRANCH:${_gitBranch}
+SOURCE_DIR:${_gitDir}/${_libSubDir}
+GIT_DIR:${_gitDir}"
+
+    # OFFLINE mode
+    if [[ "${DOLIBS_MODE}" == "offline" ]]; then
+        exitOnError "It is not possible to add a GIT source in '${DOLIBS_MODE}' mode"
+    # AUTO mode
+    elif [[ "${DOLIBS_MODE}" == "auto" ]]; then                
+        # if source folder does not exist
+        if [ ! -d ${_gitDir} ]; then
+            libGitClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_libRootDir}
+        fi
+    # ONLINE mode
+    elif [[ "${DOLIBS_MODE}" == "online" ]]; then
+        # if the lib is outdated, clone it
+        if libGitOutDated ${_libRootDir} ${_gitDir}; then
+            libGitClone ${_gitRepo} ${_gitBranch} ${_gitDir} ${_libRootDir}
+        fi
+    fi
+
+    # Add the source
+    self _addSource GIT ${_libNamespace} ${_libRootDir} "${_data}"
 }
 
 # Function to add a local lib source
 # Usage: addLocalSource <namespace> <path>
 function addLocalSource() {
 
-    getArgs "_namespace _path" "${@}"
-    
-    # Check namespace
-    [[ ${_namespace} != "do" ]] || exitOnError "Namespace '${_namespace}' is reserved"
+    getArgs "_libNamespace _path" "${@}"
 
-    # Write the file with the data
-    local _libPath=${DOLIBS_LIBS_DIR}/${_namespace}
-    mkdir -p  ${_libPath}
-    cat << EOF > ${_libPath}/.source.cfg
-TYPE:LOCAL
-NAMESPACE:${_namespace}
-SOURCE_DIR:${_path}
-EOF
+    # Set required vars
+    local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
+    local _data="SOURCE_DIR:${_path}"
 
-    echoInfo "Added Local Sourced lib '${_namespace}'"
+    # Add the source
+    self _addSource LOCAL ${_libNamespace} ${_libRootDir} "${_data}"    
 }
 
 # Function to add a local lib source
 # Usage: addLocalLib <namespace> <path>
 function addLocalLib() {
 
-    getArgs "_namespace _path" "${@}"
+    getArgs "_libNamespace _path" "${@}"
 
-    # Check namespace
-    [[ ${_namespace} != "do" ]] || exitOnError "Namespace '${_namespace}' is reserved"
+    # Set required vars
+    local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
+    local _data="LIB_DIR:${_path}"
 
-    # Write the file with the data
-    local _libPath=${DOLIBS_LIBS_DIR}/${_namespace}
-    mkdir -p  ${_libPath}
-    cat << EOF > ${_libPath}/.source.cfg
-TYPE:OFFLINE
-NAMESPACE:${_namespace}
-LIB_DIR:${_path}
-EOF
-
-    echoInfo "Added Local lib '${_namespace}'"
+    # Add the source
+    self _addSource OFFLINE ${_libNamespace} ${_libRootDir} "${_data}"   
 }
 
 ### Import embedded Libs ###
@@ -175,50 +186,22 @@ EOF
 function use() {
     
     # List namespaces
-    local _namespaces=($(echo ${@} | tr ' ' '\n' | cut -d'.' -f1 | uniq))
+    local _libNamespaces=($(echo ${@} | tr ' ' '\n' | cut -d'.' -f1 | uniq))
 
     # Add all namespaces
-    for _namespace in ${_namespaces[@]}; do        
-        # If not in mode offline
-        if [[ ${DOLIBS_MODE} == offline ]]; then
-            self addLocalLib "${_namespace}" "${DOLIBS_LIBS_DIR}"
+    for _libNamespace in ${_libNamespaces[@]}; do        
+        # OFFLINE mode
+        if [[ ${DOLIBS_MODE} == "offline" ]]; then
+            self addLocalLib ${_libNamespace} ${DOLIBS_LIBS_DIR}
+        # Local source
+        elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
+            self addLocalSource ${_libNamespace} ${DOLIBS_SOURCE_LIBS_DIR}/${_libNamespace}
+        # Git source
         else
-            self addLocalSource "${_namespace}" "${DOLIBS_SOURCE_LIBS_DIR}/${_namespace}"
+            self addGitSource ${_libNamespace} ${DOLIBS_REPO} ${DOLIBS_BRANCH} libs/${_libNamespace}
         fi
     done
 
     # Import libs from embedded sources
     self import "${@}"
-}
-
-# Function to look for and import automatically all dolibs usages in the files
-# Usage: recursiveImport <path>
-function recursiveImport() {
-
-    getArgs "_path" "${@}"
-
-    # Look for custom sources
-    local _gitSources=$(find ${_path} -name "*.sh" -type f -print -exec cat {} \; \
-                       | egrep -o '^([[:space:]])*do.addGitSource .*' \
-                       | sort -u)
-
-    # Configure each git source found
-    for _gitSource in "${_gitSources[@]}"; do        
-        eval "${_gitSource}"
-    done
-
-    # Look into files for imports
-    local _libs=$(find ${_path} -name "*.sh" -type f -print -exec cat {} \; \
-                | egrep -o 'do.import([[:space:]]{1,}([[:alnum:]]|\.){1,}){1,}' \
-                | egrep -v 'local.' \
-                | cut -d' ' -f2- \
-                | tr ' ' '\n' \
-                | sort -u \
-                | paste -s -d' ')
-
-    exitOnError "It was not possible to get the required libraries"
-
-    # Import each library
-    echoInfo "Found libraries: ${_libs}"
-    do.import ${_libs}
 }

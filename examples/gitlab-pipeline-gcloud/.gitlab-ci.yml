@@ -37,8 +37,8 @@ My Prepare Job:
   stage: Prepare
   extends: .gcp-template.docker
   script:
-    - do.import gcp.storage
-    - do.gcp.storage.createBucket ${GCP_PROJECT_ID} ${GCP_PROJECT_ID}-terraform regional us-central1
+    - do.use gcp.storage
+    - gcp.storage.createBucket ${GCP_PROJECT_ID} ${GCP_PROJECT_ID}-terraform regional us-central1
 
 My Provision Job:
   stage: Provision
@@ -47,9 +47,9 @@ My Provision Job:
     TERRAFORM_DIR: "${CI_PROJECT_DIR}/terraform"    
   script:
     - export TF_VAR_project_id=${GCP_PROJECT_ID}
-    - do.terraform.createBackEndGCP ${TERRAFORM_DIR} ${GCP_PROJECT_ID}-terraform gitlab-test
-    - do.terraform.init ${TERRAFORM_DIR}
-    - do.terraform.apply ${TERRAFORM_DIR}
+    - terraform.createBackEndGCP ${TERRAFORM_DIR} ${GCP_PROJECT_ID}-terraform gitlab-test
+    - terraform.init ${TERRAFORM_DIR}
+    - terraform.apply ${TERRAFORM_DIR}
 
 My MVN Build Job:
   stage: Build
@@ -71,24 +71,24 @@ My Deploy Job:
   stage: Deploy
   extends: .gcp-template.docker
   script:
-    - do.import utils
-    - do.utils.showTitle "Deploying to the below instances"
+    - do.use utils
+    - utils.showTitle "Deploying to the below instances"
     - gcloud --project ${GCP_PROJECT_ID} compute instances list
-    - do.utils.showTitle "Hey I was deployed! =D"
+    - utils.showTitle "Hey I was deployed! =D"
 
 My Test Job:
   stage: Test
   extends: .base-template.docker
   script:
-    - do.import utils
-    - do.utils.showTitle "Hey! I'm testing something here!"
+    - do.use utils
+    - utils.showTitle "Hey! I'm testing something here!"
     
 My Promote Job:
   stage: Promote
   extends: .base-template.docker
   script:
-    - do.import utils gitlab
-    - do.utils.showTitle "Promoting Code to master!"
+    - do.use utils gitlab
+    - utils.showTitle "Promoting Code to master!"
     - export
-    - do.utils.showTitle ${CI_PROJECT_URL}
-    - do.gitlab.promoteToBranch master
+    - utils.showTitle ${CI_PROJECT_URL}
+    - gitlab.promoteToBranch master

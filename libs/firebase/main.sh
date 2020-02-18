@@ -38,7 +38,7 @@ function createProject() {
     getArgs "project id" "${@}"
 
     # Check if app already exists
-    do.firebase.validateProject ${project} ${id}
+    self validateProject ${project} ${id}
 
     # Check if firebase project is available, else create
     if [ ${?} -ne 0 ]; then 
@@ -68,7 +68,7 @@ function createApp() {
     getArgs "project application type" "${@}"
 
     # Check if app already exists
-    do.firebase.validateApp ${project} ${application} ${type}
+    self validateApp ${project} ${application} ${type}
 
     # Create Web Application is not exist    
     if [ ${?} -ne 0 ]; then
@@ -98,7 +98,7 @@ function getAppSdkConfig() {
     getArgs "project type app file" "${@}"
 
     # Get the App Id
-    app_id=$(do.firebase.getAppId ${project} ${type} ${app})
+    assign app_id=self getAppId ${project} ${type} ${app}
 
     # if not possible to get the app id
     if [ ${?} -ne 0 ]; then echoError "Could not get '${type}' App '${app}' ID from ${project} project"; return 1; fi

@@ -67,6 +67,9 @@ function libGitClone() {
     local LIB_ROOT_DIR=${4}
     local SOURCE_STATE="${LIB_ROOT_DIR}/.source.state"
 
+    # Check if git is present
+    which git &> /dev/null || exitOnError "Git command not found"            
+
     # Get the code        
     if [ ! -d ${GIT_DIR} ]; then            
         echoInfo "Cloning Libs code from '${GIT_REPO}'..."
@@ -132,11 +135,14 @@ function libImportFiles() {
     
     local SOURCE_DIR=${1}
     local LIB_DIR=${2}
+    local LIB=${3}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
+
+    echoInfo "Installing '${LIB}' code...."
 
     # Check if the lib entrypoint exists
     [ -f ${SOURCE_DIR}/${DOLIBS_MAIN_FILE} ] || exitOnError "Library source '${SOURCE_DIR}' not found! (does it need add source?)"
-    
+
     # Create lib dir and copy
     mkdir -p ${LIB_DIR} && cp ${SOURCE_DIR}/*.* ${LIB_DIR}
     exitOnError "Could not import the '${SOURCE_DIR}' library files"
@@ -155,10 +161,11 @@ function libNotIntegral() {
 
     # If sha does not exist exist
     [ -f "${LIB_SHASUM_PATH}" ] || return 0
-
+  
+    # Get current sha
     local LIB_SHASUM=$(cat ${LIB_SHASUM_PATH} | grep SHASUM | cut -d':' -f2-)
 
-    # Calculate        
+    # Calculate sha     
     local CALCULATED_SHASUM=$(find ${LIB_DIR} -maxdepth 1 -type f ! -path ${LIB_SHASUM_PATH} -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
 
     # Return result
@@ -178,50 +185,53 @@ fi
 if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
     # core folder
-    DOLIBS_CORE_DIR=${DOLIBS_DIR}/core        
+    DOLIBS_CORE_DIR=${DOLIBS_DIR}/core
 
     # If not working offline
     if [[ ${DOLIBS_MODE} != 'offline' ]]; then
 
         # Local mode
-        if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
-            # Set the Source folder
-            DOLIBS_SOURCE_DIR=${DOLIBS_LOCAL_SOURCE_DIR}
+        if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then DOLIBS_SOURCE_DIR=${DOLIBS_LOCAL_SOURCE_DIR}
         # GIT mode
-        else
-            # Set the Source folder
-            DOLIBS_SOURCE_DIR="${DOLIBS_TMPDIR}/core/${DOLIBS_BRANCH}"
+        else DOLIBS_SOURCE_DIR=${DOLIBS_TMPDIR}/core/${DOLIBS_BRANCH}; fi
 
-            # Check if git is present
-            which git &> /dev/null || exitOnError "Git command not found"            
-
+        # AUTO mode
+        if [[ ${DOLIBS_MODE} == 'auto' ]]; then
+            # If the lib is not integral, needs to update
+            if libNotIntegral ${DOLIBS_CORE_DIR}; then
+                echoInfo "It was not possible to check 'core' lib integrity, trying to get its code..."
+                _needInstall=true
+            fi
+        # ONLINE mode
+        elif [[ ${DOLIBS_MODE} == 'auto' ]]; then
             # If the lib is outdated, clone it
-            if libGitOutDated ${DOLIBS_CORE_DIR} ${DOLIBS_SOURCE_DIR}; then
-                libGitClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_SOURCE_DIR} ${DOLIBS_CORE_DIR}
+            if libGitOutDated ${DOLIBS_CORE_DIR} ${DOLIBS_SOURCE_DIR} || libSourceUpdated ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}; then
+                _needInstall=true
             fi
         fi
 
-        # dolibs core functions dirs
-        DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core
+        # If needs clone
+        if [[ "${_needInstall}" == "true" ]]; then
 
-        # If it is needed to install/update the lib
-        if libSourceUpdated ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}; then
+            # CLone the lib repo
+            libGitClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_SOURCE_DIR} ${DOLIBS_CORE_DIR}
 
-            echoInfo "Installing Core library code...."
-
-            # import core lib files
-            libImportFiles ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR}
+            # dolibs core functions dirs
+            DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core
 
             # Copy the gitignore
             cp ${DOLIBS_SOURCE_DIR}/.gitignore ${DOLIBS_DIR}
 
             # Copy license
-            cp ${DOLIBS_SOURCE_DIR}/LICENSE ${DOLIBS_CORE_DIR}/LICENSE
-            cp ${DOLIBS_SOURCE_DIR}/NOTICE ${DOLIBS_CORE_DIR}/NOTICE
+            cp ${DOLIBS_SOURCE_DIR}/LICENSE ${DOLIBS_DIR}/LICENSE
+            cp ${DOLIBS_SOURCE_DIR}/NOTICE ${DOLIBS_DIR}/NOTICE
 
             # Copy the Libs help
-            cp ${DOLIBS_SOURCE_DIR}/README.md ${DOLIBS_CORE_DIR}/README.md
-            cp ${DOLIBS_SOURCE_DIR}/libs/README.md ${DOLIBS_CORE_DIR}/DEVELOPMENT.md
+            cp ${DOLIBS_SOURCE_DIR}/README.md ${DOLIBS_DIR}/README.md
+            cp ${DOLIBS_SOURCE_DIR}/libs/README.md ${DOLIBS_DIR}/DEVELOPMENT.md
+
+            # import core lib files
+            libImportFiles ${DOLIBS_SOURCE_CORE_DIR} ${DOLIBS_CORE_DIR} core
         fi
     fi
 

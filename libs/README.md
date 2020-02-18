@@ -29,11 +29,11 @@ When you develop a new library, some steps should be followed:
     Use the `do.import` function to import other libraries for your library, example:
     ``` sh
     # This will import the utils library
-    do.import utils
+    do.use utils
 
     # Then You can access the library from your functions
     function myTest() {
-        do.utils.showTitle "This is a test!"
+        utils.showTitle "This is a test!"
     }
     ```
 5. Document your library properly in the library folder and include a reference in this README.md file    
@@ -89,8 +89,8 @@ function my_function()
 ``` sh
 #!/bin/bash
 source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh
-do.import myfunc
-do.myfunc.my_public_function
+do.use myfunc
+myfunc.my_public_function
 
 # Output:
 # Hi from my function!
@@ -115,7 +115,7 @@ do.verifyDeps example_dep || return ${?}
 source ${CURRENT_LIB_DIR}/additional_functions.sh || return ${?}
 
 # Import other required libs
-do.import utils
+do.use utils
 
 # Declare your functions
 function doOtherThing() {
@@ -137,8 +137,8 @@ function doSomething() {
 ``` sh
 #!/bin/bash
 source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh
-do.import myfuncslib
-do.myfuncs.doSomething Hi There From DevOps Libs!
+do.use myfuncs
+myfuncs.doSomething Hi There From DevOps Libs!
 
 # Output:
 # Arg1 = Hi
@@ -150,7 +150,7 @@ do.myfuncs.doSomething Hi There From DevOps Libs!
 # Library Catalog
 
 ## core.sh
-This is the root level source and includes all the Core functions to use the DevOps Libs (i.e: do.import)
+This is the root level source and includes all the Core functions to use the DevOps Libs (i.e: do.use)
 > **Obs:** This file will be automatically be imported by the dolibs.sh execution.
 
 ## gcp

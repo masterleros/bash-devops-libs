@@ -22,4 +22,4 @@ do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
 do.import local.utils
 
 # Use the needed lib
-do.local.utils.showTitle "Hello DevOps Libs!"
+local.utils.showTitle "Hello Local DevOps Libs!"

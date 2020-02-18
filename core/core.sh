@@ -176,6 +176,8 @@ fi
 # Export all values required for sub-processes
 # be able to use the core lib
 export DOLIBS_MODE=${DOLIBS_MODE}
+export DOLIBS_REPO=${DOLIBS_REPO}
+export DOLIBS_BRANCH=${DOLIBS_BRANCH}
 export DOLIBS_DIR=${DOLIBS_DIR}
 export DOLIBS_ROOTDIR=${DOLIBS_ROOTDIR}
 export DOLIBS_TMPDIR=${DOLIBS_TMPDIR}

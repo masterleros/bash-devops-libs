@@ -20,8 +20,8 @@
 
       # Import DevOps Libs and convert environment variables
       source ${DEVOPS_LIBS_DIR}/dolibs.sh
-      do.import gitlab
-      do.gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
+      do.use gitlab
+      gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
 
 # Base template docker
 .base-template.docker:
