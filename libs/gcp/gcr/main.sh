@@ -51,7 +51,11 @@ function dockerLogin() {
     assign _saUser=do.gcp.getValueFromCredential ${GOOGLE_APPLICATION_CREDENTIALS} client_email
     exitOnError "It was not possible to get the credential user email"
 
-    # Create the lock descriptor
+    # Create docker config folder if does not exist
+    DOCKER_LOCKFILE_DIR=$(dirname ${DOCKER_LOCKFILE_PATH})
+    [ -d ${DOCKER_LOCKFILE_DIR} ] || mkdir -p ${DOCKER_LOCKFILE_DIR}
+
+    # Create the lock descriptor    
     exec {DOCKER_LOCKFILE_DESC}>${DOCKER_LOCKFILE_PATH}
     exitOnError "It was not possible to aquire the lock"    
     # Aquire the soft lock for this process
@@ -90,17 +94,11 @@ function dockerLogoff() {
 function getImageDigest() {
     # Get the arguments
     getArgs "_project_id _docker_image_name _docker_image_tag" "${@}"
-
-    # Login to GCR
-    self dockerLogin
-
+    
     # Create the image tag and retrieve the digest
     DOCKER_IMAGE="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}"
     _return=$(gcloud container images list-tags ${DOCKER_IMAGE} --filter="TAGS=${_docker_image_tag}" --format="get(digest)")
     _result=${?}
-
-    # Docker Logoff from GCloud registry
-    self dockerLogoff
 
     return ${_result}
 }
