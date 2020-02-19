@@ -22,19 +22,22 @@ export GCLOUD_DOCKER_REGISTRY_HOST="gcr.io"
 export DOCKER_CONFIG_DIR="${HOME}/.docker"
 export DOCKER_CONFIG_PATH="${DOCKER_CONFIG_DIR}/docker.json"
 export DOCKER_LOCKFILE_PATH="${DOCKER_CONFIG_DIR}/.${GCLOUD_DOCKER_REGISTRY_HOST}.lock"
+export DOCKER_LOCKFILE_DESC=100
 
 ### Login with current GOOGLE_APPLICATION_CREDENTIALS to GCloud registry
 function dockerLogin() {
 
+    ################ OLD APPROACH - not multi-thread safe #################
     # Check if not already configured gcloud docker helper or
     # if not, configure docker to push images into Container Registry
-    if [ ! "$([ -f "${HOME}/.docker/config.json" ] && cat "${HOME}/.docker/config.json" | egrep "\"gcr\.io\": \"gcloud\"")" ]; then
-        gcloud --project ${_project_id} --quiet auth configure-docker
-        exitOnError "Docker GCP registry could not be configured"
-    fi
+    # if [ ! "$([ -f "${HOME}/.docker/config.json" ] && cat "${HOME}/.docker/config.json" | egrep "\"gcr\.io\": \"gcloud\"")" ]; then
+    #     gcloud --project ${_project_id} --quiet auth configure-docker
+    #     exitOnError "Docker GCP registry could not be configured"
+    # fi
 
-    # Avoid new parallel aware login process
-    return 0
+    # # Avoid new parallel aware login process
+    # return 0
+    ################ OLD APPROACH - not multi-thread safe #################
 
     # TODO
 
@@ -46,26 +49,40 @@ function dockerLogin() {
 
     # Get credential user
     assign _saUser=do.gcp.getValueFromCredential ${GOOGLE_APPLICATION_CREDENTIALS} client_email
+    exitOnError "It was not possible to get the credential user email"
 
-    # Check if gcp lockfile exists
-    if [ -f ${DOCKER_LOCKFILE_PATH} ]; then
-        # Check if locks are live
+    # Create the lock descriptor
+    exec {DOCKER_LOCKFILE_DESC}>${DOCKER_LOCKFILE_PATH}
+    exitOnError "It was not possible to aquire the lock"    
+    # Aquire the soft lock for this process
+    flock -s ${DOCKER_LOCKFILE_DESC}
 
-        # Check if is not logged as required user
-        _loggedUser="$(cat ${DOCKER_LOCKFILE_PATH} | egrep "^gcr_sa=" | cut -d'=' -f2-)"
-        [[ ! "${_loggedUser}" || "${_loggedUser}" != "${_saUser}" ]]
-        exitOnError "'${_loggedUser}' is currently using docker ${GCLOUD_DOCKER_REGISTRY_HOST} registry"
-    fi
+    # Check if is not logged as required user
+    _loggedUser="$(cat ${DOCKER_LOCKFILE_PATH} | egrep "^gcr_sa=" | cut -d'=' -f2-)"
+    [[ ! "${_loggedUser}" || "${_loggedUser}" != "${_saUser}" ]]
+    exitOnError "'${_loggedUser}' is currently using docker ${GCLOUD_DOCKER_REGISTRY_HOST} registry"
 
     # Docker login to GCloud registry
+    echoInfo "Docker loging-in to 'https://${GCLOUD_DOCKER_REGISTRY_HOST}'..."
     cat ${GOOGLE_APPLICATION_CREDENTIALS} | docker login -u _json_key --password-stdin https://${GCLOUD_DOCKER_REGISTRY_HOST}    
 }
 
 
 ### Logoff of current GCloud registry
 function dockerLogoff() {
-    # TODO
-    return 0
+
+    # Check if the lock is in place yet
+    flock -n ${DOCKER_LOCKFILE_DESC}
+
+    # If the locked by other, do not logoff
+    if [ ${?} -eq 0 ]; then
+        echoInfo "Docker loging-out from 'https://${GCLOUD_DOCKER_REGISTRY_HOST}'..."
+        docker logout https://${GCLOUD_DOCKER_REGISTRY_HOST}
+        rm ${DOCKER_LOCKFILE_PATH}
+    fi
+
+    # Remove soft lock of this proccess
+    flock -s -u ${DOCKER_LOCKFILE_DESC}
 }
 
 ### Get the digest of a specific tagged image ###
