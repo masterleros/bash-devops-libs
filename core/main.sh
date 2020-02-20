@@ -81,6 +81,9 @@ function import() {
 
                 # import files
                 libImportFiles ${_libSourceDir} ${_libDir} ${_lib}
+
+                # Create/update documentation
+                self document ${DOLIBS_LIBS_DIR}/${_libNamespace} ${DOLIBS_DOCUMENTATION_DIR}/${_libNamespace}.md ${_libNamespace}
             fi
 
             # Create the libs and set as imported

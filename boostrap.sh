@@ -186,6 +186,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
 
     # core folder
     DOLIBS_CORE_DIR=${DOLIBS_DIR}/core
+    DOLIBS_SHDOC_DIR=${DOLIBS_CORE_DIR}/shdoc
 
     # If not working offline
     if [[ ${DOLIBS_MODE} != 'offline' ]]; then
@@ -217,7 +218,11 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             libGitClone ${DOLIBS_REPO} ${DOLIBS_BRANCH} ${DOLIBS_SOURCE_DIR} ${DOLIBS_CORE_DIR}
 
             # dolibs core functions dirs
-            DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core
+            DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core            
+
+            # Create doc folder and copy shdoc (documentation)
+            mkdir -p ${DOLIBS_SHDOC_DIR}
+            cp ${DOLIBS_SOURCE_CORE_DIR}/shdoc/* ${DOLIBS_SHDOC_DIR}
 
             # Copy the gitignore
             cp ${DOLIBS_SOURCE_DIR}/.gitignore ${DOLIBS_DIR}

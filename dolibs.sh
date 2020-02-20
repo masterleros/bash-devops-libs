@@ -13,6 +13,8 @@
 #    limitations under the License.
 
 #!/bin/bash
+# @file dolibs.sh
+# @brief This is de main entrypoint for the lib and needs to be copied whithin your source files, then it needs to be included
 
 # Validate OS
 if [[ "${BASH}" != *"/bash" ]]; then echo "Current OS is not running on bash interpreter" >&2; exit -1; fi

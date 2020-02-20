@@ -16,9 +16,13 @@
 
 ### Print a nice title ###
 # usage: showTitle "title text"
-function showTitle {
+
+# @description Print a nice title
+# @arg text text Titles's text
+function showTitle() {
 
     getArgs "text" "${@}"
+    
 
     len=$(echo "# ${text} #"| wc -c)
     separator=$(eval printf '\#%.0s' {2..${len}})
@@ -29,7 +33,11 @@ function showTitle {
 
 ### Execute a command until success within a retries ###
 # usage: retryExecution "command"
-function retryExecution {
+
+# @description Execute a command until success within a retries
+# @arg $retries number ammount of retries
+# @arg $cmd string command to be executed
+function retryExecution() {
     
     getArgs "retries @cmd" "${@}"
 

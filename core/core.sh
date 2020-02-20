@@ -184,6 +184,8 @@ export DOLIBS_TMPDIR=${DOLIBS_TMPDIR}
 export DOLIBS_LIB_FILE=${DOLIBS_CORE_DIR}/lib.sh
 export DOLIBS_LIBS_DIR=${DOLIBS_DIR}/libs
 export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
+export DOLIBS_DOCUMENTATION_DIR=${DOLIBS_DIR}/docs
+export DOLIBS_SHDOC_BIN=${DOLIBS_SHDOC_DIR}/shdoc.awk
 
 # Export all core functions for sub-bash executions 
 # so that are not included when listing includes 
