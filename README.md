@@ -1,72 +1,163 @@
-# DEVOPS libraries for .gitlab-ci.yml #
+# DEVOPS Bash libraries #
 
 ## Introduction
-DevOps Libs is a set of common functionatilities and templates to accelerate DevOps setup processes
+**dolibs** is an small bash framework with a built-in set of common functionatilities and templates to accelerate DevOps setup processes.
 
-### Using Libraries
+# Using Libraries
 In order to use this library (i.e: local execution or in GitLab Pipeline) you need to include the DevOps Libs in your project.
+For that you need to follow the steps:
 
-In order to use the libraries, you need to follow the steps:
-
-#### 1. Include the library
+#### 1. Download the library entrypoint
 Download the file `dolibs.sh` placed in a folder whitin your code, example: `<YOUR_REPO>/dolibs.sh`
 
-This is the entry point of the library, and once executed (see below) it will automatically retrieve the DevOps Libs code and include for you in your project at `${DOLIBS_DIR}` folder
+This is the entry point of the library, once executed (see below) it will automatically retrieve (depending one the operational mode) the **dolibs** code and include for you in your project at `${DOLIBS_DIR}` folder
 
-#### 2. Configure the library
+``` sh
+# Command to download dolibs.sh
+curl https://raw.githubusercontent.com/masterleros/bash-devops-libs/master/dolibs.sh -o dolibs.sh
+```
 
-You can pass some arguments to your library:
-
-|Argument|Value|Description|
-|-|-|-|
-|`-b`|`<branch>`|Branch from where the lib is cloned (useful to lock a lib version)|
-|`-m`|`<mode>`|Clone mode (check below)|
-|`-f`|`<path>`|Default clone root directory|
-|`-l`|`<path>`|Use a local folder as the source of libs (i.e: development)|
-
-You can edit the `dolibs.sh` inside your project to change some values globaly:
-
-|Config|Description|
-|-|-|
-|`DOLIBS_BRANCH`|Default branch from where the lib is cloned (useful to lock a lib version)|
-|`DOLIBS_DEFAULT_MODE`|Default clone mode (check below)|
-
-> `**ATTENTION**`: If you cannot connect to github at port 22, you may need to configure to used port 443, check [this guide](https://help.github.com/en/github/authenticating-to-github/using-ssh-over-the-https-port)
-
-#### 3. Use the libraries
-> **Obs:** The libraries will be addded to your repo (i.e: to redistribute your code).
+#### 2. Include and use **dolibs**
+> **Obs:** In the default operation mode (auto) it will add its own code into your current `dolibs.sh` folder at `./dolibs` (i.e: to redistribute with your code).
 
 **my-script.sh**
 ``` sh
 #!/bin/bash
+# This line of code will source the dolibs entrypoint, this format help to find dolibs.sh 
+# file relative to the current script path, regardesless of where it was executed
 source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh
 
 # Import required lib
-do.import gcp
+do.use gcp
 
-# Consume the lib
-do.gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+# Use the lib
+gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 ```
 
-> **Tip:** You can use the library in offline mode (use previous downloaded library) by using: `source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh -m offline`
+#### 3. Configure the library regarding your needs
 
-## Operation Mode
-DevOps Liberary have 4 operations modes:
+You can pass some options to the library to change its behaviour.
 
-  - **A. Auto (default)** - This mode will download the libraries if not found locally of if remote code has changed.
-  - **B. Online** - This mode will download and update the libraries on all executions.
-  - **C. Offline** - This Mode will use available libraries, if any is not found, it will fail.
-  - **D. local** - Same as `Online` but will copy libraries from a local folder instead of download from GIT (usefull for lib development and testing).
+**Example:** The below example will use the lib in offline mode located in the specified <path>
 
-You can force the operation mode in the inclusion of the library:
+**my-script.sh**
+``` sh
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh --offline -f <path>
+...
+```
+
+# dolibs Options
+
+The following options are available when you include **dolibs** by passing them as arguments:
+
+- **Operation Mode:** Indicate how updated are managed
+- **Folder:** dolibs working folder
+- **Local Source (optional):** Use a local dolibs source insted of remote (i.e: development)
+
+Other options are global and will change **dolibs** for any include, to change them, you need to edit the `dolibs.sh` file:
+
+- **DOLIBS_MODE:** Default operation mode (default: auto)
+- **DOLIBS_BRANCH:** dolibs branch (default: master)
+- **DOLIBS_REPO:** dolibs source repo (it will not change if you are note forking the project)
+
+### OPTION: Operation Mode
+This mode indicate how `dolibs` will manage the updates, there are 3 operation modes:
+
+|Mode|Argument|Description|
+|-|-|-|
+|**Auto (default)**|N/A|This mode will download/copy the libraries if not found locally or if there is no local consistency|
+|**Online**|--online|This mode will check the source's updates and will download/copy and update the libraries automatically|
+|**Offline**|--offline|This Mode will use available libraries, if it is not found nor consistent, it will fail|
+
+Example using the lib in **offline** mode:
 ``` yaml
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh -m offline # or online
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh --offline
 ```
-> **Tip:** To change default operation mode, update `DOLIBS_DEFAULT_MODE` value in `dolibs.sh`
+> **Tip:** To change default operation mode, update `DOLIBS_MODE` variable value editing `dolibs.sh` file.
+
+### OPTION: Folder
+By default, `dolibs.sh` will use the `<dolibs.sh dir>/dolibs` folder to download/copy and install all the requested libs. \
+It is possible to use **dolibs** in a custom directory, to do so, you need to specify the `-f <path>` argument when sourcing `dolibs.sh`.
+
+### OPTION: Local Source
+By default, when in `auto` or `online` mode, **dolibs** will clone its own code from GIT. \
+Instead, it is possible to specify a local source (folder) to copy from the `dolibs` code. Using in that way it is possible to develop `dolibs` libraries locally and test without the need of commit your `dolibs` code all the times.
+
+# Libraries Sources
+`dolibs` allows to add external sources to be used whitin same scripts. \
+To include them, you need first to add your custom sources and then import their libraries.
+
+Currently there are 2 custom sources:
+- **GIT Source** will download and incorporate libs from a public GIT repo
+- **Local Source:** will copy the libs from a local folder (example: your custom libs)
+- **Local Libraries:** will use the libs directly from the specified path (i.e: libs included in whitin your code)
+
+> **Tip:** It you are planni
+
+## GIT Source
+
+To include a custom GIT source, you can use the function `do.addGitSource`:
+
+**example.sh**
+``` sh
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
+
+# Set the remote lib source
+do.addGitSource myremotelib "github.com/masterleros/bash-devops-libs.git" master
+
+# Import the required lib from custom namespace
+do.import myremotelib.utils
+
+# Use the needed lib
+do.myremotelib.utils.showTitle "Hello DevOps Libs!"
+```
+
+## Local Source
+
+To include a custom local source, you can use the function `do.addLocalSource`:
+
+**example.sh**
+``` sh
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
+
+# Set the local lib source
+do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
+
+# Import the required lib from custom namespace
+do.import mylocallib.utils
+
+# Use the custom lib
+mylocallib.utils.showTitle "Hello DevOps Libs!"
+```
+
+## Local Libraries
+
+To include local libraries (will be used from where they are specified, i.e: offline), you can use the function `do.addLocalLib`:
+
+**example.sh**
+``` sh
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
+
+# Set the local lib source
+do.addLocalLib "<my source>/mylibs"
+
+# Import the required lib from custom namespace
+do.import mylibs.utils
+
+# Use the custom lib
+mylibs.utils.showTitle "Hello DevOps Libs!"
+```
+
+# Good Practices
 
 ## Global definitions
-As a good practice, you can includes the file `definitions.sh`. This is very usefull to define variables/definitions accesibles to your project's scripts globaly. Example:
+As a good practice for your own scripts centralize your project's configurations/validations. `dolibs` provides the **definitions** lib which will include the file `definitions.sh` automatically. \
+This is very usefull to define variables/definitions accesibles to your project's scripts globaly. Example:
 
 **definitions.sh**
 ``` sh
@@ -88,43 +179,8 @@ do.definitions.customFunct "${MY_PROJECT_DESCRIPTION}"
 # Output: My arg is: 'My cool project!'
 ```
 
-## Local Libraries
+# Libraries documentation
+Once a library is imported, its documentation will be generated in the `dolibs/docs` folder in a file named as its namespace (example: `utils` lib will be documented as `dolibs/docs/utils.md`)
 
-To include local libraries, you can use the function `do.addLocalSource` to add a local folder as source of libs in the `local` namespace:
-
-**example.sh**
-``` sh
-# Enable dolibs (clone to /tmp/dolibs)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -l ../.. -f /tmp/dolibs
-
-# Set the local lib source
-do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
-
-# Import the required lib from custom namespace
-do.import local.utils
-
-# Use the needed lib
-do.local.utils.showTitle "Hello DevOps Libs!"
-```
-
-## External Libraries
-
-To include external libraries, you can use the function `do.addGitSource` to add an external GIT source, then name it as a new namespace:
-
-**example.sh**
-``` sh
-# Enable dolibs (clone to /tmp)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs
-
-# Set the external lib source
-do.addGitSource myremotelib "github.com/masterleros/bash-devops-libs.git" master
-
-# Import the required lib from custom namespace
-do.import myremotelib.utils
-
-# Use the needed lib
-do.myremotelib.utils.showTitle "Hello DevOps Libs!"
-```
-
-## Available libraries
-Check the available libraries and their functionalities: [Libraries](libs/README.md)
+# Developing libraries
+Check the libraries development at: [Development](libs/README.md)
