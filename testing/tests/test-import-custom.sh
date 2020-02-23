@@ -16,7 +16,7 @@
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs
 
 # Set the custom remote lib source
-do.addGitSource gitlib "masterleros/bash-devops-libs" master libs
+do.addGitSource gitlib ${DOLIBS_REPO} ${DOLIBS_BRANCH} libs
 exitOnError
 do.import gitlib.utils
 

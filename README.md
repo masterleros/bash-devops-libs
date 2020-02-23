@@ -106,7 +106,7 @@ To include a custom GIT source, you can use the function `do.addGitSource`:
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
 
 # Set the remote lib source
-do.addGitSource myremotelib "github.com/masterleros/bash-devops-libs.git" master
+do.addGitSource myremotelib "https://github.com/masterleros/bash-devops-libs.git" master
 
 # Import the required lib from custom namespace
 do.import myremotelib.utils

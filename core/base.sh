@@ -14,37 +14,51 @@
 
 #!/bin/bash
 
-# @description Validate defined variables
-# @arg $@ list variables names to be verified
+# @description Validate if the specified variables are defined
+# @arg $@ list variables names to be validated
 # @exitcode 0 If all are defined
 # @exitcode >0 Amount of variables not defined
+# @stdout Variables not declared
+# @example 
+#   validateVars <var1> <var2> ... <varN>
 function validateVars() {
     local _result=0
     for var in ${@}; do
         if [ -z "${!var}" ]; then
-            echoError "Environment varirable '${var}' is not declared!" >&2
+            echoError "Environment varirable '${var}' is not declared!"
             ((_result+=1))
         fi
     done
     return ${_result}
 }
 
-### dependencies verification ###
-# usage: verifyDeps <dep1> <dep2> ... <depN>
+# @description Verify if the specified binaries dependencies are available
+# @arg $@ list binaries to be verified
+# @exitcode 0 If all are found
+# @exitcode >0 Amount of binaries not found
+# @stdout Binaries not found
+# @example 
+#   verifyDeps <bin1> <bin2> ... <binN>
 function verifyDeps() {
     local _result=0
     for dep in ${@}; do
         which ${dep} &> /dev/null
         if [[ $? -ne 0 ]]; then
-            echoError "Binary dependency '${dep}' not found!" >&2
+            echoError "Binary dependency '${dep}' not found!"
             ((_result+=1))
         fi
     done
     return ${_result}
 }
 
-### Check if a value exists in an array ###
-# usage: valueInArray <value> <array>
+# @description Check if a value exists in an array
+# @arg value value Value to look for
+# @arg array array Array to look for the value
+# @return Found value position
+# @exitcode 0 Value was found
+# @exitcode 1 Value not found
+# @example 
+#   assign valPos=valueInArray <value> <array>
 function valueInArray() {
     getArgs "_value &@_values" "${@}"
     local _val
@@ -56,19 +70,32 @@ function valueInArray() {
         fi
         ((_pos+=1))
     done
-    return -1
+    return 1
 }
 
-### Get a value from a config file
-# usage: configInFile <file> <key>
+# @description Get a value from a config file in format <key>:<value>
+# @arg file path Path to the file
+# @arg key Key of the required value
+# @return Value of the key
+# @exitcode 0 Key found
+# @exitcode 1 Key not found
+# @example 
+#   assign myVar=configInFile <file> <key>
 function configInFile() {
     getArgs "_file _key" "${@}"
     _return=$(cat ${_file} | grep ${_key} | cut -d':' -f2-)
     return $?
 }
 
-### Generate the documentation of a lib
+### 
 # usage: document <lib_dir> <doc_file> [namespace]
+
+# @description Generate the markdown documentation of a lib
+# @arg dir path Directory of the library to be documented
+# @arg doc path md file (markdown) to be generated
+# @arg namespace string (optional) library's namespace
+# @example 
+#   document <dir> <file> <namespace>
 function document() {
     
     getArgs "_libDir _docPath &_namespace" "${@}"

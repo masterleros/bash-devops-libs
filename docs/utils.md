@@ -9,7 +9,7 @@
 * [utils.retryExecution()](#utilsretryexecution)
 
 
-## utils.showTitle()
+# utils.showTitle()
 
 Print a nice title
 
@@ -17,7 +17,7 @@ Print a nice title
 
 * **text** (text): Titles's text
 
-## utils.retryExecution()
+# utils.retryExecution()
 
 Execute a command until success within a retries
 

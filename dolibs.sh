@@ -22,10 +22,11 @@ if [[ "${BASH}" != *"/bash" ]]; then echo "Current OS is not running on bash int
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_MODE="auto"
 DOLIBS_BRANCH="feature/boostrap"
-DOLIBS_REPO="masterleros/bash-devops-libs"
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"/
 DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
+DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
+DOLIBS_BOSTRAP="https://raw.githubusercontent.com/masterleros/bash-devops-libs/${DOLIBS_BRANCH}/boostrap.sh"
 ### DEVOPS LIBS DEFINITIONS ###
 
 # DevOps libs options
@@ -62,7 +63,7 @@ if [[ ${DOLIBS_MODE} != "offline" ]]; then
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
             cp ${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh ${DOLIBS_DIR}/boostrap.sh
         else
-            curl -s -H 'Cache-Control: no-cache' --fail https://raw.githubusercontent.com/${DOLIBS_REPO}/${DOLIBS_BRANCH}/boostrap.sh -o ${DOLIBS_DIR}/boostrap.sh
+            curl -s -H 'Cache-Control: no-cache' --fail ${DOLIBS_BOSTRAP} -o ${DOLIBS_DIR}/boostrap.sh
         fi
 
         # If there is a problem, exit

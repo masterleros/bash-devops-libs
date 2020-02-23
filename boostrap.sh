@@ -73,7 +73,7 @@ function libGitClone() {
     # Get the code        
     if [ ! -d ${GIT_DIR} ]; then            
         echoInfo "Cloning Libs code from '${GIT_REPO}'..."
-        git clone -q -b ${GIT_BRANCH} --single-branch https://git@github.com/${GIT_REPO}.git ${GIT_DIR}
+        git clone -q -b ${GIT_BRANCH} --single-branch ${GIT_REPO} ${GIT_DIR}
     else
         echoInfo "Updating Libs code from '${GIT_REPO}'..."
         git -C ${GIT_DIR} pull -q

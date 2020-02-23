@@ -16,7 +16,7 @@
 source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs -l ../..
 
 # Set the custom lib source
-do.addGitSource myremotelib "masterleros/bash-devops-libs" feature/cleanup libs
+do.addGitSource myremotelib ${DOLIBS_REPO} ${DOLIBS_BRANCH} libs
 
 # Import the required lib from custom namespace
 do.import myremotelib.utils
