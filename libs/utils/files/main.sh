@@ -27,7 +27,7 @@
 function findAndCallback() {
     getArgs "path file callback &@args" "${@}"
 
-    filesFound=($(find ${path} -iname ${file} | sort))
+    filesFound=($(find ${path} -iname ${file} | sort))    
     [ "${#filesFound[@]}" -eq 0 ] && exitOnError "Unable to locate any '${file}' file." -1
 
     for fileFound in ${filesFound[@]}; do

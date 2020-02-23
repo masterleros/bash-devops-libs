@@ -1,4 +1,6 @@
-#    Copyright 2020 Leonardo Andres Morales
+#!/bin/bash
+
+#    Copyright 2020 Andre Prado
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,10 +14,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-### Validate if the project is firestore enabled ###
-# usage: enabledProject <project>
-function enabledProject {
-    getArgs "project" "${@}"
-    gcloud --quiet --project=${project} beta firestore operations list &> /dev/null
-    return ${?}
+# Verify Dependencies
+verifyDeps gcloud || return ${?}
+
+### Deploy Cloud Function ###
+# usage: deploy <function name> <aditional_parameters_array_list>
+function deploy() {
+    getArgs "cfName @parameters" "${@}"
+
+    gcloud functions deploy ${cfName} "${parameters[@]}" | grep -vi password
+    exitOnError "Failed to deploy GCP Function ${cfName}"
 }

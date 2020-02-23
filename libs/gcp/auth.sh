@@ -17,6 +17,7 @@
 # returns: User e-mail
 function getCurrentUser() {
     _return=$(gcloud --quiet config list account --format "value(core.account)")
+    [ "${_return}" ]
     return ${?}
 }
 
@@ -43,7 +44,7 @@ function createSA {
     gcloud --project ${project} iam service-accounts list | grep ${sa_mail} > /dev/null
     if [ ${?} -ne 0 ]  ; then
         echoInfo "Creating Service account '${sa_mail}'..."
-        gcloud --project ${project} iam service-accounts create ${sa_id} --display-name ${description}
+        gcloud --project ${project} iam service-accounts create ${sa_id} --display-name "${description}"
         exitOnError
     else
         echoInfo "Service Account '${sa_mail}' already created!"

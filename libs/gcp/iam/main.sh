@@ -28,6 +28,8 @@ function validateRole {
         cmd="gcloud alpha resource-manager folders get-iam-policy ${domain_id}"
     elif [ "${domain}" == "billing" ]; then
         cmd="gcloud alpha billing accounts get-iam-policy ${domain_id}"
+    elif [ "${domain}" == "function" ]; then
+        cmd="gcloud functions get-iam-policy ${domain_id}"        
     else
         exitOnError "Unsupported get-iam-policy from '${domain}' domain" -1
     fi
@@ -60,6 +62,8 @@ function bindRole {
                 cmd="gcloud projects add-iam-policy-binding ${domain_id}"
             elif [ "${domain}" == "folder" ]; then
                 cmd="gcloud alpha resource-manager folders add-iam-policy-binding ${domain_id}"
+            elif [ "${domain}" == "function" ]; then
+                cmd="gcloud functions add-iam-policy-binding ${domain_id}"                
             else
                 exitOnError "Unsupported add-iam-policy-binding to '${domain}' domain" -1
             fi
@@ -67,6 +71,8 @@ function bindRole {
             echoInfo "Binding '${email}' role '${role}' to ${domain}: ${domain_id}..."
             if [[ "${email}" == *".iam.gserviceaccount.com" ]]; then
                 ${cmd} --member serviceAccount:${email} --role ${role} > /dev/null
+            elif [[ "${email}" == "allUsers" ]]; then
+                ${cmd} --member ${email} --role ${role} > /dev/null                
             else
                 ${cmd} --member user:${email} --role ${role} > /dev/null
             fi
