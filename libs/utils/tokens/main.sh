@@ -14,9 +14,11 @@
 
 #!/bin/bash
 
-### This function will echo the tokens found in a file ###
-# usage: get <data>
-function get {
+# @description Echo the tokens found in a text (i.e: `${<token>}`)
+# @arg data string Data where the tokens are expected
+# @example 
+#   get <data>
+function get() {
 
     getArgs "@data" "${@}"
 
@@ -27,9 +29,11 @@ function get {
     _return=($(echo "${_return[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
 }
 
-### This function will echo the tokens names found in a file ###
-# usage: getNames <data>
-function getNames {
+# @description Echo the tokens names found in a text
+# @arg data string Data where the tokens are expected
+# @example 
+#   getNames <data>
+function getNames() {
 
     getArgs "@data" "${@}"
 
@@ -41,9 +45,16 @@ function getNames {
     _return=("${_return[@]//'}'/}")
 }
 
-### This function will echo the content of a file with tokens updated to values ###
-# usage: replaceFromFile <path_to_file> [errors<true>]
-function replaceFromFile {
+# @description Echo the content of a file with tokens updated to values from defined environment vars
+# @arg file path Path to file
+# @arg errors bool (optional) if specified (true) tokens not found will be reported and exitcode will be != 0
+# @return Content with token replaced
+# @exitcode 0 All token replaced
+# @exitcode 1 Some tokens not found defined to be replaced (only with arg errors=true)
+# @stderr Tokens not found (only with arg errors=true)
+# @example 
+#   replaceFromFile <file> [errors]
+function replaceFromFile() {
 
     getArgs "file &errors" "${@}"
 
@@ -71,9 +82,16 @@ function replaceFromFile {
     return ${_result}
 }
 
-### This function will replace from a file to file
-# usage: replaceFromFileToFile <path_source> <path_target> [errors<true>]
-function replaceFromFileToFile {
+# @description Dump to a target file the content of a source file with tokens updated to values from defined environment vars
+# @arg source path Path to source file
+# @arg target path Path to target file
+# @arg errors bool (optional) if specified (true) tokens not found will be reported and exitcode will be != 0
+# @exitcode 0 All token replaced
+# @exitcode 1 Some tokens not found defined to be replaced (only with arg errors=true)
+# @stderr Tokens not found (only with arg errors=true)
+# @example 
+#   replaceFromFileToFile <source> <target> [errors]
+function replaceFromFileToFile() {
 
     getArgs "path_source path_target &errors" "${@}"
 

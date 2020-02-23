@@ -1,9 +1,14 @@
-
 * [do.validateVars()](#dovalidatevars)
 * [do.verifyDeps()](#doverifydeps)
 * [do.valueInArray()](#dovalueinarray)
 * [do.configInFile()](#doconfiginfile)
 * [do.document()](#dodocument)
+* [do.use()](#douse)
+* [do.import()](#doimport)
+* [do.addGitSource()](#doaddgitsource)
+* [do.addLocalSource()](#doaddlocalsource)
+* [do.addLocalLib()](#doaddlocallib)
+
 
 
 # do.validateVars()
@@ -42,7 +47,7 @@ Verify if the specified binaries dependencies are available
 * **0**: If all are found
 * **>0**: Amount of binaries not found
 
-### Output on stdout
+### Output on stderr
 
 * Binaries not found
 
@@ -123,11 +128,6 @@ document <dir> <file> <namespace>
 
 
 
-* [do.use()](#douse)
-* [do.import()](#doimport)
-* [do.addGitSource()](#doaddgitsource)
-* [do.addLocalSource()](#doaddlocalsource)
-* [do.addLocalLib()](#doaddlocallib)
 
 
 # do.use()

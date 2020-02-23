@@ -36,7 +36,7 @@ function validateVars() {
 # @arg $@ list binaries to be verified
 # @exitcode 0 If all are found
 # @exitcode >0 Amount of binaries not found
-# @stdout Binaries not found
+# @stderr Binaries not found
 # @example 
 #   verifyDeps <bin1> <bin2> ... <binN>
 function verifyDeps() {
@@ -127,6 +127,11 @@ function document() {
         # Append the documentation from the file
         # echoInfo "Docs: processing '${SHDOC_LIB}'"
         # echoInfo "Docs: processing '${SHDOC_FILE}'"
-        ${DOLIBS_SHDOC_BIN} < ${SHDOC_FILE} >> ${_docPath}
+        ${DOLIBS_SHDOC_BIN} < ${SHDOC_FILE} >> ${_docPath}.tmp
     done
+
+    # Rework documentation
+    cat ${_docPath}.tmp | grep '\* \[' > ${_docPath}
+    cat ${_docPath}.tmp | grep -v '\* \[' >> ${_docPath}
+    rm ${_docPath}.tmp 
 }

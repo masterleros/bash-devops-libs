@@ -21,7 +21,7 @@ if [[ "${BASH}" != *"/bash" ]]; then echo "Current OS is not running on bash int
 
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_MODE="auto"
-DOLIBS_BRANCH="feature/boostrap"
+DOLIBS_BRANCH="feature/documentation"
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"/
 DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
