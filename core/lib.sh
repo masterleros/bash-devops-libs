@@ -15,12 +15,12 @@
 #!/bin/bash
 
 # Include the header
-CURRENT_LIB=${1}
-CURRENT_LIB_DIR=${2}
-CURRENT_LIB_ENTRYPOINT=${3}
+local CURRENT_LIB=${1}
+local CURRENT_LIB_DIR=${2}
+local CURRENT_LIB_ENTRYPOINT=${3}
 
 # Include main code
-. ${CURRENT_LIB_ENTRYPOINT} || return ${?}
+. "${CURRENT_LIB_ENTRYPOINT}" || return ${?}
 
 # Include the footer (deprecated)
 # if [ $(basename ${0}) == $(basename ${BASH_SOURCE[0]}) ]; then 
