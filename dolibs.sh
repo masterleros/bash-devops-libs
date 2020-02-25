@@ -1,4 +1,3 @@
-#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +12,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
 # @file dolibs.sh
 # @brief This is de main entrypoint for the lib and needs to be copied whithin your source files, then it needs to be included
 
 # Validate OS
-if [[ "${BASH}" != *"/bash" ]]; then echo "Current OS is not running on bash interpreter" >&2; exit -1; fi
+if [ ! "${BASH}" ]; then echo "Current OS is not running on bash interpreter" >&2; exit -1; fi
 
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_MODE="auto"
@@ -46,9 +46,9 @@ while [ "${1}" != "" ]; do
 done
 
 # If not mode offline
-if [[ ${DOLIBS_MODE} != "offline" ]]; then
+if [ "${DOLIBS_MODE}" != "offline" ]; then
     # Clone the boostrap if in online mode or it does not exist (auto mode)
-    if [[ ${DOLIBS_MODE} == "online" || ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
+    if [ "${DOLIBS_MODE}" == "online" ] || [ ! -f "${DOLIBS_DIR}/boostrap.sh" ]; then
 
         # Create the lib folder
         [ -d "${DOLIBS_DIR}" ] || mkdir -p "${DOLIBS_DIR}"
@@ -72,7 +72,7 @@ fi
 # [ ${set_e_enabled} ] || set -e
 
 # Execute the boostrap if is present
-if [ ! -f ${DOLIBS_DIR}/boostrap.sh ]; then
+if [ ! -f "${DOLIBS_DIR}/boostrap.sh" ]; then
     echo "ERROR: It was not possible to find the boostrap in '${DOLIBS_DIR}' (offline mode?)"
     exit -1
 fi

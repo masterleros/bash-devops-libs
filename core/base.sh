@@ -42,7 +42,7 @@ function validateVars() {
 function verifyDeps() {
     local _result=0
     for dep in ${@}; do
-        which ${dep} &> /dev/null
+        which "${dep}" &> /dev/null
         if [[ $? -ne 0 ]]; then
             echoError "Binary dependency '${dep}' not found!"
             ((_result+=1))
@@ -83,7 +83,7 @@ function valueInArray() {
 #   assign myVar=configInFile <file> <key>
 function configInFile() {
     getArgs "_file _key" "${@}"
-    _return=$(cat ${_file} | grep ${_key} | cut -d':' -f2-)
+    _return=$(< "${_file}" grep ${_key} | cut -d':' -f2-)
     return $?
 }
 
@@ -101,24 +101,24 @@ function document() {
     getArgs "_libDir _docPath &_namespace" "${@}"
 
     # Check lib folder
-    [ -d ${_libDir} ] || exitOnError "Folder '${_libDir}' not found"
+    [ -d "${_libDir}" ] || exitOnError "Folder '${_libDir}' not found"
 
     # If namespace add the separator dot
     [ "${_namespace}" ] && _namespace="${_namespace}."
 
     # Create destination folder is does not exist
-    [ -d ${_docPath} ] || mkdir -p $(dirname ${_docPath})
+    [ -d "${_docPath}" ] || mkdir -p $(dirname ${_docPath})
 
     # Remove old documentation
-    [ -f ${_docPath} ] && rm ${_docPath}
+    [ -f "${_docPath}" ] && rm "${_docPath}"
 
     echoInfo "Generating documentation for '${_libDir}'"
 
     # Process all lib files
-    SHDOC_FILES=($(find ${_libDir} -name "*.sh" | sort ))
+    SHDOC_FILES=($(find "${_libDir}" -name "*.sh" | sort ))
     for SHDOC_FILE in ${SHDOC_FILES[@]}; do
         # Set the lib subspace
-        SHDOC_LIB_SUBSPACE="$(realpath -s --relative-to=${_libDir} $(dirname ${SHDOC_FILE}) | cut -d'.' -f2 | sed "s#/#.#")"
+        SHDOC_LIB_SUBSPACE="$(realpath -s --relative-to="${_libDir}" $(dirname "${SHDOC_FILE}") | cut -d'.' -f2 | sed "s#/#.#")"
         [ "${SHDOC_LIB_SUBSPACE}" ] && SHDOC_LIB_SUBSPACE="${SHDOC_LIB_SUBSPACE}."
 
         # Export lib name
@@ -127,11 +127,11 @@ function document() {
         # Append the documentation from the file
         # echoInfo "Docs: processing '${SHDOC_LIB}'"
         # echoInfo "Docs: processing '${SHDOC_FILE}'"
-        ${DOLIBS_SHDOC_BIN} < ${SHDOC_FILE} >> ${_docPath}.tmp
+        "${DOLIBS_SHDOC_BIN}" < "${SHDOC_FILE}" >> "${_docPath}.tmp"
     done
 
     # Rework documentation
-    cat ${_docPath}.tmp | grep '\* \[' > ${_docPath}
-    cat ${_docPath}.tmp | grep -v '\* \[' >> ${_docPath}
-    rm ${_docPath}.tmp 
+    < "${_docPath}.tmp" grep '\* \[' > "${_docPath}"
+    < "${_docPath}.tmp" grep -v '\* \[' >> "${_docPath}"
+    rm "${_docPath}.tmp"
 }

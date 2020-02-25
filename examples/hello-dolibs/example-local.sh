@@ -12,8 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
 # Enable dolibs (use from ../../libs)
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs -l ../.. # source local
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs -l ../.. # source local
 
 # Import the required lib
 do.use utils
