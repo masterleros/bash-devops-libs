@@ -153,7 +153,7 @@ fi
     _funcCount=0
     for _libFunct in ${_libFuncts[@]}; do
         # If function is not already imported
-        if [[ ${_libFunct} != "do."* ]]; then
+        if [[ ${_libFunct} != *"."* ]]; then
             # New lib name
             _libFunctNew=${_lib}.${_libFunct##*.}
 

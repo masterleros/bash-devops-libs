@@ -108,7 +108,7 @@ function import() {
                     _libSourceDir=${_libSourceDir}/${_libPathDir/${_libNamespace}\//}
                 fi
 
-                # import files
+                # import files                
                 libImportFiles ${_libSourceDir} ${_libDir} ${_lib}
 
                 # Create/update documentation

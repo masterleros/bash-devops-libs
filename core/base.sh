@@ -83,7 +83,7 @@ function valueInArray() {
 #   assign myVar=configInFile <file> <key>
 function configInFile() {
     getArgs "_file _key" "${@}"
-    _return=$(< "${_file}" grep ${_key} | cut -d':' -f2-)
+    _return=$(< "${_file}" grep "${_key}" | cut -d':' -f2-)
     return $?
 }
 
@@ -98,27 +98,27 @@ function configInFile() {
 #   document <dir> <file> <namespace>
 function document() {
     
-    getArgs "_libDir _docPath &_namespace" "${@}"
+    getArgs "_libRootDir _docPath &_namespace" "${@}"
 
     # Check lib folder
-    [ -d "${_libDir}" ] || exitOnError "Folder '${_libDir}' not found"
+    [ -d "${_libRootDir}" ] || exitOnError "Folder '${_libRootDir}' not found"
 
     # If namespace add the separator dot
     [ "${_namespace}" ] && _namespace="${_namespace}."
 
     # Create destination folder is does not exist
-    [ -d "${_docPath}" ] || mkdir -p $(dirname ${_docPath})
+    [ -d "${_docPath}" ] || mkdir -p $(dirname "${_docPath}")
 
     # Remove old documentation
     [ -f "${_docPath}" ] && rm "${_docPath}"
 
-    echoInfo "Generating documentation for '${_libDir}'"
+    echoInfo "Generating documentation for '${_libRootDir}'"
 
     # Process all lib files
-    SHDOC_FILES=($(find "${_libDir}" -name "*.sh" | sort ))
+    SHDOC_FILES=($(find "${_libRootDir}" -name "*.sh" | sort ))
     for SHDOC_FILE in ${SHDOC_FILES[@]}; do
         # Set the lib subspace
-        SHDOC_LIB_SUBSPACE="$(realpath -s --relative-to="${_libDir}" $(dirname "${SHDOC_FILE}") | cut -d'.' -f2 | sed "s#/#.#")"
+        SHDOC_LIB_SUBSPACE="$(realpath -s --relative-to="${_libRootDir}" $(dirname "${SHDOC_FILE}") | cut -d'.' -f2 | sed "s#/#.#")"
         [ "${SHDOC_LIB_SUBSPACE}" ] && SHDOC_LIB_SUBSPACE="${SHDOC_LIB_SUBSPACE}."
 
         # Export lib name
