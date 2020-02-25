@@ -20,5 +20,5 @@ do.use utils.tokens # add your required libs
 
 ### YOUR CODE ###
 assign tokens=utils.tokens.getNames '${a} ${b} ${c}'
-[ "${tokens[@]}" == "a b c" ] || exit -1
+[[ "${tokens[@]}" == "a b c" ]] || exit -1
 ### YOUR CODE ###

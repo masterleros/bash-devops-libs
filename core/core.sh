@@ -16,7 +16,7 @@
 echoInfo "Loading core library..."
 
 # Verify bash version
-awk 'BEGIN { exit ARGV[1] < 4.3 }' ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}
+awk 'BEGIN { exit ARGV[1] < 4.3 }' "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}"
 exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})"
 
 # Check if not being included twice
@@ -26,8 +26,9 @@ exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0
 # Usage: self <function> <args>
 function self() {
     _function=${1}; shift
-    _namespace=${FUNCNAME[1]/$(echo ${FUNCNAME[1]} | awk -F . '{print "."$NF}')/}
-    ${_namespace}.${_function} "${@}"
+    #_namespace=${FUNCNAME[1]/$(echo "${FUNCNAME[1]}" | awk -F . '{print "."$NF}')/}
+    #${_namespace}.${_function} "${@}"
+    ${CURRENT_LIB}.${_function} "${@}"
     return ${?}
 }
 
@@ -43,14 +44,15 @@ function assign() {
     local _returnFunc=${_assigments##*"="}    
 
     # Case function is self
-    if [ ${_returnFunc} == "self" ]; then
+    if [ "${_returnFunc}" == "self" ]; then
         _returnFunc=${1}; shift
-        _namespace=${FUNCNAME[1]/$(echo ${FUNCNAME[1]} | awk -F . '{print "."$NF}')/}
-        _returnFunc=${_namespace}.${_returnFunc}
+        #_namespace=${FUNCNAME[1]/$(echo "${FUNCNAME[1]}" | awk -F . '{print "."$NF}')/}
+        #_returnFunc=${_namespace}.${_returnFunc}
+        _returnFunc=${CURRENT_LIB}.${_returnFunc}        
     fi
 
     # If desired varibla is not return
-    if [[ ${_returnVar} != "_return" ]]; then 
+    if [ "${_returnVar}" != "_return" ]; then 
         # Store last _return value
         local _returnTmp=("${_return[@]}")
         # Clean new _return
@@ -90,7 +92,8 @@ function getArgs() {
         shift        
         # if has # the argument is optional
         if [[ ${_var} == "&"* ]]; then
-            _var=$(echo ${_var}| sed 's/&//')
+            #_var=$(echo "${_var}"| sed 's/&//')
+            _var=${_var/&/}
         elif [ ! "${1}" ]; then
             echoError "Values for argument '${_var}' not found!"
             _var=""
@@ -99,7 +102,8 @@ function getArgs() {
 
         # if has @ will get all the rest of arguments
         if [[ "${_var}" == "@"* ]]; then
-            _var=$(echo ${_var}| sed 's/@//')
+            #_var=$(echo "${_var}"| sed 's/@//')
+            _var=${_var/@/}
             local _argPos=0
             while [ "${1}" ]; do         
                 eval "$(echo ${_var}[${_argPos}]='${1}')"
@@ -143,7 +147,7 @@ fi
     local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_lib} ${_libDir} ${_libEntrypoint}"' &> /dev/null; typeset -F' | awk '{print $NF}'))    
 
     # Import lib functions
-    source ${DOLIBS_LIB_FILE} ${_lib} ${_libDir} ${_libEntrypoint}
+    source "${DOLIBS_LIB_FILE}" "${_lib}" "${_libDir}" "${_libEntrypoint}"
     exitOnError "Error importing '${_libEntrypoint}'"
 
     # Remove Core functions
@@ -161,10 +165,10 @@ fi
             eval "$(echo "${_libFunctNew}() {"; echo "${_funcHeader}"; declare -f ${_libFunct} | tail -n +3)"
 
             # Unset old function name
-            unset -f ${_libFunct}
+            unset -f "${_libFunct}"
 
             # Export the new function for sub-processes
-            export -f ${_libFunctNew}
+            export -f "${_libFunctNew}"
 
             # Debug
             #echo "  -> ${_libFunctNew}()"
@@ -192,8 +196,8 @@ export DOLIBS_SHDOC_BIN=${DOLIBS_SHDOC_DIR}/shdoc.awk
 # functions when importing others
 export DOLIBS_CORE_FUNCT=$(typeset -F | awk '{print $NF}')
 for funct in ${DOLIBS_CORE_FUNCT[@]}; do
-    export -f ${funct}
+    export -f "${funct}"
 done
 
 # Import main DevOps Libs functions
-_createLibFunctions "do" ${DOLIBS_CORE_DIR}
+_createLibFunctions "do" "${DOLIBS_CORE_DIR}"
