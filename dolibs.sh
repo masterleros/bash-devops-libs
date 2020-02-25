@@ -38,15 +38,12 @@ while [ "${1}" != "" ]; do
         # dolibs folder    
         "-f") DOLIBS_DIR=${2}; shift 2;;
         # Local source folder (default is git)
-        "-l") DOLIBS_LOCAL_SOURCE_DIR=$("cd $(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)/${2} 2>&1 && pwd")
+        "-l") DOLIBS_LOCAL_SOURCE_DIR=$(cd $(cd $(dirname "${0}") >/dev/null 2>&1 && pwd)/"${2}" 2>&1 && pwd)
             if [ ! -d "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then echo "Folder '${2}' does not exist!"; exit -1 ;fi
             shift 2;;
         *) echo "ERROR: Option '${1}' not recognized"; exit -1;;
     esac
 done
-
-# Assign the dolibs temp folder
-DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
 # If not mode offline
 if [[ ${DOLIBS_MODE} != "offline" ]]; then
@@ -75,7 +72,7 @@ fi
 # [ ${set_e_enabled} ] || set -e
 
 # Execute the boostrap if is present
-if [[ ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
+if [ ! -f ${DOLIBS_DIR}/boostrap.sh ]; then
     echo "ERROR: It was not possible to find the boostrap in '${DOLIBS_DIR}' (offline mode?)"
     exit -1
 fi
