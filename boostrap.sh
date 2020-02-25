@@ -14,6 +14,7 @@
 
 #!/bin/bash
 export DOLIBS_MAIN_FILE="main.sh"
+DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
 
 ### Show a info text
 # usage: echoInfo <text>

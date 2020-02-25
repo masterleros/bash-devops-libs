@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
 # @file dolibs.sh
 # @brief This is de main entrypoint for the lib and needs to be copied whithin your source files, then it needs to be included
 
@@ -23,9 +23,8 @@ if [[ "${BASH}" != *"/bash" ]]; then echo "Current OS is not running on bash int
 DOLIBS_MODE="auto"
 DOLIBS_BRANCH="feature/documentation"
 ### DEVOPS LIBS DEFINITIONS ###
-DOLIBS_ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/ >/dev/null 2>&1 && pwd)"/
+DOLIBS_ROOTDIR=$(cd $(dirname "${BASH_SOURCE[0]}")/ >/dev/null 2>&1 && pwd)/
 DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
-DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
 DOLIBS_BOSTRAP="https://raw.githubusercontent.com/masterleros/bash-devops-libs/${DOLIBS_BRANCH}/boostrap.sh"
 ### DEVOPS LIBS DEFINITIONS ###
 
@@ -39,7 +38,7 @@ while [ "${1}" != "" ]; do
         # dolibs folder    
         "-f") DOLIBS_DIR=${2}; shift 2;;
         # Local source folder (default is git)
-        "-l") DOLIBS_LOCAL_SOURCE_DIR="$(cd $(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)/${2} 2>&1 && pwd)"
+        "-l") DOLIBS_LOCAL_SOURCE_DIR=$("cd $(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)/${2} 2>&1 && pwd")
             if [ ! -d "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then echo "Folder '${2}' does not exist!"; exit -1 ;fi
             shift 2;;
         *) echo "ERROR: Option '${1}' not recognized"; exit -1;;
@@ -55,15 +54,15 @@ if [[ ${DOLIBS_MODE} != "offline" ]]; then
     if [[ ${DOLIBS_MODE} == "online" || ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
 
         # Create the lib folder
-        [ -d ${DOLIBS_DIR} ] || mkdir -p ${DOLIBS_DIR}
+        [ -d "${DOLIBS_DIR}" ] || mkdir -p "${DOLIBS_DIR}"
         # If there is a problem, exit
         if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to create the lib folder, exiting..."; exit -1; fi    
 
         # Get the boostrap
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
-            cp ${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh ${DOLIBS_DIR}/boostrap.sh
+            cp "${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh" "${DOLIBS_DIR}/boostrap.sh"
         else
-            curl -s -H 'Cache-Control: no-cache' --fail ${DOLIBS_BOSTRAP} -o ${DOLIBS_DIR}/boostrap.sh
+            curl -s -H 'Cache-Control: no-cache' --fail "${DOLIBS_BOSTRAP}" -o "${DOLIBS_DIR}/boostrap.sh"
         fi
 
         # If there is a problem, exit
@@ -81,6 +80,6 @@ if [[ ! -f ${DOLIBS_DIR}/boostrap.sh ]]; then
     exit -1
 fi
 
-. ${DOLIBS_DIR}/boostrap.sh
+. "${DOLIBS_DIR}/boostrap.sh"
 
 #[ ${set_e_enabled} ] || set +e # Disable set e if was enabled
