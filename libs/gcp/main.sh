@@ -17,9 +17,6 @@
 # Verify Dependencies
 do.verifyDeps gcloud || return ${?}
 
-# Import sub-modules
-source ${CURRENT_LIB_DIR}/auth.sh || return ${?}
-
 ### Validate and set the requested project ###
 # usage: useProject <project_id>
 function useProject() {

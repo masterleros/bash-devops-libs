@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
+
 ### Validate a role of a email ###
 # usage: validateRole <domain> <domain_id> <role> <email>
 # domains: project folder billing
@@ -35,12 +37,12 @@ function validateRole {
     fi
 
     # Execute the validation
-    foundRoles=$(${cmd} --flatten="bindings[].members" --filter "bindings.role=${role} AND bindings.members:${email}" --format="table(bindings.members)")
+    foundRoles=$("${cmd}" --flatten="bindings[].members" --filter "bindings.role=${role} AND bindings.members:${email}" --format="table(bindings.members)")
     exitOnError "Check your IAM permissions (for get-iam-policy) at ${domain}: ${domain_id}"
 
     # If email role was not found
     echo "${foundRoles}" | grep "${email}" > /dev/null
-    return $?
+    return ${?}
 }
 
 ### Bind Role to a list of emails ###
@@ -54,7 +56,7 @@ function bindRole {
     for email in ${emails[@]}; do
 
         # Validate if the role is already provided
-        self validateRole ${domain} ${domain_id} ${role} ${email}
+        self validateRole "${domain}" "${domain_id}" "${role}" "${email}"
         if [ ${?} -ne 0 ]; then
 
             # Concat the domain
@@ -70,11 +72,11 @@ function bindRole {
 
             echoInfo "Binding '${email}' role '${role}' to ${domain}: ${domain_id}..."
             if [[ "${email}" == *".iam.gserviceaccount.com" ]]; then
-                ${cmd} --member serviceAccount:${email} --role ${role} > /dev/null
+                "${cmd}" --member serviceAccount:"${email}" --role "${role}" > /dev/null
             elif [[ "${email}" == "allUsers" ]]; then
-                ${cmd} --member ${email} --role ${role} > /dev/null                
+                "${cmd}" --member "${email}" --role "${role}" > /dev/null                
             else
-                ${cmd} --member user:${email} --role ${role} > /dev/null
+                "${cmd}" --member user:"${email}" --role "${role}" > /dev/null
             fi
 
             exitOnError "Failed to bind role: '${role}' to ${domain}: ${domain_id}"    

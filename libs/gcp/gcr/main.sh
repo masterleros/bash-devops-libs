@@ -48,27 +48,27 @@ function dockerLogin() {
     exitOnError "Required credentials not found"
 
     # Get credential user
-    assign _saUser=do.gcp.getValueFromCredential ${GOOGLE_APPLICATION_CREDENTIALS} client_email
+    assign _saUser=do.gcp.getValueFromCredential "${GOOGLE_APPLICATION_CREDENTIALS}" client_email
     exitOnError "It was not possible to get the credential user email"
 
     # Create docker config folder if does not exist
-    DOCKER_LOCKFILE_DIR=$(dirname ${DOCKER_LOCKFILE_PATH})
-    [ -d ${DOCKER_LOCKFILE_DIR} ] || mkdir -p ${DOCKER_LOCKFILE_DIR}
+    DOCKER_LOCKFILE_DIR=$(dirname "${DOCKER_LOCKFILE_PATH}")
+    [ -d "${DOCKER_LOCKFILE_DIR}" ] || mkdir -p "${DOCKER_LOCKFILE_DIR}"
 
     # Create the lock descriptor    
-    exec {DOCKER_LOCKFILE_DESC}>${DOCKER_LOCKFILE_PATH}
+    exec "{DOCKER_LOCKFILE_DESC}">"${DOCKER_LOCKFILE_PATH}"
     exitOnError "It was not possible to aquire the lock"    
     # Aquire the soft lock for this process
     flock -s ${DOCKER_LOCKFILE_DESC}
 
     # Check if is not logged as required user
-    _loggedUser="$(cat ${DOCKER_LOCKFILE_PATH} | egrep "^gcr_sa=" | cut -d'=' -f2-)"
-    [[ ! "${_loggedUser}" || "${_loggedUser}" != "${_saUser}" ]]
+    _loggedUser=$(< "${DOCKER_LOCKFILE_PATH}" egrep "^gcr_sa=" | cut -d'=' -f2-)
+    [ ! "${_loggedUser}" ] || [ "${_loggedUser}" != "${_saUser}" ]
     exitOnError "'${_loggedUser}' is currently using docker ${GCLOUD_DOCKER_REGISTRY_HOST} registry"
 
     # Docker login to GCloud registry
     echoInfo "Docker loging-in to 'https://${GCLOUD_DOCKER_REGISTRY_HOST}'..."
-    cat ${GOOGLE_APPLICATION_CREDENTIALS} | docker login -u _json_key --password-stdin https://${GCLOUD_DOCKER_REGISTRY_HOST}    
+    < "${GOOGLE_APPLICATION_CREDENTIALS}" docker login -u _json_key --password-stdin https://"${GCLOUD_DOCKER_REGISTRY_HOST}"
 }
 
 
@@ -76,13 +76,13 @@ function dockerLogin() {
 function dockerLogoff() {
 
     # Check if the lock is in place yet
-    flock -n ${DOCKER_LOCKFILE_DESC}
+    flock -n "${DOCKER_LOCKFILE_DESC}"
 
     # If the locked by other, do not logoff
     if [ ${?} -eq 0 ]; then
         echoInfo "Docker loging-out from 'https://${GCLOUD_DOCKER_REGISTRY_HOST}'..."
-        docker logout https://${GCLOUD_DOCKER_REGISTRY_HOST}
-        rm ${DOCKER_LOCKFILE_PATH}
+        docker logout https://"${GCLOUD_DOCKER_REGISTRY_HOST}"
+        rm "${DOCKER_LOCKFILE_PATH}"
     fi
 
     # Remove soft lock of this proccess
@@ -97,7 +97,7 @@ function getImageDigest() {
 
     # Create the image tag and retrieve the digest
     DOCKER_IMAGE="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}"
-    _return=$(gcloud container images list-tags ${DOCKER_IMAGE} --filter="TAGS=${_docker_image_tag}" --format="get(digest)")
+    _return=$(gcloud container images list-tags "${DOCKER_IMAGE}" --filter="TAGS=${_docker_image_tag}" --format="get(digest)")
     _result=${?}
 
     return ${_result}
@@ -110,7 +110,7 @@ function getFullDigestTag() {
     getArgs "_project_id _docker_image_name _docker_image_tag" "${@}"
 
     # Get the image tag digest
-    assign _tagDigest=self getImageDigest ${_project_id} ${_docker_image_name} ${_docker_image_tag}
+    assign _tagDigest=self getImageDigest "${_project_id}" "${_docker_image_name}" "${_docker_image_tag}"
     _result=${?}
 
     # Return the full image digest tag
@@ -132,7 +132,7 @@ function buildAndPublish() {
     self dockerLogin
 
     # Build Image
-    docker build -t ${DOCKER_IMAGE_TAG_LATEST} -f ${_docker_file} "${_docker_build_args[@]}" ${_docker_dir}
+    docker build -t "${DOCKER_IMAGE_TAG_LATEST}" -f "${_docker_file}" "${_docker_build_args[@]}" "${_docker_dir}"
     exitOnError "It was not possible to build docker image '${DOCKER_IMAGE_TAG_LATEST}'"
 
     # Publish Image
@@ -147,11 +147,11 @@ function buildAndPublish() {
         DOCKER_IMAGE_TAG_CUSTOM="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}:${DOCKER_IMAGE_VERSION}"
 
         # Tag the custom version
-        docker tag ${DOCKER_IMAGE_TAG_LATEST} ${DOCKER_IMAGE_TAG_CUSTOM}
+        docker tag "${DOCKER_IMAGE_TAG_LATEST}" "${DOCKER_IMAGE_TAG_CUSTOM}"
         exitOnError "It was not possible to tag the custom version '${DOCKER_IMAGE_TAG_CUSTOM}'"
 
         # Publish Image
-        docker push ${DOCKER_IMAGE_TAG_CUSTOM}
+        docker push "${DOCKER_IMAGE_TAG_CUSTOM}"
         exitOnError "It was not possible to push docker image '${DOCKER_IMAGE_TAG_CUSTOM}'"
 
         # Clean up local custom image

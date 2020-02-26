@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
+
 ### Validate if the project is firestore enabled ###
 # usage: enabledProject <project>
 function enabledProject {

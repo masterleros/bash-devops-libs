@@ -34,7 +34,8 @@ function use() {
             self addLocalSource "${_libNamespace}" "${DOLIBS_SOURCE_LIBS_DIR}/${_libNamespace}"
         # Git source
         else
-            self addGitSource "${_libNamespace}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs/"${_libNamespace}"
+            echo "self addGitSource "${_libNamespace}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs/"${_libNamespace}""
+            self addGitSource "${_libNamespace}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "libs/${_libNamespace}"
         fi
     done
 

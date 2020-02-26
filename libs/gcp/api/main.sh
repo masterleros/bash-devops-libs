@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
+
 ### Validate a role of current user ###
 # usage: enable <api_domain>
 function enable {

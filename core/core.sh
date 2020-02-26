@@ -28,7 +28,7 @@ function self() {
     _function=${1}; shift
     #_namespace=${FUNCNAME[1]/$(echo "${FUNCNAME[1]}" | awk -F . '{print "."$NF}')/}
     #${_namespace}.${_function} "${@}"
-    ${CURRENT_LIB}.${_function} "${@}"
+    "${CURRENT_LIB}.${_function}" "${@}"
     return ${?}
 }
 

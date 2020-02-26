@@ -23,7 +23,7 @@ function get() {
     getArgs "@data" "${@}"
 
     # Get tokens
-    _return=($(echo ${data} | egrep -o '\$\{([a-zA-Z0-9_]+)\}'))
+    _return=($(echo "${data}" | egrep -o '\$\{([a-zA-Z0-9_]+)\}'))
 
     # Sort and make tokens unique in the list
     _return=($(echo "${_return[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
@@ -41,8 +41,8 @@ function getNames() {
     assign _return=self get "${data}"
 
     # Remove token structure chars
-    _return=("${_return[@]//'${'/}")
-    _return=("${_return[@]//'}'/}")
+    _return=(${_return[@]/\${/})
+    _return=(${_return[@]/\}/})
 }
 
 # @description Echo the content of a file with tokens updated to values from defined environment vars
@@ -59,8 +59,8 @@ function replaceFromFile() {
     getArgs "file &errors" "${@}"
 
     # Check if file exists
-    [ -f ${file} ] || exitOnError "File '${file}' not found"
-    local _content=$(cat ${file})    
+    [ -f "${file}" ] || exitOnError "File '${file}' not found"
+    local _content=$(cat "${file}")
 
     # Get the tokens
     assign tokens=self get "${_content}"
@@ -69,7 +69,7 @@ function replaceFromFile() {
     local _result=0
     for token in ${tokens[@]}; do
         # If variable is defined, replace
-        var=$(echo ${token} | egrep -o '([a-zA-Z0-9_]+)')
+        var=$(echo "${token}" | egrep -o '([a-zA-Z0-9_]+)')
         if [ "${!var}" ]; then
             _content=${_content//$token/${!var}}
         else
@@ -96,9 +96,9 @@ function replaceFromFileToFile() {
     getArgs "path_source path_target &errors" "${@}"
 
     # Get the content updated
-    assign content=self replaceFromFile ${path_source} ${errors}
+    assign content=self replaceFromFile "${path_source}" "${errors}"
     local _result=${?}
 
-    echo "${content}" > ${path_target}    
+    echo "${content}" > "${path_target}"   
     return ${_result}
 }

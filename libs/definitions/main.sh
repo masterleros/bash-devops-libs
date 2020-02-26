@@ -16,8 +16,8 @@
 export DOLIBS_DEFINITIONS=${DOLIBS_ROOTDIR}/definitions.sh
 
 # Check if file exists
-if [ -f ${DOLIBS_DEFINITIONS} ]; then
-    source ${DOLIBS_DEFINITIONS}
+if [ -f "${DOLIBS_DEFINITIONS}" ]; then
+    source "${DOLIBS_DEFINITIONS}"
     echoInfo "Definitions file is included now!"
 else
     exitOnError "Defintions file '${DOLIBS_DEFINITIONS}' was not found"
