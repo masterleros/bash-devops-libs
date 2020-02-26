@@ -22,7 +22,6 @@
 function showTitle() {
 
     getArgs "text" "${@}"
-    
 
     len=$(echo "# ${text} #"| wc -c)
     separator=$(eval printf '\#%.0s' {2.."${len}"})

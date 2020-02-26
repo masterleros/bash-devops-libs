@@ -1,3 +1,4 @@
+* [utils.configs.setVariablesFromFile()](#utilsconfigssetvariablesfromfile)
 * [utils.files.findAndCallback()](#utilsfilesfindandcallback)
 * [utils.showTitle()](#utilsshowtitle)
 * [utils.retryExecution()](#utilsretryexecution)
@@ -7,6 +8,25 @@
 * [utils.tokens.replaceFromFileToFile()](#utilstokensreplacefromfiletofile)
 
 
+
+# utils.configs.setVariablesFromFile()
+
+Get values from file's variables and set into same given variable names
+
+### Arguments
+
+* **file** (path): Path to the file
+* **args** (list): Variables names to be set
+
+### Exit codes
+
+* **1**: File not found
+
+### Example
+
+```bash
+setVariablesFromFile <file> <var1> <var2> ... <varN>
+```
 
 
 
@@ -64,10 +84,16 @@ Echo the tokens found in a text (i.e: `${<token>}`)
 
 * **data** (string): Data where the tokens are expected
 
+### Return value
+
+* Array with the tokens found
+
 ### Example
 
 ```bash
 get <data>
+# output:
+"${token1}" "${token2}" "${tokenN}"
 ```
 
 # utils.tokens.getNames()
@@ -78,10 +104,16 @@ Echo the tokens names found in a text
 
 * **data** (string): Data where the tokens are expected
 
+### Return value
+
+* Array with the token's names found
+
 ### Example
 
 ```bash
 getNames <data>
+# output:
+"token1" "token2" "tokenN"
 ```
 
 # utils.tokens.replaceFromFile()

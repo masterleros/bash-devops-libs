@@ -13,6 +13,11 @@
 #    limitations under the License.
 
 #!/bin/bash
+# @file definitions
+# @brief This lib will include your `definitions.sh` file placed in the `dolibs.sh` folder by doing a ```source <path>/definition.sh```. 
+# @brief 
+# @brief Doin so, will enable the lib to use centralized values defined for your scripts.
+
 export DOLIBS_DEFINITIONS=${DOLIBS_ROOTDIR}/definitions.sh
 
 # Check if file exists

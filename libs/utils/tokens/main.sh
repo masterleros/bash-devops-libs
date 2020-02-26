@@ -16,8 +16,11 @@
 
 # @description Echo the tokens found in a text (i.e: `${<token>}`)
 # @arg data string Data where the tokens are expected
+# @return Array with the tokens found
 # @example 
 #   get <data>
+#   # output:
+#   "${token1}" "${token2}" "${tokenN}"
 function get() {
 
     getArgs "@data" "${@}"
@@ -31,8 +34,11 @@ function get() {
 
 # @description Echo the tokens names found in a text
 # @arg data string Data where the tokens are expected
+# @return Array with the token's names found
 # @example 
 #   getNames <data>
+#   # output:
+#   "token1" "token2" "tokenN"
 function getNames() {
 
     getArgs "@data" "${@}"
