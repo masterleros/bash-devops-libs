@@ -63,7 +63,10 @@ function deploy {
         # fi
         ### OLD CODE ###
 
-        # Deploy specific version
+        # Workaround
+        gcloud config set app/use_deprecated_preparation True
+
+        # Deploy specific version        
         gcloud --quiet app deploy ${detokenizedFile} --version ${version}
     
     else 
