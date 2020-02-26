@@ -68,7 +68,7 @@ function assign() {
         local _returnVal
         local _argPos=0
         for _returnVal in "${_return[@]}"; do 
-            eval "$(echo ${_returnVar}[${_argPos}]='${_returnVal}')"
+            eval $(echo "${_returnVar}"["${_argPos}"]="'${_returnVal}'")
             ((_argPos+=1))
         done
         # Copy back _return value

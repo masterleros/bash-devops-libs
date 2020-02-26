@@ -32,7 +32,7 @@ function createSecret() {
     getArgs "_namespace _keyName @_secrets" "${@}"
 
     # Check and create the SA secret 
-    if [ "$(kubectl get secrets -n ${_namespace} --field-selector metadata.name=${_keyName} -o=name)" ]; then    
+    if [ $(kubectl get secrets -n "${_namespace}" --field-selector metadata.name="${_keyName}" -o=name) ]; then    
         echoInfo "Great! K8S Secret is already present!"
         return 0
     fi

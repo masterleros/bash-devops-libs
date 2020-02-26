@@ -45,7 +45,7 @@ function retryExecution() {
         eval "${cmd}"
         if [ ${?} -eq 0 ]; then
             return 0
-        elif [ ${retry} -ne $((retries+1)) ]; then
+        elif [ "${retry}" == $((retries+1)) ]; then
             echo "Retying(${retry}) execution of '${cmd}'..."
         fi
     done

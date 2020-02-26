@@ -26,6 +26,6 @@ function setVariablesFromFile() {
           local _temp=$(< "${file}" grep "${_var}" | awk -F "=" '{print $2}' | tr -d '"' | tr -d ' ')
           [ "${_temp}" ] || exitOnError "Value ${_var} is undefined! check ${file} file" -1
           echoInfo "Setting ${_var} = '${_temp}'"
-          eval "$(echo ${_var}='${_temp}')"
+          eval $(echo "${_var}"="'${_temp}'")
      done
 }

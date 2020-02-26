@@ -33,8 +33,9 @@ function runTest() {
     local _testPath=${1}
     local _bashArgs=${2}
     local _bashArgsText=$([ ! "${_bashArgs}" ] || echo " (Args: ${_bashArgs})")
+    local _test=$(basename "${_testPath}")"${_bashArgsText}"
     
-    _showTestTitle " START TEST $(basename ${_testPath})${_bashArgsText} "
+    _showTestTitle " START TEST ${_test} "
 
     # grant execution permissions
     chmod +x "${_testPath}"
@@ -45,11 +46,11 @@ function runTest() {
     
     # If test has failed
     if [ ${?} -ne 0 ]; then 
-        _showTestTitle " TEST FAILED $(basename ${_testPath})${_bashArgsText} "
+        _showTestTitle " TEST FAILED ${_test} "
         exit -1; 
     fi    
 
-    _showTestTitle " TEST SUCCESS $(basename ${_testPath})${_bashArgsText} "  
+    _showTestTitle " TEST SUCCESS ${_test} "  
 }
 
 # Get tests and execute them

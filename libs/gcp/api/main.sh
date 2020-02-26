@@ -20,6 +20,6 @@ function enable {
 
     getArgs "project api" "${@}"
 
-    gcloud --project ${project} services enable ${api}
+    gcloud --project "${project}" services enable "${api}"
     exitOnError "Failing enabling API: ${api}"
 }

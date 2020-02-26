@@ -23,8 +23,8 @@ if [ ! "${BASH}" ]; then echo "Current OS is not running on bash interpreter" >&
 DOLIBS_MODE="auto"
 DOLIBS_BRANCH="feature/documentation"
 ### DEVOPS LIBS DEFINITIONS ###
-DOLIBS_ROOTDIR=$(cd $(dirname "${BASH_SOURCE[0]}")/ >/dev/null 2>&1 && pwd)/
-DOLIBS_DIR="${DOLIBS_ROOTDIR}/dolibs"
+DOLIBS_ROOTDIR=$(cd $(dirname "${BASH_SOURCE[0]}")/ >/dev/null 2>&1 && pwd)
+DOLIBS_DIR=${DOLIBS_ROOTDIR}/dolibs
 DOLIBS_BOSTRAP="https://raw.githubusercontent.com/masterleros/bash-devops-libs/${DOLIBS_BRANCH}/boostrap.sh"
 ### DEVOPS LIBS DEFINITIONS ###
 
@@ -34,7 +34,10 @@ while [ "${1}" != "" ]; do
         # clone mode
         "--online") DOLIBS_MODE='online'; shift 1;;
         "--auto") DOLIBS_MODE='auto'; shift 1;;
-        "--offline") DOLIBS_MODE='offline'; shift 1;;
+        "--offline")
+            # if online mode, use same source as included            
+            DOLIBS_DIR=${DOLIBS_ROOTDIR}
+            DOLIBS_MODE='offline'; shift 1;;
         # dolibs folder    
         "-f") DOLIBS_DIR=${2}; shift 2;;
         # Local source folder (default is git)
