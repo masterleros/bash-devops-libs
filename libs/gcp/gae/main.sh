@@ -8,8 +8,8 @@ function waitOperation() {
     getArgs "service version" "${@}"
 
     # Wait if there is a running operations for the service
-    operation=$(cloud app operations list --filter="op_resource.metadata.target:/${service}/versions/${version} AND NOT op_resource.done=true" --format="value(ID)")
-    [ "${operation}" ] && gcloud app operations wait "${operation}""
+    operation=$(gcloud app operations list --filter="op_resource.metadata.target:/${service}/versions/${version} AND NOT op_resource.done=true" --format="value(ID)")
+    [ "${operation}" ] && gcloud app operations wait "${operation}"
 }
 
 ### Function to deploy a gae app ###
@@ -40,7 +40,7 @@ function deploy {
 
         # If it exists and is stopped, delete version
         if [ "${status}" == "STOPPED" ]; then
-            gcloud --quiet app versions delete --service=${service} ${version}
+            gcloud --quiet app versions delete --service="${service}" "${version}"
             exitOnError "Failed to delete same version (${version}) which is currently stopped!"
 
             # Wait the operation
