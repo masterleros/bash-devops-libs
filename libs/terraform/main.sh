@@ -23,7 +23,7 @@ function init() {
 
     getArgs "terraform_path" "${@}"
 
-    cd ${terraform_path}
+    cd "${terraform_path}"
 
     terraform init
     exitOnError "Failed to initialize terraform"
@@ -35,7 +35,7 @@ function apply() {
     
     getArgs "terraform_path" "${@}"
 
-    cd ${terraform_path}
+    cd "${terraform_path}"
 
     # Case executing in automation, execute with auto approve
     if [ "${CI}" ]; then
@@ -59,7 +59,7 @@ function createBackEndGCP() {
     exitOnError "'GOOGLE_APPLICATION_CREDENTIALS' Variable must be set for backend configuration"
 
     # Create backend config
-    cat > ${terraform_path}/backend.tf << EOF
+    cat > "${terraform_path}"/backend.tf << EOF
 terraform {
   backend "gcs" {
     bucket = "${bucket}"

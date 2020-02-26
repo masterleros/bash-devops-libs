@@ -22,7 +22,7 @@ do.verifyDeps kubectl || return ${?}
 function deployYaml() {
     getArgs "yaml_file" "${@}"
 
-    kubectl apply -f ${yaml_file}
+    kubectl apply -f "${yaml_file}"
     exitOnError "The command kubectl apply could not deploy with the yaml file"
 }
 
@@ -38,6 +38,6 @@ function createSecret() {
     fi
 
     echoInfo "Creating K8S Secret..."
-    kubectl create secret -n ${_namespace} generic ${_keyName} "${_secrets}"
+    kubectl create secret -n "${_namespace}" generic "${_keyName}" "${_secrets}"
     exitOnError "The secret could not be created"
 }

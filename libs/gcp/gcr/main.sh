@@ -136,7 +136,7 @@ function buildAndPublish() {
     exitOnError "It was not possible to build docker image '${DOCKER_IMAGE_TAG_LATEST}'"
 
     # Publish Image
-    docker push ${DOCKER_IMAGE_TAG_LATEST}
+    docker push "${DOCKER_IMAGE_TAG_LATEST}"
     exitOnError "It was not possible to push docker image '${DOCKER_IMAGE_TAG_LATEST}'"
 
     # Check if custom version can be created based on GIT branch

@@ -25,7 +25,7 @@ function showTitle() {
     
 
     len=$(echo "# ${text} #"| wc -c)
-    separator=$(eval printf '\#%.0s' {2..${len}})
+    separator=$(eval printf '\#%.0s' {2.."${len}"})
     echo "        ${separator}"
     echo "        # ${text} #"
     echo "        ${separator}"
@@ -41,11 +41,11 @@ function retryExecution() {
     
     getArgs "retries @cmd" "${@}"
 
-    for retry in $(seq $((${retries}+1))); do
+    for retry in $(seq $((retries+1))); do
         eval "${cmd}"
         if [ ${?} -eq 0 ]; then
             return 0
-        elif [ ${retry} -ne $((${retries}+1)) ]; then
+        elif [ ${retry} -ne $((retries+1)) ]; then
             echo "Retying(${retry}) execution of '${cmd}'..."
         fi
     done

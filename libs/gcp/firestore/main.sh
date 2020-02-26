@@ -18,6 +18,6 @@
 # usage: enabledProject <project>
 function enabledProject {
     getArgs "project" "${@}"
-    gcloud --quiet --project=${project} beta firestore operations list &> /dev/null
+    gcloud --quiet --project="${project}" beta firestore operations list &> /dev/null
     return ${?}
 }
