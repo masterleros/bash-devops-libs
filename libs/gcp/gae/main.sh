@@ -24,55 +24,8 @@ function deploy {
     do.utils.tokens.replaceFromFileToFile ${path} ${detokenizedFile} true
     exitOnError "It was not possible to replace all the tokens in '${path}', please check if values were exported."
 
-    # Get service name
-    service=$(cat ${detokenizedFile} | grep -e ^service: | awk '{print $NF}')
-    [ ${service} ] || service="default"
-
-    # If it is requesting a specific version
-    if [ "${version}" ]; then
-        
-        ### NEW CODE ###
-        # Wait any pending operation
-        self waitOperation "${service}" "${version}"
-
-        # Get the status of current version    
-        status=$(gcloud app versions list --filter="SERVICE=${service} AND VERSION.ID=${version} AND TRAFFIC_SPLIT=0" --format="value(SERVING_STATUS)")
-
-        # If it exists and is stopped, delete version
-        if [ "${status}" == "STOPPED" ]; then
-            gcloud --quiet app versions delete --service="${service}" "${version}"
-            exitOnError "Failed to delete same version (${version}) which is currently stopped!"
-
-            # Wait the operation
-            self waitOperation "${service}" "${version}"
-        fi
-        ### NEW CODE ###
-
-        ### OLD CODE ###
-        # # If it has no current version yet deployed
-        # #serving=$(gcloud app versions list --filter="SERVICE=${service} AND VERSION.ID=${version}" --format="value(SERVING_STATUS)")
-        
-        # # Check if same version was deployed before but is stopped, if so, delete version
-        # if [[ $(gcloud --quiet app versions list 2>&1 | grep "${service}") ]]; then
-            
-        #     gcloud --quiet app versions list --uri --service=${service} --hide-no-traffic | grep ${version} > /dev/null
-        #     if [ ${?} -ne 0 ]; then
-        #         gcloud --quiet app versions delete --service=${service} ${version}
-        #         exitOnError "Failed to delete same version (${version}) which is currently stopped!"
-        #     fi
-        # fi
-        ### OLD CODE ###
-
-        # Workaround
-        gcloud config set app/use_deprecated_preparation True
-
-        # Deploy specific version        
-        gcloud --quiet app deploy ${detokenizedFile} --version ${version}
-    
-    else 
-        # Deploy with no version defined
-        gcloud --quiet app deploy ${detokenizedFile}
-    fi
+    # Deploy with no version defined
+    gcloud --quiet app deploy ${detokenizedFile}
     exitOnError "Failed to deploy the application"
 
     # Remove tokenized yamls
