@@ -107,7 +107,7 @@ function import() {
                 local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_lib} ${_libPath}"' &> /dev/null; typeset -F' | awk '{print $NF}'))
 
                 # Create the functions
-                _createLibFunctions ${_lib} "${_libContext}" ${_libFuncts}
+                _createLibFunctions ${_lib} "${_libContext}" ${_libFuncts[@]}
             else 
                 ((_result+=1)); 
             fi
