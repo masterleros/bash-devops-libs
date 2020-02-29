@@ -36,7 +36,7 @@ function execute() {
 #   executeWithInfo <info> <outfile> <command> <args>
 function executeWithInfo() {
     getArgs "_info _outfile @_command" "${@}"
-    echoInfo "Executing '${_info}' (output at '${_outfile}')"
+    echoInfo "Executing '${_info}'"
     self execute "${_outfile}" "${_command[@]}"    
     _return=${_return}
 }
