@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Verify Dependencies
-do.verifyDeps ps tr egrep || return ${?}
+verifyDeps ps tr egrep || return ${?}
 
 # Required variables
 _LIBPROC_PIDS=""
