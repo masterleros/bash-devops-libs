@@ -1,21 +1,26 @@
 #!/bin/bash
+DOLIBS_LOCAL_MODE_DIR=../../
+
 # Enable dolibs (use from ../../libs)
 source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh
 
 # Import the required lib
-do.import process
+do.import process time
 
 # This function will be executed when waiting the subprocess and it fails
 function endCallback() {
-    getArgs "_code _pid _cmd _logFile" "${@}"
+    getArgs "_code _pid _cmd _logFile _elapsed" "${@}"
 
     # Depending on the exit code
     if [ "${_code}" == 0 ]; then
-        echoInfo "Command '${_cmd}' completed successfully!"
+        echoInfo "Command '${_cmd}' completed successfully! (${_elapsed}s)"
     else
-        echoError "Command '${_cmd}' failed with code '${_pid}', check logs at '${_logFile}'"
+        echoError "Command '${_cmd}' failed with code '${_code}', check logs at '${_logFile}'"
     fi
 }
+
+# Set the timer
+do.time.startTimer DEPLOY
 
 # for this execution we want the PID
 assign pid=do.process.executeWithInfo "My failing command" /tmp/1.out ls i-dont-exist
@@ -30,4 +35,11 @@ do.process.executeWithInfo "Just sleep 2s" /tmp/5.out sleep 2
 # Wait all processes to end in within 20s
 echoInfo "Waiting all commands to terminate..."
 do.process.waitAll endCallback 8
-exitOnError "Some processes failed"
+waitResult=${?}
+
+# Get the elapsed time
+assign elapsed=do.time.elapsed DEPLOY
+assign human=do.time.human "${elapsed}"
+echoInfo "Elapsed time: ${human}"
+
+exitOnError "Some processes failed" ${waitResult}
