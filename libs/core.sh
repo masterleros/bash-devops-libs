@@ -171,6 +171,7 @@ function getArgs() {
         if [[ "${_var}" == "@"* ]]; then
             _var=$(echo ${_var}| sed 's/@//')
             local _argPos=0
+            unset ${_var} # Clean up the array before assign values
             while [ "${1}" ]; do         
                 eval "$(echo ${_var}[${_argPos}]='${1}')"
                 shift; ((_argPos+=1))
