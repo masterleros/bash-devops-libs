@@ -33,12 +33,12 @@ function init() {
 # usage: apply <terraform path>
 function apply() {
     
-    getArgs "terraform_path" "${@}"
+    getArgs "terraform_path &quiet" "${@}"
 
     cd "${terraform_path}"
 
     # Case executing in automation, execute with auto approve
-    if [ "${CI}" ]; then
+    if [ "${CI}" ] || [ "${quiet}" == true ] ; then
         terraform plan
         terraform apply -auto-approve        
     else

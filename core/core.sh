@@ -105,7 +105,7 @@ function getArgs() {
             #_var=$(echo "${_var}"| sed 's/@//')
             _var=${_var/@/}
             local _argPos=0
-            unset ${_var} # Clean up the array before assign values
+            unset -v ${_var} # Clean up the array before assign values
             while [ "${1}" ]; do         
                 eval "$(echo ${_var}[${_argPos}]='${1}')"
                 shift; ((_argPos+=1))
@@ -148,7 +148,8 @@ fi
     local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_lib} ${_libDir} ${_libEntrypoint}"' &> /dev/null; typeset -F' | awk '{print $NF}'))    
 
     # Import lib functions
-    source "${DOLIBS_LIB_FILE}" "${_lib}" "${_libDir}" "${_libEntrypoint}"
+    # source "${DOLIBS_LIB_FILE}" "${_lib}" "${_libDir}" "${_libEntrypoint}"
+    source "${_libEntrypoint}"
     exitOnError "Error importing '${_libEntrypoint}'"
 
     # Remove Core functions
@@ -172,7 +173,7 @@ fi
             export -f "${_libFunctNew}"
 
             # Debug
-            #echo "  -> ${_libFunctNew}()"
+            # echo "  ${_libFunct} -> ${_libFunctNew}()"
             ((_funcCount+=1))
         fi
     done

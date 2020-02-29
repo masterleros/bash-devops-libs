@@ -27,20 +27,6 @@ export DOCKER_LOCKFILE_DESC=100
 ### Login with current GOOGLE_APPLICATION_CREDENTIALS to GCloud registry
 function dockerLogin() {
 
-    ################ OLD APPROACH - not multi-thread safe #################
-    # Check if not already configured gcloud docker helper or
-    # if not, configure docker to push images into Container Registry
-    # if [ ! "$([ -f "${HOME}/.docker/config.json" ] && cat "${HOME}/.docker/config.json" | egrep "\"gcr\.io\": \"gcloud\"")" ]; then
-    #     gcloud --project ${_project_id} --quiet auth configure-docker
-    #     exitOnError "Docker GCP registry could not be configured"
-    # fi
-
-    # # Avoid new parallel aware login process
-    # return 0
-    ################ OLD APPROACH - not multi-thread safe #################
-
-    # TODO
-
     do.import gcp
 
     # Check if credential definition is present

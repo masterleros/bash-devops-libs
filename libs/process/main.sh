@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Verify Dependencies
-do.verifyDeps ps tr egrep || return ${?}
+do.verifyDeps ps tr egrep time || return ${?}
 
 # Required variables
 _LIBPROC_PIDS=""
@@ -17,10 +17,13 @@ function execute() {
 
     getArgs "_outfile @_command" "${@}"
 
-    eval ${_command[@]} &>${_outfile} &
+    # Execute the command
+    #eval time ${_command[@]} &>${_outfile} &
+    export TIME='INFO:   Process ended\nINFO:   Elapsed Time: %Es'
+    eval $(which time) ${_command[@]} &>${_outfile} &
     _return=${!}
 
-    # Store the command for future track
+    # Store the command for future track    
     _LIBPROC_CMDS[${_return}]="${_command[@]}"
     _LIBPROC_LOG_FILES[${_return}]="${_outfile}"
 
@@ -36,12 +39,13 @@ function execute() {
 #   executeWithInfo <info> <outfile> <command> <args>
 function executeWithInfo() {
     getArgs "_info _outfile @_command" "${@}"
-    echoInfo "Executing '${_info}' (output at '${_outfile}')"
+    echoInfo "Executing '${_info}'"
     self execute "${_outfile}" "${_command[@]}"    
     _return=${_return}
 }
 
-# @description Wait all executed processes with a timeout and an end callback function
+# @description Wait all executed processes with a timeout and an end callback function.
+#   The callback function will be executed with the artuments: `<exitCode> <pid> <cmd> <logFile> <elapsed>`
 # @arg $endCallbackFunc function Path to file where the outputs are redirected
 # @arg $_command string Command to be executed
 # @exitcode 0 If all processes ended with code 0
@@ -49,6 +53,11 @@ function executeWithInfo() {
 # @exitcode 124 If some function ended because timeout
 # @example 
 #   waitAll <endCallbackFunc> <timeout>
+#   
+#   # callback function example:
+#   function myCallBack() {
+#       getArgs "_code _pid _cmd _logFile _elapsed" "${@}" 
+#   }
 function waitAll() {
 
     getArgs "_endCallbackFunc &_timeout" "${@}"
@@ -68,12 +77,13 @@ function waitAll() {
             for DOLIB_PID in ${TERM_PIDS}; do
                 wait ${DOLIB_PID}
                 local _current=${?}
+                local _elapsed=$(< "${_LIBPROC_LOG_FILES[${DOLIB_PID}]}" grep 'INFO:   Elapsed Time:' | egrep -o "[0-9]{1,}:[0-9]{2}\.[0-9]{2}")
 
                 # Remove terminated PIDS
-                _LIBPROC_PIDS=$(echo "${_LIBPROC_PIDS}" | tr " " "\n" | egrep -x -v "${DOLIB_PID}")
+                _LIBPROC_PIDS=$(echo "${_LIBPROC_PIDS}" | tr " " "\n" | egrep -x -v "${DOLIB_PID}")                
 
                 # Callback function
-                "${_endCallbackFunc}" "${_current}" "${_current}" "${_LIBPROC_CMDS[${DOLIB_PID}]}" "${_LIBPROC_LOG_FILES[${DOLIB_PID}]}"
+                "${_endCallbackFunc}" "${_current}" "${DOLIB_PID}" "${_LIBPROC_CMDS[${DOLIB_PID}]}" "${_LIBPROC_LOG_FILES[${DOLIB_PID}]}" "${_elapsed}"
 
                 # Set final status
                 ((_result=${_result} | ${_current}))
@@ -93,4 +103,4 @@ function waitAll() {
 
     # return result
     return ${_result}
-}
+} 

@@ -24,5 +24,5 @@ for INCLUDED_DOLIB in ${INCLUDED_DOLIBS[@]}; do
     CURRENT=$(basename ${INCLUDED_DOLIB})
 
     # Generate documentaton for the current lib
-    do.document ${INCLUDED_DOLIB} ${CURRENT}.md ${CURRENT}
+    do.document ${INCLUDED_DOLIB} $(dirname ${BASH_SOURCE[0]})/../docs/${CURRENT}.md ${CURRENT}
 done
