@@ -20,7 +20,7 @@ CURRENT_LIB_DIR=${2}
 CURRENT_LIB_ENTRYPOINT=${3}
 
 # Include main code
-. ${CURRENT_LIB_ENTRYPOINT} || return ${?}
+. "${CURRENT_LIB_ENTRYPOINT}" || return ${?}
 
 # Include the footer (deprecated)
 # if [ $(basename ${0}) == $(basename ${BASH_SOURCE[0]}) ]; then 

@@ -13,15 +13,15 @@
 #    limitations under the License.
 
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh -f /tmp/dolibs
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -l ../.. -f /tmp/dolibs
 
 # Set the custom remote lib source
-do.addGitSource gitlib "masterleros/bash-devops-libs" master libs
+do.addGitSource gitlib "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs
 exitOnError
 do.import gitlib.utils
 
 # Set the custom lib source
-do.addLocalSource locallib $(dirname ${BASH_SOURCE[0]})/../../libs
+do.addLocalSource locallib $(dirname "${BASH_SOURCE[0]}")/../../libs
 exitOnError
 do.import locallib.utils
 

@@ -39,6 +39,9 @@ BEGIN {
     styles["github", "anchor", "from"] = ".*"
     styles["github", "anchor", "to"] = "[&](#&)"
 
+    styles["github", "return", "from"] = "(.*)"
+    styles["github", "return", "to"] = "\\1"
+
     styles["github", "exitcode", "from"] = "([>!]?[0-9]{1,3}) (.*)"
     styles["github", "exitcode", "to"] = "**\\1**: \\2"
 }
@@ -55,8 +58,10 @@ function render(type, text) {
 function reset() {
     has_example = 0
     has_args = 0
+    has_return = 0
     has_exitcode = 0
     has_stdout = 0
+    has_stderr = 0
 }
 
 /^[[:space:]]*# @internal/ {
@@ -135,6 +140,20 @@ in_example {
     docblock = docblock "\n" render("i", "Function has no arguments.") "\n"
 }
 
+/^[[:space:]]*# @return/ {
+    if (!has_return) {
+        has_return = 1
+
+        docblock = docblock "\n" render("h3", "Return value") "\n\n"
+    }
+
+    sub(/^[[:space:]]*# @return /, "")
+
+    $0 = render("return", $0)
+
+    docblock = docblock render("li", $0) "\n"
+}
+
 /^[[:space:]]*# @exitcode/ {
     if (!has_exitcode) {
         has_exitcode = 1
@@ -167,6 +186,15 @@ in_example {
     docblock = docblock "\n\n" render("li", $0) "\n"
 }
 
+/^[[:space:]]*# @stderr/ {
+    has_stderr = 1
+
+    sub(/^[[:space:]]*# @stderr /, "")
+
+    docblock = docblock "\n" render("h3", "Output on stderr")
+    docblock = docblock "\n\n" render("li", $0) "\n"
+}
+
 /^[ \t]*(function([ \t])+)?([a-zA-Z0-9_:-]+)([ \t]*)(\(([ \t]*)\))?[ \t]*\{/ && docblock != "" {
     if (is_internal) {
         is_internal = 0
@@ -177,7 +205,7 @@ in_example {
             "g" \
         )
 
-        doc = doc "\n" render("h2", func_name) "\n" docblock
+        doc = doc "\n" render("h1", func_name) "\n" docblock
 
         url = func_name
         if (style == "github") {

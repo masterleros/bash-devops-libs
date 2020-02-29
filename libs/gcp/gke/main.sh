@@ -23,7 +23,7 @@ function loginCluster() {
     getArgs "cluster_name zone project" "${@}"
  
     # Gets credentials to use the cluster
-    gcloud --quiet --project=${project} container clusters get-credentials ${cluster_name} --zone=${zone}
+    gcloud --quiet --project="${project}" container clusters get-credentials "${cluster_name}" --zone="${zone}"
     exitOnError "It is not possible to authenticate to the cluster"
 }
 
@@ -33,6 +33,6 @@ function describeCluster() {
     getArgs "cluster_name zone project" "${@}"
 
     # Describe cluster
-    gcloud --quiet --project=${project} container clusters describe ${cluster_name} --zone=${zone}
+    gcloud --quiet --project="${project}" container clusters describe "${cluster_name}" --zone="${zone}"
     exitOnError "It is not possible to show the description for cluster ${cluster_name}, it may not exist"
 }

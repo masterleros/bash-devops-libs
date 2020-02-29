@@ -15,27 +15,22 @@
 
 #!/bin/bash
 
-### Set variables from file's values and set them into the given variable names ###
-# usage: setVariablesFromFile <file> <var1> <var2> ... <varN>
+# @description Get values from file's variables and set into same given variable names
+# @arg file path Path to the file
+# @arg args list Variables names to be set
+# @exitcode 1 File not found
+# @example 
+#   setVariablesFromFile <file> <var1> <var2> ... <varN>
 function setVariablesFromFile() {
      getArgs "file @vars" "${@}"
 
-     [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
+     [ -f "${file}" ] || exitOnError "File '${file}' not found" -1
 
+     # For each var
      for _var in ${vars[@]}; do
-          local _temp="$(cat ${file} | grep ${_var} | awk -F "=" '{print $2}' | tr -d '"' | tr -d ' ')"
+          local _temp=$(< "${file}" grep "${_var}" | awk -F "=" '{print $2}' | tr -d '"' | tr -d ' ')
           [ "${_temp}" ] || exitOnError "Value ${_var} is undefined! check ${file} file" -1
           echoInfo "Setting ${_var} = '${_temp}'"
-          eval "$(echo ${_var}='${_temp}')"
+          eval $(echo "${_var}"="'${_temp}'")
      done
-}
-
-### Get arguments starting with placeholder "--" from a given file and assign the arguments as string to a given variable name ###
-# usage: getAllArgsFromFile <file>
-function getAllArgsFromFile() {
-    getArgs "file" "${@}"
-
-    [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
-
-    _return=($(cat ${file} | grep "\--"))
 }

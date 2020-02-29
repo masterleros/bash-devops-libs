@@ -22,6 +22,22 @@ do.verifyDeps kubectl || return ${?}
 function deployYaml() {
     getArgs "yaml_file" "${@}"
 
-    kubectl apply -f ${yaml_file}
+    kubectl apply -f "${yaml_file}"
     exitOnError "The command kubectl apply could not deploy with the yaml file"
+}
+
+### Create a k8s Secret ###
+# usage createSecret <namespace> <key_name> <secrets>
+function createSecret() {
+    getArgs "_namespace _keyName @_secrets" "${@}"
+
+    # Check and create the SA secret 
+    if [ $(kubectl get secrets -n "${_namespace}" --field-selector metadata.name="${_keyName}" -o=name) ]; then    
+        echoInfo "Great! K8S Secret is already present!"
+        return 0
+    fi
+
+    echoInfo "Creating K8S Secret..."
+    kubectl create secret -n "${_namespace}" generic "${_keyName}" "${_secrets}"
+    exitOnError "The secret could not be created"
 }

@@ -15,16 +15,16 @@
 #!/bin/bash
 
 TESTS_DIR="tests"
-CURRENT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) >/dev/null 2>&1 && pwd)"
+CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") >/dev/null 2>&1 && pwd)
 
 ### Print a nice title ###
 # usage: _showTestTitle "text"
 function _showTestTitle {
     local _len=$(echo "- ${1} -"| wc -c)
-    separator=$(eval printf '\=%.0s' {2..${_len}}})
-    echo ${separator}
+    separator=$(eval printf '\=%.0s' {2.."${_len}"}})
+    echo "${separator}"
     echo "- ${1} -"
-    echo ${separator}
+    echo "${separator}"
 }
 
 ### Run the test
@@ -33,11 +33,12 @@ function runTest() {
     local _testPath=${1}
     local _bashArgs=${2}
     local _bashArgsText=$([ ! "${_bashArgs}" ] || echo " (Args: ${_bashArgs})")
+    local _test=$(basename "${_testPath}")"${_bashArgsText}"
     
-    _showTestTitle " START TEST $(basename ${_testPath})${_bashArgsText} "
+    _showTestTitle " START TEST ${_test} "
 
     # grant execution permissions
-    chmod +x ${_testPath}
+    chmod +x "${_testPath}"
 
     # Execute the test
     if [ "${_bashArgs}" ]; then bash -c "${_bashArgs}; ${_testPath}"
@@ -45,15 +46,15 @@ function runTest() {
     
     # If test has failed
     if [ ${?} -ne 0 ]; then 
-        _showTestTitle " TEST FAILED $(basename ${_testPath})${_bashArgsText} "
+        _showTestTitle " TEST FAILED ${_test} "
         exit -1; 
     fi    
 
-    _showTestTitle " TEST SUCCESS $(basename ${_testPath})${_bashArgsText} "  
+    _showTestTitle " TEST SUCCESS ${_test} "  
 }
 
 # Get tests and execute them
-_testsFiles=($(find ${CURRENT_DIR}/${TESTS_DIR} -name test-*.sh))
+_testsFiles=($(find "${CURRENT_DIR}/${TESTS_DIR}" -name test-*.sh))
 _testsSuccess=0
 for _testFile in "${_testsFiles[@]}"; do    
     runTest "${_testFile}" ""    

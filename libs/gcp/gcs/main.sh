@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
+
 # Verify Dependencies
 do.verifyDeps gsutil
 
@@ -22,7 +24,7 @@ function validateBucket() {
     getArgs "project bucket" "${@}"
 
     # Get tha APP ID
-    gsutil ls -p ${project} | grep ${bucket} > /dev/null
+    gsutil ls -p "${project}" | grep "${bucket}" > /dev/null
     return ${?}
 }
 
@@ -33,9 +35,9 @@ function createBucket() {
 
     getArgs "project bucket class @region" "${@}"
 
-    self validateBucket ${project} ${bucket}
+    self validateBucket "${project}" "${bucket}"
     if [ $? -ne 0 ]; then
-        gsutil mb -c ${class} -l ${region} -p ${project} gs://${bucket}
+        gsutil mb -c "${class}" -l "${region}" -p "${project}" gs://"${bucket}"
         exitOnError "Failed to create bucket ${bucket}"
     else
         echo "Bucket '${bucket}' already exist!"
@@ -48,7 +50,7 @@ function enableVersioning() {
 
     getArgs "bucket" "${@}"
 
-    gsutil versioning set on gs://${bucket}
+    gsutil versioning set on gs://"${bucket}"
     exitOnError "Failed to enable versioning on bucket ${bucket}"
 }
 
@@ -61,6 +63,6 @@ function setUserACL() {
 
     getArgs "bucket user access" "${@}"
 
-    gsutil acl ch -u ${user}:${access} gs://${bucket}
+    gsutil acl ch -u "${user}":"${access}" gs://"${bucket}"
     exitOnError "Failed to set ACL on bucket ${bucket}"
 }

@@ -1,4 +1,6 @@
-#    Copyright 2020 Leonardo Andres Morales
+#!/bin/bash
+
+#    Copyright 2020 Andre Prado
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -13,14 +15,15 @@
 #    limitations under the License.
 
 #!/bin/bash
-# Enable dolibs (clone to /tmp/dolibs)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -l ../.. -f /tmp/dolibs
 
-# Set the local lib source
-do.addLocalSource $(dirname "${BASH_SOURCE[0]}")/../../libs
+# Verify Dependencies
+verifyDeps gcloud || return ${?}
 
-# Import the required lib from custom namespace
-do.import local.utils
+### Deploy Cloud Function ###
+# usage: deploy <function name> <aditional_parameters_array_list>
+function deploy() {
+    getArgs "cfName @parameters" "${@}"
 
-# Use the needed lib
-local.utils.showTitle "Hello Local DevOps Libs!"
+    gcloud functions deploy ${cfName} "${parameters[@]}" | grep -vi password
+    exitOnError "Failed to deploy GCP Function ${cfName}"
+}

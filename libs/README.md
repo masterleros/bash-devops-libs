@@ -145,18 +145,4 @@ myfuncs.doSomething Hi There From DevOps Libs!
 # Arg1 = There
 # Others = From DevOps Libs!
 # My path is: <lib path>
-```    
-
-# Library Catalog
-
-## core.sh
-This is the root level source and includes all the Core functions to use the DevOps Libs (i.e: do.use)
-> **Obs:** This file will be automatically be imported by the dolibs.sh execution.
-
-## gcp
-This library includes different functionalities for Google Cloud Platform
-
-## utils
-TODO
-
-TODO
+```

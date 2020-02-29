@@ -32,14 +32,14 @@ function convertEnvVars() {
         _environment=${_definition#*:}
 
         # Check if matched current definition
-        if [[ ${CI_COMMIT_REF_NAME} == ${_branch} ]]; then
+        if [ "${CI_COMMIT_REF_NAME}" == "${_branch}" ]; then
             export CI_BRANCH_ENVIRONMENT=${_environment};
             break
         fi
     done
 
     # Check if found an environment
-    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your DOLIBS_BRANCHES_DEFINITION!" -1
+    [ "${CI_BRANCH_ENVIRONMENT}" ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your DOLIBS_BRANCHES_DEFINITION!" -1
 
     # Get vars to be renamed    
     vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*=" | awk -F= '{print $1}'))
@@ -49,10 +49,10 @@ function convertEnvVars() {
         # Set same variable with the final name
         echoInfo "####################################################"
         for var in "${vars[@]}"; do
-            var=$(echo ${var} | awk -F '=' '{print $1}')
-            new_var=$(echo ${var} | cut -d'_' -f3-)
+            var=$(echo "${var}" | awk -F '=' '{print $1}')
+            new_var=$(echo "${var}" | cut -d'_' -f3-)
             echoInfo "${CI_BRANCH_ENVIRONMENT} value set: '${new_var}'"
-            export ${new_var}="${!var}"
+            export "${new_var}"="${!var}"
         done
         echoInfo "####################################################"
     else
@@ -80,6 +80,6 @@ function promoteToBranch() {
     #echo ${GITLAB_USER_PRIVATE_KEY}
     
     # Sync the repost
-    sync https://git@${CI_SERVER_HOST}/${CI_PROJECT_PATH} ${branch}
+    sync https://git@"${CI_SERVER_HOST}/${CI_PROJECT_PATH}" "${branch}"
     exitOnError
 }

@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
+
 # Verify Dependencies
 do.verifyDeps terraform || return ${?}
 
@@ -21,7 +23,7 @@ function init() {
 
     getArgs "terraform_path" "${@}"
 
-    cd ${terraform_path}
+    cd "${terraform_path}"
 
     terraform init
     exitOnError "Failed to initialize terraform"
@@ -31,12 +33,12 @@ function init() {
 # usage: apply <terraform path>
 function apply() {
     
-    getArgs "terraform_path" "${@}"
+    getArgs "terraform_path &quiet" "${@}"
 
-    cd ${terraform_path}
+    cd "${terraform_path}"
 
     # Case executing in automation, execute with auto approve
-    if [ "${CI}" ]; then
+    if [ "${CI}" ] || [ "${quiet}" == true ] ; then
         terraform plan
         terraform apply -auto-approve        
     else
@@ -57,7 +59,7 @@ function createBackEndGCP() {
     exitOnError "'GOOGLE_APPLICATION_CREDENTIALS' Variable must be set for backend configuration"
 
     # Create backend config
-    cat > ${terraform_path}/backend.tf << EOF
+    cat > "${terraform_path}"/backend.tf << EOF
 terraform {
   backend "gcs" {
     bucket = "${bucket}"

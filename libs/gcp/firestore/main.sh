@@ -12,10 +12,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+#!/bin/bash
+
 ### Validate if the project is firestore enabled ###
 # usage: enabledProject <project>
 function enabledProject {
     getArgs "project" "${@}"
-    gcloud --quiet --project=${project} beta firestore operations list > /dev/null
+    gcloud --quiet --project="${project}" beta firestore operations list &> /dev/null
     return ${?}
 }
