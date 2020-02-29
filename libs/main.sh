@@ -73,7 +73,7 @@ function import() {
 
         # if lib was already imported
         #self _valueInArray ${_lib} "${DOLIBS_IMPORTED[@]}"
-        echo "${DOLIBS_IMPORTED}" | tr ';' '\n' | grep "${_lib}" > /dev/null
+        echo "${DOLIBS_IMPORTED}" | tr ';' '\n' | grep "^${_lib}\$" > /dev/null
         if [ ${?} == 0 ]; then
             echoInfo "Library '${_lib}' already imported!"
         else
