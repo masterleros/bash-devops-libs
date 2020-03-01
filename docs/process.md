@@ -1,6 +1,6 @@
 * [process.execute()](#processexecute)
 * [process.executeWithInfo()](#processexecutewithinfo)
-* [process.myCallBack()](#processmycallback)
+* [process.function myCallBack {](#processfunction-mycallback-)
 * [process.waitAll()](#processwaitall)
 
 
@@ -36,7 +36,7 @@ Execute in a subprocess and redirect its outputs to the logfile with a message
 executeWithInfo <info> <outfile> <command> <args>
 ```
 
-# process.myCallBack()
+# process.function myCallBack {
 
 Wait all executed processes with a timeout and an end callback function.
   The callback function will be executed with the artuments: `<exitCode> <pid> <cmd> <logFile> <elapsed>`
@@ -58,7 +58,7 @@ Wait all executed processes with a timeout and an end callback function.
 waitAll <endCallbackFunc> <timeout>
 
 # callback function example:
-function myCallBack() {
+function myCallBack {
 # process.waitAll()
 
     getArgs "_code _pid _cmd _logFile _elapsed" "${@}" 

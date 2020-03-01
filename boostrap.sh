@@ -118,7 +118,7 @@ function libGitOutDated() {
     local GIT_ORIGIN_HASH=$(cd "${GIT_DIR}" && git fetch -q && git rev-parse origin/"${GIT_BRANCH}")
 
     # Return result
-    [ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]]   
+    [ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]
 }
 
 ### Function to indicate if the source if different than the lib ###
@@ -128,7 +128,7 @@ function libSourceUpdated() {
     local LIB_DIR=${2}
 
     # Validate source and lib folder differences
-    [ $(cd "${SOURCE_DIR}"; find -maxdepth 1 -type f -exec diff {} "${LIB_DIR}"/{} \; 2>&1) ]
+    [ "$(cd "${SOURCE_DIR}"; find -maxdepth 1 -type f -exec diff {} "${LIB_DIR}"/{} \; 2>&1)" ]
 }
 
 ### Import Lib files ###
@@ -140,7 +140,7 @@ function libImportFiles() {
     local LIB=${3}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
 
-    echoInfo "Installing '${LIB}' code...."
+    echoInfo "Installing '${LIB}' code..."
 
     # Check if the lib entrypoint exists
     [ -f "${SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${SOURCE_DIR}' not found! (does it need add source?)"
@@ -175,9 +175,9 @@ function libNotIntegral() {
 }
 
 # Show operation mode
-if [[ ${DOLIBS_MODE} == 'offline' ]]; then 
+if [ "${DOLIBS_MODE}" == 'offline' ]; then 
     echoInfo "---> DevOps Libs (${DOLIBS_MODE}) <---"
-elif [[ ${DOLIBS_MODE} == 'local' ]]; then 
+elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
     echoInfo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
 else
     echoInfo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
@@ -191,7 +191,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     DOLIBS_SHDOC_DIR=${DOLIBS_CORE_DIR}/shdoc
 
     # If not working offline
-    if [[ ${DOLIBS_MODE} != 'offline' ]]; then
+    if [ "${DOLIBS_MODE}" != 'offline' ]; then
 
         # Local mode
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
@@ -201,6 +201,9 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             DOLIBS_SOURCE_DIR="${DOLIBS_TMPDIR}/core/${DOLIBS_BRANCH}"; 
         fi
 
+        # dolibs core functions dirs
+        DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
+
         # AUTO mode
         if [ "${DOLIBS_MODE}" == 'auto' ]; then
             # If the lib is not integral, needs to update
@@ -209,7 +212,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
                 _needInstall=true
             fi
         # ONLINE mode
-        elif [ "${DOLIBS_MODE}" == 'auto' ]; then
+        elif [ "${DOLIBS_MODE}" == 'online' ]; then
             # If the lib is outdated, clone it
             if libGitOutDated "${DOLIBS_CORE_DIR}" "${DOLIBS_SOURCE_DIR}" || libSourceUpdated "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}"; then
                 _needInstall=true
@@ -219,11 +222,10 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         # If needs clone
         if [ "${_needInstall}" == "true" ]; then
 
-            # CLone the lib repo
-            libGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${DOLIBS_SOURCE_DIR}" "${DOLIBS_CORE_DIR}"
-
-            # dolibs core functions dirs
-            DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core
+            # If not in local source clone the lib repo
+            if [ ! "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
+                libGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${DOLIBS_SOURCE_DIR}" "${DOLIBS_CORE_DIR}"
+            fi
 
             # Create doc folder and copy shdoc (documentation)
             mkdir -p "${DOLIBS_SHDOC_DIR}"

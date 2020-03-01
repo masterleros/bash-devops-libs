@@ -80,24 +80,7 @@ function import() {
                 # Update lib dir to the offline folder
                 assign _libDir=self configInFile "${_libSourceConfig}" LIB_DIR                                
                 _libDir=${_libDir}/${_libPathDir}
-            # AUTO mode
-            elif [ "${DOLIBS_MODE}" == "auto" ]; then                
-                # If the lib is not integral, it needs to update
-                if libNotIntegral "${_libDir}"; then
-                    echoInfo "It was not possible to check '${_lib}' lib integrity, updating..."
-                    local _needInstall=true
-                fi
-            # ONLINE mode
-            elif [ "${DOLIBS_MODE}" == "online" ]; then
-                # If the source code was updated, it needs to update
-                if libSourceUpdated "${_libSourceDir}" "${_libDir}"; then
-                    echoInfo "Source dir changed, updating..."
-                    local _needInstall=true
-                fi
-            fi
-
-            # If needs clone
-            if [[ "${_needInstall}" == "true" ]]; then
+            else
 
                 # Get the source folder
                 assign _libSourceDir=self configInFile "${_libSourceConfig}" SOURCE_DIR
@@ -107,6 +90,26 @@ function import() {
                 if [[ "${_libPathDir}" != "${_libNamespace}" ]]; then
                     _libSourceDir=${_libSourceDir}/${_libPathDir/${_libNamespace}\//}
                 fi
+
+                # AUTO mode
+                if [ "${DOLIBS_MODE}" == "auto" ]; then                
+                    # If the lib is not integral, it needs to update
+                    if libNotIntegral "${_libDir}"; then
+                        echoInfo "It was not possible to check '${_lib}' lib integrity, updating..."
+                        local _needInstall=true
+                    fi
+                # ONLINE mode
+                elif [ "${DOLIBS_MODE}" == "online" ]; then
+                    # If the source code was updated, it needs to update
+                    if libSourceUpdated "${_libSourceDir}" "${_libDir}"; then
+                        echoInfo "Source dir changed, updating..."
+                        local _needInstall=true
+                    fi
+                fi
+            fi
+
+            # If needs clone
+            if [[ "${_needInstall}" == "true" ]]; then
 
                 # import files                
                 libImportFiles "${_libSourceDir}" "${_libDir}" "${_lib}"

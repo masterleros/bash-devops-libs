@@ -37,7 +37,7 @@ function deploy {
     if [ "${version}" ]; then
     
         # If it has no current version yet deployed
-        if [ $(gcloud --quiet app versions list 2>&1 | grep "${service}") ]; then
+        if [ "$(gcloud --quiet app versions list 2>&1 | grep ${service})" ]; then
 
             # Check if same version was deployed before but is stopped, if so, delete version
             gcloud --quiet app versions list --uri --service="${service}" --hide-no-traffic | grep "${version}" > /dev/null
