@@ -20,8 +20,13 @@ do.verifyDeps firebase || return ${?}
 # Set firebase options
 if [ "${FIREBASE_TOKEN}" ]; then FIREBASE_OPTS="--non-interactive --token ${FIREBASE_TOKEN}"; fi
 
-### Check firebase project if exists ###
-# usage: validateProject <project> <id>
+# @description Check firebase project if exists
+# @arg $project string GCP Project ID
+# @arg $id string Firebase Project to be validated
+# @exitcode 0 If the project exist
+# @exitcode >0 If the project exist does not exist
+# @example 
+#   validateProject <project> <id>
 function validateProject() {
 
     getArgs "project id" "${@}"
