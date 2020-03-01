@@ -175,9 +175,9 @@ function libNotIntegral() {
 }
 
 # Show operation mode
-if [ ${DOLIBS_MODE} == 'offline' ]; then 
+if [ "${DOLIBS_MODE}" == 'offline' ]; then 
     echoInfo "---> DevOps Libs (${DOLIBS_MODE}) <---"
-elif [ ${DOLIBS_LOCAL_SOURCE_DIR} ]; then 
+elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
     echoInfo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
 else
     echoInfo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
@@ -191,7 +191,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
     DOLIBS_SHDOC_DIR=${DOLIBS_CORE_DIR}/shdoc
 
     # If not working offline
-    if [[ ${DOLIBS_MODE} != 'offline' ]]; then
+    if [ "${DOLIBS_MODE}" != 'offline' ]; then
 
         # Local mode
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
