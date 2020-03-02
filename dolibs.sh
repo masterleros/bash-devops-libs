@@ -18,7 +18,7 @@ export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 
 ### DEVOPS LIBS BRANCH ###
 DOLIBS_DEFAULT_MODE="auto"
-DOLIBS_BRANCH="master"
+DOLIBS_BRANCH="hotfix/process"
 DOLIBS_REPO="github.com/masterleros/bash-devops-libs.git"
 ### DEVOPS LIBS DEFINITIONS ###
 
@@ -54,7 +54,7 @@ function devOpsLibsClone() {
         # Update retrieved lib status
         cat << EOF > ${DOLIBS_STATUS}
 branch:${DOLIBS_BRANCH}
-hash:$(git rev-parse HEAD)
+hash:$(cd ${DOLIBS_TMP_DIR}; git rev-parse HEAD)
 updated:$(date)
 user:$(git config user.name)
 email:$(git config user.email)

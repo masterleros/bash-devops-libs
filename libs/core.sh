@@ -160,7 +160,8 @@ function getArgs() {
         shift        
         # if has # the argument is optional
         if [[ ${_var} == "&"* ]]; then
-            _var=$(echo ${_var}| sed 's/&//')
+            #_var=$(echo ${_var}| sed 's/&//')
+            _var=${_var/&/}
         elif [ ! "${1}" ]; then
             echoError "Values for argument '${_var}' not found!"
             _var=""
@@ -169,9 +170,12 @@ function getArgs() {
 
         # if has @ will get all the rest of arguments
         if [[ "${_var}" == "@"* ]]; then
-            _var=$(echo ${_var}| sed 's/@//')
+            #_var=$(echo ${_var}| sed 's/@//')
+            _var=${_var/@/}            
             local _argPos=0
+            unset -v ${_var}
             while [ "${1}" ]; do         
+                #echo ${_var}[${_argPos}]="${1}"
                 eval "$(echo ${_var}[${_argPos}]='${1}')"
                 shift; ((_argPos+=1))
             done
@@ -188,6 +192,7 @@ function getArgs() {
 # Usage: _createLibFunctions <lib alias> <func1> <func2> ... <funcN>
 function _createLibFunctions() {
 
+    local _libFuncts
     getArgs "&_libAlias &_funcHeader &@_libFuncts" "${@}"
 
     # Make as part of do namespace

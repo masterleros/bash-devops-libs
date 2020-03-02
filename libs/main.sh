@@ -72,9 +72,10 @@ function import() {
         local _libTmpMain=${_libTmpPath}/${DOLIBS_MAIN_FILE}
 
         # if lib was already imported
-        self _valueInArray ${_lib} "${DOLIBS_IMPORTED[@]}"        
-        if [[ ${?} -ne 0 ]]; then
-            echoInfo "DEVOPS Library '${_lib}' already imported!"
+        #self _valueInArray ${_lib} "${DOLIBS_IMPORTED[@]}"
+        echo "${DOLIBS_IMPORTED}" | tr ';' '\n' | grep "^${_lib}\$" > /dev/null
+        if [ ${?} == 0 ]; then
+            echoInfo "Library '${_lib}' already imported!"
         else
             # Check if it is in online mode to copy/update libs
             if [[ "${DOLIBS_MODE}" == "online" || "${DOLIBS_MODE}" == "local" ]]; then
@@ -107,13 +108,13 @@ function import() {
                 local _libFuncts=($(bash -c '. '"${DOLIBS_LIB_FILE} ${_lib} ${_libPath}"' &> /dev/null; typeset -F' | awk '{print $NF}'))
 
                 # Create the functions
-                _createLibFunctions ${_lib} "${_libContext}" ${_libFuncts}
+                _createLibFunctions ${_lib} "${_libContext}" ${_libFuncts[@]}
             else 
                 ((_result+=1)); 
             fi
 
             # Set as imported
-            export DOLIBS_IMPORTED+=(${_lib})
+            export DOLIBS_IMPORTED="${DOLIBS_IMPORTED};${_lib}"
 
             # Show import
             echoInfo "Imported Library '${_lib}' (${_funcCount} functions)"
