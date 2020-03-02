@@ -14,7 +14,7 @@
 
 #!/bin/bash
 # Enable dolibs (clone to /tmp/dolibs)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs -l ../..
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --online -f /tmp/dolibs -l ../..
 
 # Set the custom lib source
 do.addGitSource myremotelib "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs

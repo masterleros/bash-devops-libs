@@ -60,8 +60,8 @@ function exitOnError() {
 }
 
 ### Function to clone the lib code ###
-# usage: libGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
-function libGitClone() {
+# usage: dolibGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
+function dolibGitClone() {
 
     local GIT_REPO=${1}
     local GIT_BRANCH=${2}
@@ -97,8 +97,8 @@ EOF
 }
 
 ### Function to indicate if the lib code is outdated ###
-# usage: libGitOutDated <LIB_ROOT_DIR>
-function libGitOutDated() {
+# usage: dolibGitOutDated <LIB_ROOT_DIR>
+function dolibGitOutDated() {
 
     local LIB_ROOT_DIR=${1}
     local GIT_DIR=${2}
@@ -122,8 +122,8 @@ function libGitOutDated() {
 }
 
 ### Function to indicate if the source if different than the lib ###
-# usage: libSourceUpdated <SOURCE_DIR> <LIB_DIR>
-function libSourceUpdated() {
+# usage: dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
+function dolibSourceUpdated() {
     local SOURCE_DIR=${1}
     local LIB_DIR=${2}
 
@@ -132,8 +132,8 @@ function libSourceUpdated() {
 }
 
 ### Import Lib files ###
-# Usage: libImportFiles <SOURCE_DIR> <LIB_DIR>
-function libImportFiles() {
+# Usage: dolibImportFiles <SOURCE_DIR> <LIB_DIR>
+function dolibImportFiles() {
     
     local SOURCE_DIR=${1}
     local LIB_DIR=${2}
@@ -155,8 +155,8 @@ function libImportFiles() {
 }
 
 ### Check if the libs files are valid ###
-# Usage: libNotIntegral <LIB_DIR>
-function libNotIntegral() {
+# Usage: dolibNotIntegral <LIB_DIR>
+function dolibNotIntegral() {
     
     local LIB_DIR=${1}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
@@ -174,13 +174,53 @@ function libNotIntegral() {
     [ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]    
 }
 
+### Detect if code needs to be updated ###
+# Usage: libNeedsUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
+# obs: if not GIT_DIR is provided, it's threated as local source
+# return 0 if updated, 1 if not present, 2 if git updated, 3 if source updated
+function dolibUpdate() {
+
+    local SOURCE_DIR=${1}
+    local LIB_ROOT_DIR=${2}
+    local LIB_SUB_DIR=${3}
+    local GIT_DIR=${4}
+    local LIB_DIR=${LIB_ROOT_DIR}; [ "${LIB_SUB_DIR}" ] && LIB_DIR="${LIB_ROOT_DIR}/${LIB_SUB_DIR}"
+    local LIB=$(realpath "${LIB_DIR}" --relative-to="${DOLIBS_DIR}")
+
+    # AUTO mode
+    if [ "${DOLIBS_MODE}" == 'auto' ]; then
+        # If the lib is not integral, needs to update
+        if dolibNotIntegral "${LIB_DIR}"; then
+            echoInfo "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
+            dolibImportFiles "${SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
+            return 1
+        fi
+    # ONLINE mode
+    elif [ "${DOLIBS_MODE}" == 'online' ]; then
+        # If the lib is outdated, clone it
+        if [ "${GIT_DIR}" ] && dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
+            echoInfo "GIT Source has changed for '${LIB}', trying to get its code..."
+            dolibGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
+            dolibImportFiles "${SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
+            return 2
+        # If the lib is outdated, copy it
+        elif dolibSourceUpdated "${SOURCE_DIR}" "${LIB_DIR}"; then
+            echoInfo "Local source has changed for '${LIB}', trying to get its code..."
+            dolibImportFiles "${SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
+            return 3
+        fi
+    fi
+
+    return 0
+}
+
 # Show operation mode
 if [ "${DOLIBS_MODE}" == 'offline' ]; then 
-    echoInfo "---> DevOps Libs (${DOLIBS_MODE}) <---"
+    echoInfo "---> dolibs Libs (${DOLIBS_MODE}) <---"
 elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
-    echoInfo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
+    echoInfo "---> dolibs Local Source dir: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
 else
-    echoInfo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
+    echoInfo "---> dolibs GIT source branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
 fi
 
 # If Core library was not yet loaded
@@ -199,33 +239,17 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         # GIT mode
         else 
             DOLIBS_SOURCE_DIR="${DOLIBS_TMPDIR}/core/${DOLIBS_BRANCH}"; 
+            DOLIBS_GIT_DIR="${DOLIBS_SOURCE_DIR}"
         fi
 
         # dolibs core functions dirs
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
 
-        # AUTO mode
-        if [ "${DOLIBS_MODE}" == 'auto' ]; then
-            # If the lib is not integral, needs to update
-            if libNotIntegral "${DOLIBS_CORE_DIR}"; then
-                echoInfo "It was not possible to check 'core' lib integrity, trying to get its code..."
-                _needInstall=true
-            fi
-        # ONLINE mode
-        elif [ "${DOLIBS_MODE}" == 'online' ]; then
-            # If the lib is outdated, clone it
-            if libGitOutDated "${DOLIBS_CORE_DIR}" "${DOLIBS_SOURCE_DIR}" || libSourceUpdated "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}"; then
-                _needInstall=true
-            fi
-        fi
+        # Update lib if rquired
+        dolibUpdate "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}"
 
-        # If needs clone
-        if [ "${_needInstall}" == "true" ]; then
-
-            # If not in local source clone the lib repo
-            if [ ! "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
-                libGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${DOLIBS_SOURCE_DIR}" "${DOLIBS_CORE_DIR}"
-            fi
+        # If lib was updated, update others required
+        if [ ${?} != 0 ]; then
 
             # Create doc folder and copy shdoc (documentation)
             mkdir -p "${DOLIBS_SHDOC_DIR}"
@@ -241,15 +265,12 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             # Copy the Libs help
             cp "${DOLIBS_SOURCE_DIR}"/README.md "${DOLIBS_DIR}"/README.md
             cp "${DOLIBS_SOURCE_DIR}"/libs/README.md "${DOLIBS_DIR}"/DEVELOPMENT.md
-
-            # import core lib files
-            libImportFiles "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" core
         fi
     fi
 
     ### Include Libs ###
-    if [ -f "${DOLIBS_CORE_DIR}"/core.sh ]; then        
-        . "${DOLIBS_CORE_DIR}"/core.sh
+    if [ -f "${DOLIBS_CORE_DIR}/${DOLIBS_MAIN_FILE}" ]; then        
+        . "${DOLIBS_CORE_DIR}/${DOLIBS_MAIN_FILE}"
         exitOnError "Could not import DevOps Libs"
     else
         exitOnError "Could not find DevOps Libs (offline mode?)" 1
@@ -259,4 +280,5 @@ fi
 # Check required binaries
 # git
 # diff
+# tr
 # shasum
