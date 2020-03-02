@@ -54,7 +54,7 @@ function devOpsLibsClone() {
         # Update retrieved lib status
         cat << EOF > ${DOLIBS_STATUS}
 branch:${DOLIBS_BRANCH}
-hash:$(git rev-parse HEAD)
+hash:$(cd ${DOLIBS_TMP_DIR}; git rev-parse HEAD)
 updated:$(date)
 user:$(git config user.name)
 email:$(git config user.email)
