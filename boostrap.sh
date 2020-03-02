@@ -121,7 +121,7 @@ function dolibImportFiles() {
     exitOnError "Could not create the '${LIB_DIR}' folder"
 
     # Copy the files (ignore the auto generated)
-    find "${LIB_SOURCE_DIR}" -maxdepth 1 -type f \( ! -iname ".source.cfg" ! -iname ".source.state" ! -iname ".lib.shasum" \) -exec cp {} ${LIB_DIR} \;
+    find "${LIB_SOURCE_DIR}" -maxdepth 1 -type f \( ! -iname ".source.cfg" ! -iname ".source.state" ! -iname ".lib.shasum" \) -exec cp {} "${LIB_DIR}" \;
     exitOnError "Could not import the '${LIB_SOURCE_DIR}' library files"
 
     # Add the checksum file

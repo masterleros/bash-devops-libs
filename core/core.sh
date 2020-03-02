@@ -23,7 +23,7 @@ function dolibReworkFunction() {
 
     ### NEW ###
     # Get function content
-    local _funcBody=$(declare -f  ${_funct} | tail -n +3 | head -n -1)
+    local _funcBody=$(declare -f "${_funct}" | tail -n +3 | head -n -1)
 
     # rework function content
     _funcBody=${_funcBody//exceptOnError/local _eCode='${?}'; [ '${_eCode}' == 0 ] || raise '${_eCode}' && return '${_eCode}'}

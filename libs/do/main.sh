@@ -13,8 +13,10 @@
 #    limitations under the License.
 
 #!/bin/bash
-source ${SELF_LIB_DIR}/base.sh
-source ${SELF_LIB_DIR}/docs.sh
+
+# Include its components
+. "${SELF_LIB_DIR}/base.sh"
+. "${SELF_LIB_DIR}/docs.sh"
 
 # @description Use build-in libraries to be used in a script
 # @arg $@ list List of libraries names

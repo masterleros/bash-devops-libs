@@ -23,10 +23,10 @@ exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0
 [ ! "${DOLIBS_LOADED}" ] || exitOnError "You cannot include twice the core library"
 
 # Include core components (sequence is sensitive)
-. ${DOLIBS_CORE_DIR}/output.sh
-. ${DOLIBS_CORE_DIR}/args.sh
-. ${DOLIBS_CORE_DIR}/except.sh
-. ${DOLIBS_CORE_DIR}/core.sh
+. "${DOLIBS_CORE_DIR}/output.sh"
+. "${DOLIBS_CORE_DIR}/args.sh"
+. "${DOLIBS_CORE_DIR}/except.sh"
+. "${DOLIBS_CORE_DIR}/core.sh"
 
 # Export all values required for sub-processes
 # be able to use the core lib
