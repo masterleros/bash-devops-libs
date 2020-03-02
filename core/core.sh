@@ -52,9 +52,11 @@ function dolibCreateLibFunctions() {
     getArgs "_lib _libDir" "${@}"
 
     # Set the function local context
+    local SELF_LIB="${_lib}"
+    local SELF_LIB_DIR="${_libDir}"
     local _funcHeader='
-local CURRENT_LIB='${_lib}'
-local CURRENT_LIB_DIR='${_libDir}'
+local SELF_LIB='${SELF_LIB}'
+local SELF_LIB_DIR='${SELF_LIB_DIR}'
 if [ ${-//[^e]/} ]; then 
     set +e
     ${FUNCNAME} "${@}"
@@ -68,15 +70,18 @@ fi
     local _libEntrypoint=${_libDir}/${DOLIBS_MAIN_FILE}
     [ -f "${_libEntrypoint}" ] || exitOnError "It was not posible to find '${_lib}' entrypoint at '${_libEntrypoint}'"
 
-    # Get the lib funcions
-    local _libFuncts=($(bash -c '. '"${_libEntrypoint}"' &> /dev/null; typeset -F' | awk '{print $NF}'))    
+    # Get current funcions
+    local _currFuncts=($(typeset -F | awk '{print $NF}'))
 
-    # Import lib functions
+    # Import lib
     source "${_libEntrypoint}"
     exitOnError "Error importing '${_libEntrypoint}'"
 
-    # Remove Core functions
-    for _coreFunc in ${DOLIBS_CORE_FUNCT[@]}; do _libFuncts=("${_libFuncts[@]/${_coreFunc}}"); done
+    # Get new functions
+    local _libFuncts=($(typeset -F | awk '{print $NF}'))
+
+    # Remove last functions
+    for _currFunct in ${_currFuncts[@]}; do _libFuncts=("${_libFuncts[@]/${_currFunct}}"); done
 
     # Rename functions
     _return=0

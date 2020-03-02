@@ -13,7 +13,8 @@
 #    limitations under the License.
 
 #!/bin/bash
-source $(dirname "${BASH_SOURCE[0]}")/base.sh
+source ${SELF_LIB_DIR}/base.sh
+source ${SELF_LIB_DIR}/docs.sh
 
 # @description Use build-in libraries to be used in a script
 # @arg $@ list List of libraries names
@@ -96,7 +97,7 @@ function import() {
                 fi
 
                 # Update lib if rquired
-                dolibUpdate "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}"
+                dolibUpdate "${_lib}" "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}"
 
                 # Create/update documentation if lib was updated
                 [ ${?} == 0 ] || self document "${_libRootDir}" "${DOLIBS_DOCUMENTATION_DIR}/${_libNamespace}.md" "${_libNamespace}"                

@@ -17,47 +17,18 @@ export DOLIBS_MAIN_FILE="main.sh"
 DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
-### Show a info text
-# usage: echoInfo <text>
-function echoInfo() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="INFO:  "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}"
-        _textToPrint="       "
-    done
-}
-
-### Show a test in the stderr
-# usage: echoError <text>
-function echoError() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="ERROR: "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}" >&2
-        _textToPrint="       "
-    done
-}
-
-### Exit program with text when last exit code is non-zero ###
-# usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
+### Temporary functions ###
 function exitOnError() {
-    local _errorCode=${2:-$?}
-    local _errorText=${1}
-    if [ "${_errorCode}" -ne 0 ]; then
-        if [ ! -z "${_errorText}" ]; then
-            echoError "${_errorText}"
-        else
-            echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
-        fi
+    if [ "${2:-$?}" != 0 ]; then
+        echo "ERROR:  ${1}"
         echo "Exiting (${_errorCode})..."
         exit "${_errorCode}"
     fi
 }
+function echoInfo() {
+    echo "INFO:   ${1}"
+}
+### Temporary functions ###
 
 ### Function to clone the lib code ###
 # usage: dolibGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
@@ -124,18 +95,18 @@ function dolibGitOutDated() {
 ### Function to indicate if the source if different than the lib ###
 # usage: dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
 function dolibSourceUpdated() {
-    local SOURCE_DIR=${1}
+    local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
 
     # Validate source and lib folder differences
-    [ "$(cd "${SOURCE_DIR}"; find -maxdepth 1 -type f -exec diff {} "${LIB_DIR}"/{} \; 2>&1)" ]
+    [ "$(cd "${LIB_SOURCE_DIR}"; find -maxdepth 1 -type f -exec diff {} "${LIB_DIR}"/{} \; 2>&1)" ]
 }
 
 ### Import Lib files ###
 # Usage: dolibImportFiles <SOURCE_DIR> <LIB_DIR>
 function dolibImportFiles() {
     
-    local SOURCE_DIR=${1}
+    local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
     local LIB=${3}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
@@ -143,11 +114,11 @@ function dolibImportFiles() {
     echoInfo "Installing '${LIB}' code..."
 
     # Check if the lib entrypoint exists
-    [ -f "${SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${SOURCE_DIR}' not found! (does it need add source?)"
+    [ -f "${LIB_SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${LIB_SOURCE_DIR}' not found! (does it need add source?)"
 
     # Create lib dir and copy
-    mkdir -p "${LIB_DIR}" && cp "${SOURCE_DIR}"/*.* "${LIB_DIR}"
-    exitOnError "Could not import the '${SOURCE_DIR}' library files"
+    mkdir -p "${LIB_DIR}" && cp "${LIB_SOURCE_DIR}"/*.* "${LIB_DIR}"
+    exitOnError "Could not import the '${LIB_SOURCE_DIR}' library files"
 
     # Add the checksum file
     shasum=$(find "${LIB_DIR}" -maxdepth 1 -type f ! -path "${LIB_SHASUM_PATH}" -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
@@ -180,38 +151,41 @@ function dolibNotIntegral() {
 # return 0 if updated, 1 if not present, 2 if git updated, 3 if source updated
 function dolibUpdate() {
 
-    local SOURCE_DIR=${1}
-    local LIB_ROOT_DIR=${2}
-    local LIB_SUB_DIR=${3}
-    local GIT_DIR=${4}
+    local LIB=${1}
+    local LIB_SOURCE_DIR=${2}
+    local LIB_ROOT_DIR=${3}
+    local LIB_SUB_DIR=${4}
+    local GIT_DIR=${5}
     local LIB_DIR=${LIB_ROOT_DIR}; [ "${LIB_SUB_DIR}" ] && LIB_DIR="${LIB_ROOT_DIR}/${LIB_SUB_DIR}"
-    local LIB=$(realpath "${LIB_DIR}" --relative-to="${DOLIBS_DIR}")
+    local _result=0
 
     # AUTO mode
     if [ "${DOLIBS_MODE}" == 'auto' ]; then
         # If the lib is not integral, needs to update
         if dolibNotIntegral "${LIB_DIR}"; then
             echoInfo "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
-            dolibImportFiles "${SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
-            return 1
+            _result=1
         fi
     # ONLINE mode
     elif [ "${DOLIBS_MODE}" == 'online' ]; then
         # If the lib is outdated, clone it
         if [ "${GIT_DIR}" ] && dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
             echoInfo "GIT Source has changed for '${LIB}', trying to get its code..."
-            dolibGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
-            dolibImportFiles "${SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
-            return 2
+            _result=2
         # If the lib is outdated, copy it
-        elif dolibSourceUpdated "${SOURCE_DIR}" "${LIB_DIR}"; then
+        elif dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
             echoInfo "Local source has changed for '${LIB}', trying to get its code..."
-            dolibImportFiles "${SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
-            return 3
+            _result=3
         fi
     fi
 
-    return 0
+    # if needs to update
+    if [ "${_result}" != 0 ]; then
+        [ "${GIT_DIR}" ] && dolibGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
+        dolibImportFiles "${LIB_SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
+    fi
+
+    return ${_result}
 }
 
 # Show operation mode
@@ -224,7 +198,7 @@ else
 fi
 
 # If Core library was not yet loaded
-if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
+if [ ! "${DOLIBS_LOADED}" ]; then
 
     # core folder
     DOLIBS_CORE_DIR=${DOLIBS_DIR}/core
@@ -246,7 +220,7 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
 
         # Update lib if rquired
-        dolibUpdate "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}"
+        dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}"
 
         # If lib was updated, update others required
         if [ ${?} != 0 ]; then

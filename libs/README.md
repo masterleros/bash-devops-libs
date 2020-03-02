@@ -5,7 +5,7 @@ When you develop a new library, some steps should be followed:
 
 ### Inside your global script code:
 1. Place your library as `libs/<LIB_NAME>/main.sh` file. This will implicitly recognize the library "<LIB_NAME>lib", example:
-> **Info:**  `CURRENT_LIB` (your own library name) and `CURRENT_LIB_DIR` (your library base dir) variables will be already defined for your usage.
+> **Info:**  `SELF_LIB` (your own library name) and `SELF_LIB_DIR` (your library base dir) variables will be already defined for your usage.
 
 2. Verify the required dependencies for your execution, example:
     ``` sh
@@ -21,8 +21,8 @@ When you develop a new library, some steps should be followed:
     ``` sh
     # This will add the code from additional_functions.sh 
     # and other_functions.sh files inside your lib folder
-    source ${CURRENT_LIB_DIR}/additional_functions.sh || return ${?}
-    source ${CURRENT_LIB_DIR}/other_functions.sh || return ${?}
+    source ${SELF_LIB_DIR}/additional_functions.sh || return ${?}
+    source ${SELF_LIB_DIR}/other_functions.sh || return ${?}
     ```
 
 4. Include other libraries:
@@ -112,14 +112,14 @@ do.validateVars example_var || return ${?}
 do.verifyDeps example_dep || return ${?}
 
 # Import sub-modules
-source ${CURRENT_LIB_DIR}/additional_functions.sh || return ${?}
+source ${SELF_LIB_DIR}/additional_functions.sh || return ${?}
 
 # Import other required libs
 do.use utils
 
 # Declare your functions
 function doOtherThing() {
-    _return=${CURRENT_LIB_DIR}
+    _return=${SELF_LIB_DIR}
 }
 
 function doSomething() {

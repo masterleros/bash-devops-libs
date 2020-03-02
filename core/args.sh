@@ -17,7 +17,7 @@
 # Usage: self <function> <args>
 function self() {
     _function=${1}; shift
-    "${CURRENT_LIB}.${_function}" "${@}"
+    "${SELF_LIB}.${_function}" "${@}"
     return ${?}
 }
 
@@ -35,7 +35,7 @@ function assign() {
     # Case function is self
     if [ "${_returnFunc}" == "self" ]; then
         _returnFunc=${1}; shift
-        _returnFunc=${CURRENT_LIB}.${_returnFunc}        
+        _returnFunc=${SELF_LIB}.${_returnFunc}        
     fi
 
     # If desired varibla is not return

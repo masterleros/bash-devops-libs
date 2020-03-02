@@ -20,15 +20,17 @@ awk 'BEGIN { exit ARGV[1] < 4.3 }' "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}"
 exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]})"
 
 # Check if not being included twice
-[ ! "${DOLIBS_CORE_FUNCT}" ]; exitOnError "You cannot include twice the core library"
+[ ! "${DOLIBS_LOADED}" ] || exitOnError "You cannot include twice the core library"
 
-# Include core components
+# Include core components (sequence is sensitive)
+. ${DOLIBS_CORE_DIR}/output.sh
 . ${DOLIBS_CORE_DIR}/args.sh
 . ${DOLIBS_CORE_DIR}/except.sh
 . ${DOLIBS_CORE_DIR}/core.sh
 
 # Export all values required for sub-processes
 # be able to use the core lib
+export DOLIBS_LOADED=true
 export DOLIBS_MODE=${DOLIBS_MODE}
 export DOLIBS_REPO=${DOLIBS_REPO}
 export DOLIBS_BRANCH=${DOLIBS_BRANCH}
@@ -37,17 +39,7 @@ export DOLIBS_ROOTDIR=${DOLIBS_ROOTDIR}
 export DOLIBS_TMPDIR=${DOLIBS_TMPDIR}
 export DOLIBS_LIBS_DIR=${DOLIBS_DIR}/libs
 export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
-export DOLIBS_DOCUMENTATION_DIR=${DOLIBS_DIR}/docs
-export DOLIBS_SHDOC_BIN=${DOLIBS_SHDOC_DIR}/shdoc.awk
 
-# Export all core functions for sub-bash executions 
-# so that are not included when listing includes 
-# functions when importing others
-export DOLIBS_CORE_FUNCT=$(typeset -F | awk '{print $NF}')
-for funct in ${DOLIBS_CORE_FUNCT[@]}; do
-    export -f "${funct}"
-done
-
-# Import main dolibs functions
-dolibUpdate "${DOLIBS_SOURCE_CORE_DIR}/do" "${DOLIBS_CORE_DIR}" "do"
-dolibCreateLibFunctions "do" "${DOLIBS_CORE_DIR}/do"
+# Import main do functions (to manage libs)
+dolibUpdate "do" "${DOLIBS_SOURCE_LIBS_DIR}/do" "${DOLIBS_LIBS_DIR}" "do"
+dolibCreateLibFunctions "do" "${DOLIBS_LIBS_DIR}/do"
