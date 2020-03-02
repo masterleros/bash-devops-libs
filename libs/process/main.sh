@@ -19,9 +19,9 @@ function execute() {
 
     # Execute the command
     #eval time ${_command[@]} &>${_outfile} &
-    export TIME='INFO:   Process ended\nINFO:   Elapsed Time: %Es'
-    echo "INFO:   Executing: 'eval $(which time) ${_command[@]}'" >${_outfile}
-    eval $(which time) ${_command[@]} &>>${_outfile} &
+    export TIME='INFO:   Process ended\nINFO:   Elapsed Time: %E'
+    echo "INFO:   Executing: '$(which time) ${_command[@]}'" >${_outfile}
+    $(which time) ${_command[@]} &>>${_outfile} &
     _return=${!}
 
     # Store the command for future track    
