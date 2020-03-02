@@ -99,7 +99,7 @@ function dolibSourceUpdated() {
     local LIB_DIR=${2}
 
     # Validate source and lib folder differences
-    [ "$(cd "${LIB_SOURCE_DIR}"; find -maxdepth 1 -type f -exec diff {} "${LIB_DIR}"/{} \; 2>&1)" ]
+    [ "$(cd "${LIB_SOURCE_DIR}"; find -maxdepth 1 -type f \( ! -iname ".source.cfg" ! -iname ".source.state" ! -iname ".lib.shasum" \) -exec diff {} "${LIB_DIR}"/{} \; 2>&1)" ]
 }
 
 ### Import Lib files ###
@@ -116,8 +116,12 @@ function dolibImportFiles() {
     # Check if the lib entrypoint exists
     [ -f "${LIB_SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${LIB_SOURCE_DIR}' not found! (does it need add source?)"
 
-    # Create lib dir and copy
-    mkdir -p "${LIB_DIR}" && cp "${LIB_SOURCE_DIR}"/*.* "${LIB_DIR}"
+    # Create lib dir
+    mkdir -p "${LIB_DIR}"
+    exitOnError "Could not create the '${LIB_DIR}' folder"
+
+    # Copy the files (ignore the auto generated)
+    find "${LIB_SOURCE_DIR}" -maxdepth 1 -type f \( ! -iname ".source.cfg" ! -iname ".source.state" ! -iname ".lib.shasum" \) -exec cp {} ${LIB_DIR} \;
     exitOnError "Could not import the '${LIB_SOURCE_DIR}' library files"
 
     # Add the checksum file
@@ -201,8 +205,7 @@ fi
 if [ ! "${DOLIBS_LOADED}" ]; then
 
     # core folder
-    DOLIBS_CORE_DIR=${DOLIBS_DIR}/core
-    DOLIBS_SHDOC_DIR=${DOLIBS_CORE_DIR}/shdoc
+    DOLIBS_CORE_DIR=${DOLIBS_DIR}/core    
 
     # If not working offline
     if [ "${DOLIBS_MODE}" != 'offline' ]; then
@@ -224,10 +227,6 @@ if [ ! "${DOLIBS_LOADED}" ]; then
 
         # If lib was updated, update others required
         if [ ${?} != 0 ]; then
-
-            # Create doc folder and copy shdoc (documentation)
-            mkdir -p "${DOLIBS_SHDOC_DIR}"
-            cp "${DOLIBS_SOURCE_CORE_DIR}"/shdoc/* "${DOLIBS_SHDOC_DIR}"
 
             # Copy the gitignore
             cp "${DOLIBS_SOURCE_DIR}"/.gitignore "${DOLIBS_DIR}"

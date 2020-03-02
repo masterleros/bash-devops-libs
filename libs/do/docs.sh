@@ -16,7 +16,7 @@
 
 # Define required values
 export DOLIBS_DOCUMENTATION_DIR=${DOLIBS_DIR}/docs
-export DOLIBS_SHDOC_BIN=${DOLIBS_SHDOC_DIR}/shdoc.awk
+export DOLIBS_SHDOC_BIN=${SELF_LIB_DIR}/shdoc.awk
 
 # @description Generate the markdown documentation of a lib
 # @arg dir path Directory of the library to be documented
