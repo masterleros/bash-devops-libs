@@ -136,6 +136,7 @@ function verifyDeps() {
 # usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
 # when a variable name starts with @<var> it will take the rest of values
 # when a variable name starts with &<var> it is optional and script will not fail case there is no value for it
+# when a variable has an <var>=<value> format, it will take a default value
 function getArgs() {
 
     local _result=0
@@ -143,8 +144,20 @@ function getArgs() {
     local _var
 
     for _var in "${_args[@]}"; do
-        shift        
-        # if has # the argument is optional
+        shift
+
+        # if has = the argument has default value
+        if [[ ${_var} == *"="* ]]; then
+            local _default=$(echo ${_var}| sed 's/.*=//')
+            _var=$(echo ${_var}| sed 's/=.*//')
+            # no args to shift, we are good with the default
+            if [ ! "${1}" ]; then
+              eval "$(echo ${_var}='${_default}')"
+              continue
+            fi
+        fi
+
+        # if has & the argument is optional
         if [[ ${_var} == "&"* ]]; then
             _var=$(echo ${_var}| sed 's/&//')
         elif [ ! "${1}" ]; then
