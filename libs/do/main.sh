@@ -35,9 +35,10 @@ function use() {
         # Local source
         elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
             self addLocalSource "${_libNamespace}" "${DOLIBS_SOURCE_LIBS_DIR}/${_libNamespace}"
-        # Git source
+        # Git source (pointing to local where dolibs was already cloned)
         else
-            self addGitSource "${_libNamespace}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "libs/${_libNamespace}"
+            self addLocalSource "${_libNamespace}" "${DOLIBS_GIT_DIR}/libs/${_libNamespace}"
+            #self addGitSource "${_libNamespace}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "libs/${_libNamespace}"
         fi
     done
 
