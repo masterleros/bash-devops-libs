@@ -14,28 +14,61 @@
 
 #!/bin/bash
 
+### Empty function that receives the function/code 
+#content to be reworked
+function dolibReworkCode() {
+    ${PLUGIN_PLACEHOLDER}
+}
+
+### Import a module
+function dolibImportModule() {
+
+    # Import the module
+    . "${1}"
+
+    # If the __rework function exist
+    if [ "$(declare -F __rework)" ]; then
+
+        # Get the rework function from the module
+        local newCode=$(declare -f __rework | tail -n +3 | head -n -1)
+
+        # Get current rework code
+        local funcCode=$(declare -f dolibReworkCode | tail -n +3 | head -n -1)
+        # Redeclare the function with the  new modules rework code
+        eval "$(echo "dolibReworkCode() {"; echo "${funcCode/'${PLUGIN_PLACEHOLDER}'/"${newCode}"';${PLUGIN_PLACEHOLDER}'}"; echo "}")"
+
+        # Unset the module rework function    
+        unset -f __rework
+
+        # Export the new function for sub-processes
+        export -f dolibReworkCode
+    fi
+}
+
 ### Rework a function
 # Usage: dolibReworkFunction <_funct> [_newFunc]
 # obs: _newFunc is optional in case of changing its name
 function dolibReworkFunction() {
 
-    getArgs "_funct &_newFunc" "${@}"
+    local _funct=${1}
+    local _newFunc=${2}
 
-    ### NEW ###
-    # Get function content
-    local _funcBody=$(declare -f "${_funct}" | tail -n +3 | head -n -1)
-
-    # rework function content
-    _funcBody=${_funcBody//exceptOnError/local _eCode='${?}'; [ '${_eCode}' == 0 ] || raise '${_eCode}' && return '${_eCode}'}
-
-    # Reasembly the function
+    # If no new function name is given, use the current one
     [ "${_newFunc}" ] || _newFunc="${_funct}"
-    local _funcDeclare=$(echo "${_newFunc}() {"; echo "${_funcHeader}"; echo "${_funcBody}"; echo })
+
+    # Get function content
+    local body=$(declare -f "${_funct}" | tail -n +3 | head -n -1)
+
+    # if no body, exit with error
+    [ "$(declare -f ${_funct})" ] || exitOnError "Function '${_funct}' does not exist"
+    
+    # Execute the modules rework
+    dolibReworkCode
 
     # Export the reworked function
-    eval "${_funcDeclare}"
+    eval "$(echo "${_newFunc}() {"; echo "${_funcHeader}"; echo "${body}"; echo "}")"
 
-    # Unset old function name
+    # Unset old function name if is different than original
     [ "${_funct}" == "${_newFunc}" ] || unset -f "${_funct}"
 
     # Export the new function for sub-processes
@@ -49,43 +82,48 @@ function dolibReworkFunction() {
 # Usage: dolibCreateLibFunctions <_lib> <lib_dir>
 function dolibCreateLibFunctions() {
 
-    getArgs "_lib _libDir" "${@}"
+    local _lib=${1}
+    local _libDir=${2}
 
-    # Set the function local context
+    # Set the function local context, this is required because    
+    # these values can be used when sourcing the new lib code
     local SELF_LIB="${_lib}"
     local SELF_LIB_DIR="${_libDir}"
     local _funcHeader='
-local SELF_LIB='${SELF_LIB}'
-local SELF_LIB_DIR='${SELF_LIB_DIR}'
-if [ ${-//[^e]/} ]; then 
-    set +e
-    ${FUNCNAME} "${@}"
-    _result=${?}
-    set -e
-    return ${_result}
-fi
-'
+    local SELF_LIB='${SELF_LIB}'
+    local SELF_LIB_DIR='${SELF_LIB_DIR}'
+    if [ ${-//[^e]/} ]; then 
+        set +e
+        ${FUNCNAME} "${@}"
+        _result=${?}
+        set -e
+        return ${_result}
+    fi'
+    ############################
 
     # Check the lib entrypoint
     local _libEntrypoint=${_libDir}/${DOLIBS_MAIN_FILE}
     [ -f "${_libEntrypoint}" ] || exitOnError "It was not posible to find '${_lib}' entrypoint at '${_libEntrypoint}'"
 
     # Get current funcions
-    local _currFuncts=($(typeset -F | awk '{print $NF}'))
+    local _currFuncts=$(typeset -F)
 
     # Import lib
     source "${_libEntrypoint}"
     exitOnError "Error importing '${_libEntrypoint}'"
 
     # Get new functions
-    local _libFuncts=($(typeset -F | awk '{print $NF}'))
-
-    # Remove last functions
-    for _currFunct in ${_currFuncts[@]}; do _libFuncts=("${_libFuncts[@]/${_currFunct}}"); done
+    local _libFuncts=($((typeset -F; echo "${_currFuncts}") | sort | uniq -u | awk '{print $NF}'))
 
     # Rename functions
     _return=0
     for _libFunct in ${_libFuncts[@]}; do
+
+        # Remove last functions
+        for _currFunct in ${_currFuncts[@]}; do 
+            _libFuncts=("${_libFuncts[@]/^${_currFunct}*/}"); 
+        done
+
         # If function is not already imported
         if [[ ${_libFunct} != *"."* ]]; then
             # New lib name
@@ -93,7 +131,6 @@ fi
 
             # Rework the function
             dolibReworkFunction "${_libFunct}" "${_libFunctNew}"
-
     
             ((_return+=1))
         fi

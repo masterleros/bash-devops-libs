@@ -22,11 +22,14 @@ exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0
 # Check if not being included twice
 [ ! "${DOLIBS_LOADED}" ] || exitOnError "You cannot include twice the core library"
 
-# Include core components (sequence is sensitive)
-. "${DOLIBS_CORE_DIR}/output.sh"
-. "${DOLIBS_CORE_DIR}/args.sh"
-. "${DOLIBS_CORE_DIR}/except.sh"
+# Include core
 . "${DOLIBS_CORE_DIR}/core.sh"
+
+# Import modules
+for DOLIBS_MODULE in $(ls "${DOLIBS_CORE_DIR}/"mod-*.*); do
+    # echoInfo "Loading '${DOLIBS_MODULE}' module..."
+    dolibImportModule "${DOLIBS_MODULE}"
+done
 
 # Export all values required for sub-processes
 # be able to use the core lib

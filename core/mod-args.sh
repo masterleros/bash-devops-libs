@@ -12,6 +12,32 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# Rework imported code
+function __rework() {
+
+    # For each instance found
+    for lineFound in "$(echo "${body}" | grep getArgs)"; do
+        if [ "${lineFound}" ]; then
+            
+            local var
+            local definitions=""
+            local reworked=""
+            local newline=$'\n'
+            local toRework=($(echo "${lineFound}" | cut -d '"' -f2))    
+
+            # Get each defined var
+            for var in ${toRework[@]}; do
+                var=${var/&}; var=${var/@}; 
+                definitions="${definitions} local ${var}${newline}"            
+                reworked="${reworked} ${var/=*}"
+            done
+
+            # Update the code
+            body=${body/"${lineFound}"/"${definitions} getArgs \"${reworked}\" \"\${@}\""}
+        fi
+    done
+}
+
 #!/bin/bash
 ### Consume an internal library ###
 # Usage: self <function> <args>
