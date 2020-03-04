@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +13,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
 
 TESTS_DIR="tests"
 CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") >/dev/null 2>&1 && pwd)
 
 ### Print a nice title ###
 # usage: _showTestTitle "text"
-function _showTestTitle {
+function _showTestTitle() {
     local _len=$(echo "- ${1} -"| wc -c)
     separator=$(eval printf '\=%.0s' {2.."${_len}"}})
     echo "${separator}"

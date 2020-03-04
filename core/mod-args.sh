@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +39,6 @@ function __rework() {
     done
 }
 
-#!/bin/bash
 ### Consume an internal library ###
 # Usage: self <function> <args>
 function self() {
