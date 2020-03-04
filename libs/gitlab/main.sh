@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
 
 ### This funciton will map environment variables to the final name ###
 # Usage: convertEnvVars <CI_COMMIT_REF_NAME> <DOLIBS_BRANCHES_DEFINITION>

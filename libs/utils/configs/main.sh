@@ -1,3 +1,4 @@
+#!/bin/bash
  
 #    Copyright 2020 Leonardo Andres Morales
 
@@ -13,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
 
 # @description Get values from file's variables and set into same given variable names
 # @arg file path Path to the file
