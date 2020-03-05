@@ -21,11 +21,11 @@ if [ ! "${BASH}" ]; then echo "Current OS is not running on bash interpreter" >&
 
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_MODE="auto"
-DOLIBS_BRANCH="develop"
+DOLIBS_BRANCH="feature/advanced-function-import"
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_ROOTDIR=$(cd $(dirname "${BASH_SOURCE[0]}")/ >/dev/null 2>&1 && pwd)
 DOLIBS_DIR=${DOLIBS_ROOTDIR}/dolibs
-DOLIBS_BOSTRAP="https://raw.githubusercontent.com/masterleros/bash-devops-libs/${DOLIBS_BRANCH}/boostrap.sh"
+DOLIBS_GIT_BOSTRAP="https://raw.githubusercontent.com/masterleros/bash-devops-libs/${DOLIBS_BRANCH}/boostrap.sh"
 ### DEVOPS LIBS DEFINITIONS ###
 
 # DevOps libs options
@@ -49,9 +49,10 @@ while [ "${1}" != "" ]; do
 done
 
 # If not mode offline
+DOLIBS_BOSTRAP="${DOLIBS_DIR}/boostrap-${DOLIBS_BRANCH//\//-}.sh"
 if [ "${DOLIBS_MODE}" != "offline" ]; then
     # Clone the boostrap if in online mode or it does not exist (auto mode)
-    if [ "${DOLIBS_MODE}" == "online" ] || [ ! -f "${DOLIBS_DIR}/boostrap.sh" ]; then
+    if [ "${DOLIBS_MODE}" == "online" ] || [ ! -f "${DOLIBS_BOSTRAP}" ]; then
 
         # Create the lib folder
         [ -d "${DOLIBS_DIR}" ] || mkdir -p "${DOLIBS_DIR}"
@@ -60,13 +61,13 @@ if [ "${DOLIBS_MODE}" != "offline" ]; then
 
         # Get the boostrap
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
-            cp "${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh" "${DOLIBS_DIR}/boostrap.sh"
+            cp "${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh" "${DOLIBS_BOSTRAP}"
         else
-            curl -s -H 'Cache-Control: no-cache' --fail "${DOLIBS_BOSTRAP}" -o "${DOLIBS_DIR}/boostrap.sh"
+            curl -s -H 'Cache-Control: no-cache' --fail "${DOLIBS_GIT_BOSTRAP}" -o "${DOLIBS_BOSTRAP}"            
         fi
 
         # If there is a problem, exit
-        if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to retrieve the boostraper, exiting..."; exit -1; fi
+        if [ ${?} -ne 0 ]; then echo "ERROR: It was not possible to retrieve the boostraper (check source), exiting..."; exit -1; fi
     fi
 fi
 
@@ -75,11 +76,12 @@ fi
 # [ ${set_e_enabled} ] || set -e
 
 # Execute the boostrap if is present
-if [ ! -f "${DOLIBS_DIR}/boostrap.sh" ]; then
-    echo "ERROR: It was not possible to find the boostrap in '${DOLIBS_DIR}' (offline mode?)"
+if [ ! -f "${DOLIBS_BOSTRAP}" ]; then
+    echo "ERROR: It was not possible to find the boostrap at '${DOLIBS_BOSTRAP}' (offline mode?)"
     exit -1
 fi
 
-. "${DOLIBS_DIR}/boostrap.sh"
+echo "executing ${DOLIBS_BOSTRAP}"
+. "${DOLIBS_BOSTRAP}"
 
 #[ ${set_e_enabled} ] || set +e # Disable set e if was enabled
