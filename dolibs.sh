@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
 # @file dolibs.sh
 # @brief This is de main entrypoint for the lib and needs to be copied whithin your source files, then it needs to be included
 
