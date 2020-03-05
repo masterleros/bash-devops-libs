@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,5 +13,4 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
 source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs

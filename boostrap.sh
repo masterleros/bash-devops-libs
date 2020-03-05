@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,56 +13,26 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#!/bin/bash
 export DOLIBS_MAIN_FILE="main.sh"
 DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
-### Show a info text
-# usage: echoInfo <text>
-function echoInfo() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="INFO:  "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}"
-        _textToPrint="       "
-    done
-}
-
-### Show a test in the stderr
-# usage: echoError <text>
-function echoError() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="ERROR: "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}" >&2
-        _textToPrint="       "
-    done
-}
-
-### Exit program with text when last exit code is non-zero ###
-# usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
+### Temporary functions ###
 function exitOnError() {
-    local _errorCode=${2:-$?}
-    local _errorText=${1}
-    if [ "${_errorCode}" -ne 0 ]; then
-        if [ ! -z "${_errorText}" ]; then
-            echoError "${_errorText}"
-        else
-            echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
-        fi
+    if [ "${2:-$?}" != 0 ]; then
+        echo "ERROR:  ${1}"
         echo "Exiting (${_errorCode})..."
         exit "${_errorCode}"
     fi
 }
+function echoInfo() {
+    echo "INFO:   ${1}"
+}
+### Temporary functions ###
 
 ### Function to clone the lib code ###
-# usage: libGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
-function libGitClone() {
+# usage: dolibGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
+function dolibGitClone() {
 
     local GIT_REPO=${1}
     local GIT_BRANCH=${2}
@@ -97,8 +68,8 @@ EOF
 }
 
 ### Function to indicate if the lib code is outdated ###
-# usage: libGitOutDated <LIB_ROOT_DIR>
-function libGitOutDated() {
+# usage: dolibGitOutDated <LIB_ROOT_DIR>
+function dolibGitOutDated() {
 
     local LIB_ROOT_DIR=${1}
     local GIT_DIR=${2}
@@ -111,7 +82,7 @@ function libGitOutDated() {
     [ -d "${GIT_DIR}" ] || return 0
 
     # Get local status
-    local GIT_BRANCH=$(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-)    
+    local GIT_BRANCH=$(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-)
     local GIT_HASH=$(< "${SOURCE_STATE}" grep GIT_HASH | cut -d':' -f2-)
 
     # Get git remote hash
@@ -121,21 +92,36 @@ function libGitOutDated() {
     [ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]
 }
 
+### Function to indicate if the lib code is outdated ###
+# usage: dolibGitWrongBranch <LIB_ROOT_DIR> <GIT_BRANCH>
+function dolibGitWrongBranch() {
+
+    local LIB_ROOT_DIR=${1}
+    local GIT_BRANCH=${2}
+    local SOURCE_STATE="${LIB_ROOT_DIR}/.source.state"
+
+    # If state dos not exist
+    [ -f "${SOURCE_STATE}" ] || return 0
+
+    # Return if current state branch is different than required
+    [ "${GIT_BRANCH}" != $(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-) ]
+}
+
 ### Function to indicate if the source if different than the lib ###
-# usage: libSourceUpdated <SOURCE_DIR> <LIB_DIR>
-function libSourceUpdated() {
-    local SOURCE_DIR=${1}
+# usage: dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
+function dolibSourceUpdated() {
+    local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
 
     # Validate source and lib folder differences
-    [ "$(cd "${SOURCE_DIR}"; find -maxdepth 1 -type f -exec diff {} "${LIB_DIR}"/{} \; 2>&1)" ]
+    [ "$(cd "${LIB_SOURCE_DIR}"; find -maxdepth 1 -type f \( ! -iname ".source.cfg" ! -iname ".source.state" ! -iname ".lib.shasum" \) -exec diff {} "${LIB_DIR}"/{} \; 2>&1)" ]
 }
 
 ### Import Lib files ###
-# Usage: libImportFiles <SOURCE_DIR> <LIB_DIR>
-function libImportFiles() {
+# Usage: dolibImportFiles <SOURCE_DIR> <LIB_DIR>
+function dolibImportFiles() {
     
-    local SOURCE_DIR=${1}
+    local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
     local LIB=${3}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
@@ -143,11 +129,15 @@ function libImportFiles() {
     echoInfo "Installing '${LIB}' code..."
 
     # Check if the lib entrypoint exists
-    [ -f "${SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${SOURCE_DIR}' not found! (does it need add source?)"
+    [ -f "${LIB_SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${LIB_SOURCE_DIR}' not found! (does it need add source?)"
 
-    # Create lib dir and copy
-    mkdir -p "${LIB_DIR}" && cp "${SOURCE_DIR}"/*.* "${LIB_DIR}"
-    exitOnError "Could not import the '${SOURCE_DIR}' library files"
+    # Create lib dir
+    mkdir -p "${LIB_DIR}"
+    exitOnError "Could not create the '${LIB_DIR}' folder"
+
+    # Copy the files (ignore the auto generated)
+    find "${LIB_SOURCE_DIR}" -maxdepth 1 -type f \( ! -iname ".source.cfg" ! -iname ".source.state" ! -iname ".lib.shasum" \) -exec cp {} "${LIB_DIR}" \;
+    exitOnError "Could not import the '${LIB_SOURCE_DIR}' library files"
 
     # Add the checksum file
     shasum=$(find "${LIB_DIR}" -maxdepth 1 -type f ! -path "${LIB_SHASUM_PATH}" -exec sha1sum {} \; | sha1sum | cut -d' ' -f1)
@@ -155,8 +145,8 @@ function libImportFiles() {
 }
 
 ### Check if the libs files are valid ###
-# Usage: libNotIntegral <LIB_DIR>
-function libNotIntegral() {
+# Usage: dolibNotIntegral <LIB_DIR>
+function dolibNotIntegral() {
     
     local LIB_DIR=${1}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
@@ -174,21 +164,68 @@ function libNotIntegral() {
     [ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]    
 }
 
+### Detect if code needs to be updated ###
+# Usage: libNeedsUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
+# obs: if not GIT_DIR is provided, it's threated as local source
+# return 0 if updated, 1 if not present, 2 if auto mode but branch changed, 3 if git updated, 4 if source updated
+function dolibUpdate() {
+
+    local LIB=${1}
+    local LIB_SOURCE_DIR=${2}
+    local LIB_ROOT_DIR=${3}
+    local LIB_SUB_DIR=${4}
+    local GIT_DIR=${5}
+    local GIT_REPO=${6}
+    local GIT_BRANCH=${7}
+    local LIB_DIR=${LIB_ROOT_DIR}; [ "${LIB_SUB_DIR}" ] && LIB_DIR="${LIB_ROOT_DIR}/${LIB_SUB_DIR}"
+    local _result=0
+
+    # AUTO mode
+    if [ "${DOLIBS_MODE}" == 'auto' ]; then
+        # If the lib is not integral, needs to update
+        if dolibNotIntegral "${LIB_DIR}"; then
+            echoInfo "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
+            _result=1
+        elif [ "${GIT_DIR}" ] && dolibGitWrongBranch "${LIB_ROOT_DIR}" "${GIT_BRANCH}"; then
+            echoInfo "Source branch has changed, trying to get its code..."
+            _result=2
+        fi
+    # ONLINE mode
+    elif [ "${DOLIBS_MODE}" == 'online' ]; then
+        # If the lib is outdated, clone it
+        if [ "${GIT_DIR}" ] && dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
+            echoInfo "GIT Source has changed for '${LIB}', trying to get its code..."
+            _result=3
+        # If the lib is outdated, copy it
+        elif dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
+            echoInfo "Local source has changed for '${LIB}', trying to get its code..."
+            _result=4
+        fi
+    fi
+
+    # if needs to update
+    if [ "${_result}" != 0 ]; then
+        [ "${GIT_DIR}" ] && dolibGitClone "${GIT_REPO}" "${GIT_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
+        dolibImportFiles "${LIB_SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
+    fi
+
+    return ${_result}
+}
+
 # Show operation mode
 if [ "${DOLIBS_MODE}" == 'offline' ]; then 
-    echoInfo "---> DevOps Libs (${DOLIBS_MODE}) <---"
+    echoInfo "---> dolibs Libs (${DOLIBS_MODE}) <---"
 elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
-    echoInfo "---> DevOps Libs Local Source: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
+    echoInfo "---> dolibs Local Source dir: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
 else
-    echoInfo "---> DevOps Libs branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
+    echoInfo "---> dolibs GIT source branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
 fi
 
 # If Core library was not yet loaded
-if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
+if [ ! "${DOLIBS_LOADED}" ]; then
 
     # core folder
-    DOLIBS_CORE_DIR=${DOLIBS_DIR}/core
-    DOLIBS_SHDOC_DIR=${DOLIBS_CORE_DIR}/shdoc
+    DOLIBS_CORE_DIR=${DOLIBS_DIR}/core    
 
     # If not working offline
     if [ "${DOLIBS_MODE}" != 'offline' ]; then
@@ -199,37 +236,17 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
         # GIT mode
         else 
             DOLIBS_SOURCE_DIR="${DOLIBS_TMPDIR}/core/${DOLIBS_BRANCH}"; 
+            DOLIBS_GIT_DIR="${DOLIBS_SOURCE_DIR}"
         fi
 
         # dolibs core functions dirs
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
 
-        # AUTO mode
-        if [ "${DOLIBS_MODE}" == 'auto' ]; then
-            # If the lib is not integral, needs to update
-            if libNotIntegral "${DOLIBS_CORE_DIR}"; then
-                echoInfo "It was not possible to check 'core' lib integrity, trying to get its code..."
-                _needInstall=true
-            fi
-        # ONLINE mode
-        elif [ "${DOLIBS_MODE}" == 'online' ]; then
-            # If the lib is outdated, clone it
-            if libGitOutDated "${DOLIBS_CORE_DIR}" "${DOLIBS_SOURCE_DIR}" || libSourceUpdated "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}"; then
-                _needInstall=true
-            fi
-        fi
+        # Update lib if required
+        dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}"
 
-        # If needs clone
-        if [ "${_needInstall}" == "true" ]; then
-
-            # If not in local source clone the lib repo
-            if [ ! "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
-                libGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${DOLIBS_SOURCE_DIR}" "${DOLIBS_CORE_DIR}"
-            fi
-
-            # Create doc folder and copy shdoc (documentation)
-            mkdir -p "${DOLIBS_SHDOC_DIR}"
-            cp "${DOLIBS_SOURCE_CORE_DIR}"/shdoc/* "${DOLIBS_SHDOC_DIR}"
+        # If lib was updated, update others required
+        if [ ${?} != 0 ]; then
 
             # Copy the gitignore
             cp "${DOLIBS_SOURCE_DIR}"/.gitignore "${DOLIBS_DIR}"
@@ -241,15 +258,12 @@ if [ ! "${DOLIBS_CORE_FUNCT}" ]; then
             # Copy the Libs help
             cp "${DOLIBS_SOURCE_DIR}"/README.md "${DOLIBS_DIR}"/README.md
             cp "${DOLIBS_SOURCE_DIR}"/libs/README.md "${DOLIBS_DIR}"/DEVELOPMENT.md
-
-            # import core lib files
-            libImportFiles "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" core
         fi
     fi
 
     ### Include Libs ###
-    if [ -f "${DOLIBS_CORE_DIR}"/core.sh ]; then        
-        . "${DOLIBS_CORE_DIR}"/core.sh
+    if [ -f "${DOLIBS_CORE_DIR}/${DOLIBS_MAIN_FILE}" ]; then        
+        . "${DOLIBS_CORE_DIR}/${DOLIBS_MAIN_FILE}"
         exitOnError "Could not import DevOps Libs"
     else
         exitOnError "Could not find DevOps Libs (offline mode?)" 1
@@ -259,4 +273,5 @@ fi
 # Check required binaries
 # git
 # diff
+# tr
 # shasum
