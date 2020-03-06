@@ -34,7 +34,7 @@ function __rework() {
             done
 
             # Update the code
-            body=${body/"${lineFound}"/"${definitions} getArgs \"${reworked}\" \"\${@}\""}
+            _body=${_body/"${lineFound}"/"${definitions} getArgs \"${reworked}\" \"\${@}\""}
         fi
     done
 }

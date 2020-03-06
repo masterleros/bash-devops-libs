@@ -17,20 +17,6 @@ DOLIB_EXCEPTION_CATCH=""
 
 #  https://stackoverflow.com/questions/22009364/is-there-a-try-catch-command-in-bash
 
-# Rework imported code
-function __rework() {
-    # rework function content
-    body=${body//raiseOnError/local _eCode='${?}'; [ '${_eCode}' == 0 ] || raise '${_eCode}' && return '${_eCode}'}
-}
-
-
-# Raise an exception in case of an error
-# function raiseOnError() {
-#     local _errorCode=${?}
-#     [ "${_errorCode}" == 0 ] || raise ${_errorCode} 1
-#     return ${_errorCode}
-# }
-
 # Set execution when an exception is raised
 function catch() {
     DOLIB_EXCEPTION_CATCH=("${@}")
@@ -38,13 +24,14 @@ function catch() {
 
 # Raise an exception
 function raise() {
-    local _errorCode=${?}
-    local _errIndex=${1}
-    [ "${_errIndex}" ] || _errIndex=0
-    [ "${DOLIB_EXCEPTION_CATCH}" ] && [ "$(trap -- | grep tryCatch)" ] || \
-        echoError "Unhandled exception at '${BASH_SOURCE["${_errIndex}"]}' - line ${BASH_LINENO["${_errIndex}"]} (code: ${_errorCode})"
-    kill -SIGTERM ${$}
-    return ${_errorCode}
+    local _eCode=${?}
+    if [ "${_eCode}" != 0 ]; then
+        [ "${DOLIB_EXCEPTION_CATCH}" ] && \
+        [ "$(trap -- | grep tryCatch)" ] || \
+            echoError "Unhandled exception at '${BASH_SOURCE[-1]}' - line ${BASH_LINENO[-2]} (code: ${_eCode})"
+        kill -SIGTERM ${$}
+    fi
+    return ${_eCode}
 }
 
 # Catch execution in the exception
@@ -61,7 +48,10 @@ function try() {
         # Unset the trap
         trap - SIGTERM        
     }
-    
+
     # Set thy trap
     trap tryCatch SIGTERM
+
+    # Execute the command
+    ${@}
 }

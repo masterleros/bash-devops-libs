@@ -51,21 +51,22 @@ function dolibReworkFunction() {
 
     local _funct=${1}
     local _newFunc=${2}
+    local _file=${_libEntrypoint:-${BASH_SOURCE[-1]}}
 
     # If no new function name is given, use the current one
     [ "${_newFunc}" ] || _newFunc="${_funct}"
 
     # Get function content
-    local body=$(declare -f "${_funct}" | tail -n +3 | head -n -1)
+    local _body=$(declare -f "${_funct}" | tail -n +3 | head -n -1)
 
     # if no body, exit with error
-    [ "${body}" ] || exitOnError "Function '${_funct}' does not exist"
+    [ "${_body}" ] || exitOnError "Function '${_funct}' does not exist"
     
     # Execute the modules rework
     dolibReworkCode
 
     # Export the reworked function
-    eval "$(echo "${_newFunc}() {"; echo "${_funcHeader}"; echo "${body}"; echo "}")"
+    eval "$(echo "${_newFunc}() {"; echo "${_funcHeader}"; echo "${_body}"; echo "}")"
 
     # Unset old function name if is different than original
     [ "${_funct}" == "${_newFunc}" ] || unset -f "${_funct}"

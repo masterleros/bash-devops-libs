@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
 ### Show a info text
 # usage: echoInfo <text>
 function echoInfo() {
@@ -38,20 +37,4 @@ function echoError() {
         echo "${_textToPrint} ${_line}" >&2
         _textToPrint="       "
     done
-}
-
-### Exit program with text when last exit code is non-zero ###
-# usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
-function exitOnError() {
-    local _errorCode=${2:-$?}
-    local _errorText=${1}
-    if [ "${_errorCode}" -ne 0 ]; then
-        if [ ! -z "${_errorText}" ]; then
-            echoError "${_errorText}"
-        else
-            echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
-        fi
-        echo "Exiting (${_errorCode})..."
-        exit "${_errorCode}"
-    fi
 }
