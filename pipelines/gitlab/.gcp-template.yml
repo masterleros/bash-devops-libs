@@ -1,0 +1,105 @@
+#    Copyright 2020 Leonardo Andres Morales
+
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+
+#      http://www.apache.org/licenses/LICENSE-2.0
+
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+# GCP template docker
+.gcp-template.docker:
+  image: google/cloud-sdk:latest
+  extends: .gcp-template
+  tags:
+    - docker  
+
+# GCP template for GIT sync
+.gcp-template.gitsync-docker:
+  extends: .gcp-template.docker
+  script:
+    - do.validateVars REMOTE_REPO
+    - do.use git
+    - git config --local credential.helper gcloud.sh
+    - git.sync ${REMOTE_REPO} ${REMOTE_BRANCH}
+
+# GCP Terraform template
+.gcp-template.terraform-docker:
+  image:     
+    name: hashicorp/terraform:full
+    entrypoint: [""]
+  extends: .gcp-template.terraform
+  tags:
+    - docker  
+
+# Terraform template
+.gcp-template.terraform:
+  before_script:
+    - |
+      # .gcp-template.terraform before_script
+
+      # Import DevOps Libs and convert environment variables
+      source ${DEVOPS_LIBS_DIR}/dolibs.sh
+      do.use gitlab
+      gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
+
+      # Validate required vars and dependencies
+      do.validateVars GCP_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
+
+      # Install credential and set SA as active
+      mkdir -p $(dirname ${GOOGLE_APPLICATION_CREDENTIALS})
+      echo "${GCP_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}      
+
+      # Import Terraform lib
+      do.use terraform
+
+  after_script:
+    - | 
+      # .gcp-template.terraform after_script
+
+      # Delete installed credential
+      rm -f ${GOOGLE_APPLICATION_CREDENTIALS}
+
+# GCP template
+.gcp-template:
+  before_script:
+    - | 
+      # .gcp-template before_script
+
+      # Import DevOps Libs and convert environment variables
+      source ${DEVOPS_LIBS_DIR}/dolibs.sh
+      do.use gitlab
+      gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
+
+      # Validate required vars and dependencies
+      do.validateVars GCP_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS
+
+      # Import GCP lib
+      do.use gcp
+
+      # Install credential and set SA as active
+      mkdir -p $(dirname ${GOOGLE_APPLICATION_CREDENTIALS})
+      echo "${GCP_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+
+      # Activate the Service Account from credential
+      gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+
+  after_script:
+    - | 
+      # .gcp-template after_script
+     
+      source ${DEVOPS_LIBS_DIR}/dolibs.sh offline
+
+      # Reimport as after script process is other than before_script/script
+      do.use gcp
+
+      # Revoke service account
+      gcp.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+
+      # Delete installed credential
+      rm -f ${GOOGLE_APPLICATION_CREDENTIALS}

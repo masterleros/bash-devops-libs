@@ -1,45 +1,21 @@
 #!/bin/bash
+#    Copyright 2020 Leonardo Andres Morales
 
-### This funciton will map environment variables to the final name ###
-# Usage: convertEnvVars <CI_COMMIT_REF_NAME> <DEVOPS_LIBS_BRANCHES_DEFINITION>
-# Example: [ENV]_CI_[VAR_NAME] -> [VAR NAME]  ### 
-#
-# DEVOPS_LIBS_BRANCHES_DEFINITION: "<def1> <def2> ... <defN>"
-# Definition: <branch>:<env> (example: feature/*:DEV)
-# DEVOPS_LIBS_BRANCHES_DEFINITION example: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
-#
-function convertEnvVars() {
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
 
-    getArgs "CI_COMMIT_REF_NAME @DEVOPS_LIBS_BRANCHES_DEFINITION" "${@}"
+#      http://www.apache.org/licenses/LICENSE-2.0
 
-    # Set environment depending on branches definition
-    for _definition in "${DEVOPS_LIBS_BRANCHES_DEFINITION[@]}"; do
-        _branch=${_definition%:*}
-        _environment=${_definition#*:}
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
 
-        # Check if matched current definition
-        if [[ ${CI_COMMIT_REF_NAME} == ${_branch} ]]; then
-            CI_BRANCH_ENVIRONMENT=${_environment};
-            break
-        fi
-    done
 
-    # Check if found an environment
-    [ ${CI_BRANCH_ENVIRONMENT} ] || exitOnError "'${CI_COMMIT_REF_NAME}' branch naming is not supported, check your DEVOPS_LIBS_BRANCHES_DEFINITION!" -1
-
-    # Get vars to be renamed    
-    vars=($(printenv | egrep -o "${CI_BRANCH_ENVIRONMENT}_CI_.*=" | awk -F= '{print $1}'))
-
-    # Set same variable with the final name
-    echoInfo "####################################################"
-    for var in "${vars[@]}"; do
-        var=$(echo ${var} | awk -F '=' '{print $1}')
-        new_var=$(echo ${var} | cut -d'_' -f3-)
-        echoInfo "${CI_BRANCH_ENVIRONMENT} value set: '${new_var}'"
-        export ${new_var}="${!var}"
-    done
-    echoInfo "####################################################"
-}
+# Verify Dependencies
+do.verifyDeps git || return ${?}
 
 ### Synchronize a GIT repository with current code
 # usage: sync <git_url>
@@ -48,34 +24,34 @@ function sync() {
     getArgs "url branch" "${@}"
 
     # Verify Dependencies
-    verifyDeps git || return ${?}
+    do.verifyDeps git || return ${?}
 
     # Remote repository to sync and current branch
     remote="gitsync"
     
     # Add upstream case is not yet present
     if [ "$(git remote -v | grep ${remote})" ]; then
-        git remote remove ${remote}
+        git remote remove "${remote}"
     fi
 
     # Add remote
-    git remote add ${remote} ${url}
+    git remote add "${remote}" "${url}"
     exitOnError
 
     # Push remote
     echoInfo "Sending code to the remote repository '${url}' at branch '${branch}'"
-    if [[ "${branch}" != "${CI_COMMIT_REF_NAME}" ]]; then
+    if [ "${branch}" != "${CI_COMMIT_REF_NAME}" ]; then
         # Get the origin code from the required branch
-        git fetch origin ${branch}
+        git fetch origin "${branch}"
 
         # Push to remote
-        git push ${remote} ${branch}
+        git push "${remote}" "${branch}"
     else
         # Push head to remote
-        git push ${remote} HEAD:refs/heads/${branch}
+        git push "${remote}" HEAD:refs/heads/"${branch}"
     fi
     exitOnError
 
     # Remove upstream remote
-    git remote remove ${remote}
+    git remote remove "${remote}"
 }

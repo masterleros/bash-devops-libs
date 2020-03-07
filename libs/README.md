@@ -5,15 +5,15 @@ When you develop a new library, some steps should be followed:
 
 ### Inside your global script code:
 1. Place your library as `libs/<LIB_NAME>/main.sh` file. This will implicitly recognize the library "<LIB_NAME>lib", example:
-> **Info:**  `CURRENT_LIB` (your own library name) and `CURRENT_LIB_DIR` (your library base dir) variables will be already defined for your usage.
+> **Info:**  `SELF_LIB` (your own library name) and `SELF_LIB_DIR` (your library base dir) variables will be already defined for your usage.
 
 2. Verify the required dependencies for your execution, example:
     ``` sh
     # Validate available variables (if applicable) and return if error
-    validateVars <var1> <var2> ... <varN> || return ${?}
+    do.validateVars <var1> <var2> ... <varN> || return ${?}
 
     # Verify Dependencies (if applicable) and return if error
-    verifyDeps <dep1> <dep2> ... <depN> || return ${?}
+    do.verifyDeps <dep1> <dep2> ... <depN> || return ${?}
     ```
 
 3. Include your files:
@@ -21,19 +21,19 @@ When you develop a new library, some steps should be followed:
     ``` sh
     # This will add the code from additional_functions.sh 
     # and other_functions.sh files inside your lib folder
-    source ${CURRENT_LIB_DIR}/additional_functions.sh || return ${?}
-    source ${CURRENT_LIB_DIR}/other_functions.sh || return ${?}
+    source ${SELF_LIB_DIR}/additional_functions.sh || return ${?}
+    source ${SELF_LIB_DIR}/other_functions.sh || return ${?}
     ```
 
 4. Include other libraries:
     Use the `do.import` function to import other libraries for your library, example:
     ``` sh
     # This will import the utils library
-    do.import utils
+    do.use utils
 
     # Then You can access the library from your functions
     function myTest() {
-        do.utils.showTitle "This is a test!"
+        utils.showTitle "This is a test!"
     }
     ```
 5. Document your library properly in the library folder and include a reference in this README.md file    
@@ -88,14 +88,15 @@ function my_function()
 **test.sh**
 ``` sh
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
-do.import myfunc
-do.myfunc.my_public_function
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh
+do.use myfunc
+myfunc.my_public_function
 
 # Output:
 # Hi from my function!
 # Hi from my other function!
 ```
+> **Note:** `$(dirname ${BASH_SOURCE[0]})` will make the path to be respected even if you execute the script from other working folder.
 
 ## Implementation example:
 
@@ -104,20 +105,20 @@ do.myfunc.my_public_function
 #!/bin/bash
 
 # Validate Variables
-validateVars example_var || return ${?}
+do.validateVars example_var || return ${?}
 
 # Verify Dependencies
-verifyDeps example_dep || return ${?}
+do.verifyDeps example_dep || return ${?}
 
 # Import sub-modules
-source ${CURRENT_LIB_DIR}/additional_functions.sh || return ${?}
+source ${SELF_LIB_DIR}/additional_functions.sh || return ${?}
 
 # Import other required libs
-do.import utils
+do.use utils
 
 # Declare your functions
 function doOtherThing() {
-    _return=${CURRENT_LIB_DIR}
+    _return=${SELF_LIB_DIR}
 }
 
 function doSomething() {
@@ -134,27 +135,12 @@ function doSomething() {
 **Following the above definition, we can see:**
 ``` sh
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
-do.import myfuncslib
-do.myfuncs.doSomething Hi There From DevOps Libs!
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh
+do.use myfuncs
+myfuncs.doSomething Hi There From DevOps Libs!
 
 # Output:
 # Arg1 = Hi
 # Arg1 = There
 # Others = From DevOps Libs!
 # My path is: <lib path>
-```    
-
-# Library Catalog
-
-## core.sh
-This is the root level source and includes all the Core functions to use the DevOps Libs (i.e: do.import)
-> **Obs:** This file will be automatically be imported by the devops-libs.sh execution.
-
-## gcp
-This library includes different functionalities for Google Cloud Platform
-
-## utils
-TODO
-
-TODO

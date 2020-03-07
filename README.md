@@ -1,161 +1,186 @@
-# DEVOPS libraries for .gitlab-ci.yml #
+# DEVOPS Bash libraries #
 
 ## Introduction
-DevOps Libs is a set of common functionatilities and templates to accelerate DevOps setup processes
+**dolibs** is an small bash framework with a built-in set of common functionatilities and templates to accelerate DevOps setup processes.
 
-## Folder Structure
-``` sh
-├── libs              	    (Libraries folder)
-│   ├── utils/main.sh       (Additional utils library)
-│   ├── gcp/main.sh         (Example: GCP library)
-│   ...
-│   ├── core.sh             (Core functions library)
-│   ├── lib.sh              (lib importer contextualizer)
-│   └── main.sh             (DevOps lib functions, i.e: do.import)
-├── gitlab                  (GitLab templates folders)
-│   ├── .base-template.yml  (Basic GitLab DevOps Libs template)
-│   └── .gcp-template.yml   (Example: GitLab DevOps GCP Libs templates)
-└── devops-libs.sh          (DevOps Libs management)
-```
-
-### Using Libraries
+# Using Libraries
 In order to use this library (i.e: local execution or in GitLab Pipeline) you need to include the DevOps Libs in your project.
+For that you need to follow the steps:
 
-In order to use the libraries, you need to follow the steps:
+#### 1. Download the library entrypoint
+Download the file `dolibs.sh` placed in a folder whitin your code, example: `<YOUR_REPO>/dolibs.sh`
 
-#### 1. Include the library
-Download the file `devops-libs.sh` placed in the root folder of this repository and copy to: `<YOUR_REPO>/scripts/devops-libs.sh`
+This is the entry point of the library, once executed (see below) it will automatically retrieve (depending one the operational mode) the **dolibs** code and include for you in your project at `${DOLIBS_DIR}` folder
 
-This is the entry point of the library, and once executed (see below) it will automatically retrieve the DevOps Libs code and include for you in your project at `${DEVOPS_LIBS_PATH}` folder
-
-#### 2. Configure the library
-
-You can edit the `devops-libs.sh` inside your project to change some of its characteristics:
-
-|Config|Description|
-|-|-|
-|`DEVOPS_LIBS_BRANCH`|Branch from where the lib is cloned (useful to lock a lib version)|
-|`DEVOPS_LIBS_PATH`|Directory where the libraries will be imported on your project|
-
-#### 3. Use the libraries
-There are two ways to use the libraries:
-> `**WARNING**:` GitLab Pipeline uses an environment set with `set -e` which makes the execution to exit at first error (On Local execution it is not the default and your script will continue)
-
-**A. Use the libraries on GitLab Pipelines**
-> **Obs:** In this usage, the libraries will not be commited to your repo.
-
-In order to use the libraries, it is only required to include the desired GitLab template (check the available templates) or use the base template and import the librearies you need to use. Let's see an example using the base template:
-
-**.gitlab-ci.yml**
-``` yaml
-include:
-  - project: 'devops-br/gitlab-gft-libs'
-    file: '/gitlab/.base-template.yml'
-
-variables:
-  DEVOPS_LIBS_BRANCHES_DEFINITION: "<definitions>"
-
-example_module:
-  extends: .base-template
-  script:
-    - do.import <lib1> <lib2> ... <libN>
-    - do.libX.<function> <arg1> <arg2> ... <argN>
+``` sh
+# Command to download dolibs.sh
+curl https://raw.githubusercontent.com/masterleros/bash-devops-libs/master/dolibs.sh -o dolibs.sh
 ```
 
-**B.** Use library for local executions**
-> **Obs:** In this usage, the libraries will be addded to your repo (i.e: to redistribute your code).
+#### 2. Include and use **dolibs**
+> **Obs:** In the default operation mode (auto) it will add its own code into your current `dolibs.sh` folder at `./dolibs` (i.e: to redistribute with your code).
 
-**scripts/cicd/my-script.sh**
+**my-script.sh**
 ``` sh
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
+# This line of code will source the dolibs entrypoint, this format help to find dolibs.sh 
+# file relative to the current script path, regardesless of where it was executed
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh
 
 # Import required lib
-do.import gcp
+do.use gcp
 
-# Consume the lib
-do.gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+# Use the lib
+gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
 ```
 
-**.gitlab-ci.yml**
-``` yaml
-example_module:
-  script:
-    - scripts/cicd/my-script.sh
+#### 3. Configure the library regarding your needs
+
+You can pass some options to the library to change its behaviour.
+
+**Example:** The below example will use the lib in offline mode located in the specified <path>
+
+**my-script.sh**
+``` sh
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh --offline -f <path>
+...
 ```
 
-> **Tip:** You can use the library in offline mode (use previous downloaded library) by using: `source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh offline`
+# dolibs Options
 
-## Operation Mode
-DevOps Liberary have 4 operations modes:
+The following options are available when you include **dolibs** by passing them as arguments:
 
-  - **A. Auto (default)** - This mode will attempt to download the liraries if not found locally
-  - **B. Online** - This mode will download and update the libraries on all executions
-  - **C. Offline** - This Mode will use available libraries, if any is not found, it will fail.
-  - **D. local** - Same as `Online` but will copy libraries from a local folder instead of download from GIT (usefull for lib development and testing). To use local mode, you need to set the variable `DEVOPS_LIBS_LOCAL_MODE_PATH` to the root folder of the library.
+- **Operation Mode:** Indicate how updated are managed
+- **Folder:** dolibs working folder
+- **Local Source (optional):** Use a local dolibs source insted of remote (i.e: development)
 
-You can force the operation mode in the inclusion of the library:
+Other options are global and will change **dolibs** for any include, to change them, you need to edit the `dolibs.sh` file:
+
+- **DOLIBS_MODE:** Default operation mode (default: auto)
+- **DOLIBS_BRANCH:** dolibs branch (default: master)
+- **DOLIBS_REPO:** dolibs source repo (it will not change if you are note forking the project)
+
+### OPTION: Operation Mode
+This mode indicate how `dolibs` will manage the updates, there are 3 operation modes:
+
+|Mode|Argument|Description|
+|-|-|-|
+|**Auto (default)**|N/A|This mode will download/copy the libraries if not found locally or if there is no local consistency|
+|**Online**|--online|This mode will check the source's updates and will download/copy and update the libraries automatically|
+|**Offline**|--offline|This Mode will use available libraries, if it is not found nor consistent, it will fail|
+
+Example using the lib in **offline** mode:
 ``` yaml
 #!/bin/bash
-source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh offline # or online
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh --offline
 ```
-> **Tip:** To change default operation mode, update `DEVOPS_LIBS_DEFAULT_MODE` value in `devops-libs.sh`
+> **Tip:** To change default operation mode, update `DOLIBS_MODE` variable value editing `dolibs.sh` file.
 
-## GitLab Pipeline Requirements
-> **Obs:** Templates are definitions of `before_script` and in some cases `after_script`, please be sure you don't need to implement your own mentioned sections as GitLab does not support both (template and custom) section to be merged and only one will be executed.
+### OPTION: Folder
+By default, `dolibs.sh` will use the `<dolibs.sh dir>/dolibs` folder to download/copy and install all the requested libs. \
+It is possible to use **dolibs** in a custom directory, to do so, you need to specify the `-f <path>` argument when sourcing `dolibs.sh`.
 
-When using any GitLab template in this library, you will need to define some required values. Each template has it's own requirements, but there are some values that all of them require:
+### OPTION: Local Source
+By default, when in `auto` or `online` mode, **dolibs** will clone its own code from GIT. \
+Instead, it is possible to specify a local source (folder) to copy from the `dolibs` code. Using in that way it is possible to develop `dolibs` libraries locally and test without the need of commit your `dolibs` code all the times.
 
-### Git environment variables mapping definition:
-The library includes a default functionality to map environment variables depending on the branch name, this is very useful when the pipeline execute activities in different environments, this configuration is made in the global variable `DEVOPS_LIBS_BRANCHES_DEFINITION`.
+# Libraries Sources
+`dolibs` allows to add external sources to be used whitin same scripts. \
+To include them, you need first to add your custom sources and then import their libraries.
 
-**Example:**
-``` yaml
-variables:
-  DEVOPS_LIBS_BRANCHES_DEFINITION: "feature/*:DEV fix/*:DEV develop:INT release/*:HML bugfix/*:HML master:PRD hotfix/*:PRD"
-```
+Currently there are 2 custom sources:
+- **GIT Source** will download and incorporate libs from a public GIT repo
+- **Local Source:** will copy the libs from a local folder (example: your custom libs)
+- **Local Libraries:** will use the libs directly from the specified path (i.e: libs included in whitin your code)
 
-**The above example will map:**
+> **Tip:** It you are planni
 
-| Branches | Environment |
-|-|-|
-| `feature/*` and `fix/*` | **DEV** |
-| `develop` | **INT** |
-| `release/*` and `bugfix/*` | **UAT** |
-| `master` and `hotfix/*` | **PRD** |
+## GIT Source
 
-This will indicate to the templates to convert Environment Variables depending on the building Branch. The format to follow to define those variables is `<ENV>_CI_<VAR>`.
+To include a custom GIT source, you can use the function `do.addGitSource`:
 
-**Definition example:**
-
-| Environment | Var | Value |
-|-|-|-|
-| **DEV** | DEV_CI_MYVAR | "Hello from DEV!" |
-| **INT** | INT_CI_MYVAR | "Hello from INT!" |
-| **UAT** | UAT_CI_MYVAR | "Hello from UAT!" |
-| **PRD** | PRD_CI_MYVAR | "Hello from PRD!" |
-
-**Execution example:**
-
-Supposing that we are building on `develop` branch an following the above branch definition, we can see:
+**example.sh**
 ``` sh
-# Current branch = develop
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
 
-echo ${MYVAR} # This will print: "Hello from INT!"
+# Set the remote lib source
+do.addGitSource myremotelib "https://github.com/masterleros/bash-devops-libs.git" master
+
+# Import the required lib from custom namespace
+do.import myremotelib.utils
+
+# Use the needed lib
+do.myremotelib.utils.showTitle "Hello DevOps Libs!"
 ```
+
+## Local Source
+
+To include a custom local source, you can use the function `do.addLocalSource`:
+
+**example.sh**
+``` sh
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
+
+# Set the local lib source
+do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
+
+# Import the required lib from custom namespace
+do.import mylocallib.utils
+
+# Use the custom lib
+mylocallib.utils.showTitle "Hello DevOps Libs!"
+```
+
+## Local Libraries
+
+To include local libraries (will be used from where they are specified, i.e: offline), you can use the function `do.addLocalLib`:
+
+**example.sh**
+``` sh
+# Enable dolibs (clone to /tmp/dolibs)
+source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
+
+# Set the local lib source
+do.addLocalLib "<my source>/mylibs"
+
+# Import the required lib from custom namespace
+do.import mylibs.utils
+
+# Use the custom lib
+mylibs.utils.showTitle "Hello DevOps Libs!"
+```
+
+# Good Practices
 
 ## Global definitions
-This library includes an automated inclusion of the file `scripts/definitions.sh`. This is very usefull to define variables/definitions accesibles to your project's scripts globaly. Example:
+As a good practice for your own scripts centralize your project's configurations/validations. `dolibs` provides the **definitions** lib which will include the file `definitions.sh` automatically. \
+This is very usefull to define variables/definitions accesibles to your project's scripts globaly. Example:
 
-**scripts/definitions.sh**
+**definitions.sh**
 ``` sh
 export MY_PROJECT_DESCRIPTION="My cool project!"
+
+function customFunct() {
+  getArgs "arg"
+  echo "My arg is: '${arg}'"
+}
 ```
 
-The above environment variable `MY_PROJECT_DESCRIPTION` will be accesible locally and in the DevOps Automation.
+The above environment variable `MY_PROJECT_DESCRIPTION` and custom function `customFunct()` will be accesibles from you script once you include it:
 
-## Additional GitLab Pipeline templates
-Check the templates section to check the available templates and their functionalities: [Templates](gitlab/README.md)
+**my-script.sh**
+``` sh
+do.import definitions
+do.definitions.customFunct "${MY_PROJECT_DESCRIPTION}"
 
-## Available libraries
-Check the available libraries and their functionalities: [Libraries](libs/README.md)
+# Output: My arg is: 'My cool project!'
+```
+
+# Libraries documentation
+Once a library is imported, its documentation will be generated in the `dolibs/docs` folder in a file named as its namespace (example: `utils` lib will be documented as `dolibs/docs/utils.md`)
+
+# Developing libraries
+Check the libraries development at: [Development](libs/README.md)

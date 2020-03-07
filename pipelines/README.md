@@ -74,7 +74,7 @@ Developers will be able to create branches from develop or master according to t
 ## Configure the pipeline for the Branching Model
 
 Each branch is mapped to specifics Environments within your solution.  
-This can be more detailed here: [GitLab Libs Mapping definition](https://git.gft.com/devops-br/gitlab-gft-libs/tree/develop#git-environment-variables-mapping-definition)
+This can be more detailed here: [GitLab Libs Mapping definition](../README.md#git-environment-variables-mapping-definition)
 
 Having that on mind, you will need to set up your pipeline to work according to it.  
 To accomplish that, you will need to have `conditions` to:  
