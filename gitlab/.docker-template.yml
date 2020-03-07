@@ -1,0 +1,19 @@
+# Docker template
+.docker-template:
+  before_script:
+    - | 
+      # .docker-template before_script      
+
+      # Import DevOps Libs and convert environment variables
+      source ${CI_PROJECT_DIR}/scripts/devops-libs.sh
+      do.import git
+      do.git.convertEnvVars ${CI_COMMIT_REF_NAME} ${DEVOPS_LIBS_BRANCHES_DEFINITION}
+
+      # Validate required vars and dependencies
+      validateVars DOCKERFILE_PATH IMAGE_TAG
+      verifyDeps docker
+
+  script:
+  - | 
+    # Build docker image
+    docker build -t ${IMAGE_TAG} -f ${DOCKERFILE_PATH} $(dirname ${DOCKERFILE_PATH})

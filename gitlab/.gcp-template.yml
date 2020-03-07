@@ -1,0 +1,51 @@
+# GCP template docker
+.gcp-template-docker:
+  image: google/cloud-sdk:latest
+  extends: .gcp-template
+
+# GCP template for GIT sync
+.gcp-gitsync-template:
+  extends: .gcp-template-docker
+  script:
+    - validateVars REMOTE_REPO
+    - do.import git
+    - git config --local credential.helper gcloud.sh
+    - do.git.sync ${REMOTE_REPO} ${REMOTE_BRANCH}
+
+# GCP template
+.gcp-template:
+  before_script:
+    - | 
+      # .gcp-template before_script
+
+      # Import DevOps Libs and convert environment variables
+      source ${CI_PROJECT_DIR}/scripts/devops-libs.sh
+      do.import git
+      do.git.convertEnvVars ${CI_COMMIT_REF_NAME} ${DEVOPS_LIBS_BRANCHES_DEFINITION}
+
+      # Validate required vars and dependencies
+      validateVars GCLOUD_CREDENTIAL GOOGLE_APPLICATION_CREDENTIALS      
+
+      # Import GCP lib
+      do.import gcp
+
+      # Install credential and set SA as active
+      echo "${GCLOUD_CREDENTIAL}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+
+      # Activate the Service Account from credential
+      do.gcp.useSA ${GOOGLE_APPLICATION_CREDENTIALS}
+
+  after_script:
+    - | 
+      # .gcp-template after_script
+     
+      source ${CI_PROJECT_DIR}/scripts/devops-libs.sh offline
+
+      # Reimport as after script process is other than before_script/script
+      do.import gcp
+
+      # Revoke service account
+      do.gcp.revokeSA ${GOOGLE_APPLICATION_CREDENTIALS}
+
+      # Delete installed credential
+      rm -f ${GOOGLE_APPLICATION_CREDENTIALS}

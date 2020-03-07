@@ -32,7 +32,6 @@ function showTitle() {
 
 ### Execute a command until success within a retries ###
 # usage: retryExecution "command"
-
 # @description Execute a command until success within a retries
 # @arg $retries number ammount of retries
 # @arg $cmd string command to be executed

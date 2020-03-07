@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
 # @description Echo the tokens found in a text (i.e: `${<token>}`)
 # @arg data string Data where the tokens are expected
 # @return Array with the tokens found

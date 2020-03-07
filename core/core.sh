@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
 ### Empty function that receives the function/code 
 #content to be reworked
 function dolibReworkCode() {
@@ -60,7 +59,7 @@ function dolibReworkFunction() {
     local body=$(declare -f "${_funct}" | tail -n +3 | head -n -1)
 
     # if no body, exit with error
-    [ "$(declare -f ${_funct})" ] || exitOnError "Function '${_funct}' does not exist"
+    [ "${body}" ] || exitOnError "Function '${_funct}' does not exist"
     
     # Execute the modules rework
     dolibReworkCode

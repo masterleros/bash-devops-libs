@@ -82,7 +82,7 @@ function dolibGitOutDated() {
     [ -d "${GIT_DIR}" ] || return 0
 
     # Get local status
-    local GIT_BRANCH=$(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-)    
+    local GIT_BRANCH=$(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-)
     local GIT_HASH=$(< "${SOURCE_STATE}" grep GIT_HASH | cut -d':' -f2-)
 
     # Get git remote hash
@@ -90,6 +90,21 @@ function dolibGitOutDated() {
 
     # Return result
     [ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]
+}
+
+### Function to indicate if the lib code is outdated ###
+# usage: dolibGitWrongBranch <LIB_ROOT_DIR> <GIT_BRANCH>
+function dolibGitWrongBranch() {
+
+    local LIB_ROOT_DIR=${1}
+    local GIT_BRANCH=${2}
+    local SOURCE_STATE="${LIB_ROOT_DIR}/.source.state"
+
+    # If state dos not exist
+    [ -f "${SOURCE_STATE}" ] || return 0
+
+    # Return if current state branch is different than required
+    [ "${GIT_BRANCH}" != $(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-) ]
 }
 
 ### Function to indicate if the source if different than the lib ###
@@ -152,7 +167,7 @@ function dolibNotIntegral() {
 ### Detect if code needs to be updated ###
 # Usage: libNeedsUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
 # obs: if not GIT_DIR is provided, it's threated as local source
-# return 0 if updated, 1 if not present, 2 if git updated, 3 if source updated
+# return 0 if updated, 1 if not present, 2 if auto mode but branch changed, 3 if git updated, 4 if source updated
 function dolibUpdate() {
 
     local LIB=${1}
@@ -160,6 +175,8 @@ function dolibUpdate() {
     local LIB_ROOT_DIR=${3}
     local LIB_SUB_DIR=${4}
     local GIT_DIR=${5}
+    local GIT_REPO=${6}
+    local GIT_BRANCH=${7}
     local LIB_DIR=${LIB_ROOT_DIR}; [ "${LIB_SUB_DIR}" ] && LIB_DIR="${LIB_ROOT_DIR}/${LIB_SUB_DIR}"
     local _result=0
 
@@ -169,23 +186,26 @@ function dolibUpdate() {
         if dolibNotIntegral "${LIB_DIR}"; then
             echoInfo "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
             _result=1
+        elif [ "${GIT_DIR}" ] && dolibGitWrongBranch "${LIB_ROOT_DIR}" "${GIT_BRANCH}"; then
+            echoInfo "Source branch has changed, trying to get its code..."
+            _result=2
         fi
     # ONLINE mode
     elif [ "${DOLIBS_MODE}" == 'online' ]; then
         # If the lib is outdated, clone it
         if [ "${GIT_DIR}" ] && dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
             echoInfo "GIT Source has changed for '${LIB}', trying to get its code..."
-            _result=2
+            _result=3
         # If the lib is outdated, copy it
         elif dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
             echoInfo "Local source has changed for '${LIB}', trying to get its code..."
-            _result=3
+            _result=4
         fi
     fi
 
     # if needs to update
     if [ "${_result}" != 0 ]; then
-        [ "${GIT_DIR}" ] && dolibGitClone "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
+        [ "${GIT_DIR}" ] && dolibGitClone "${GIT_REPO}" "${GIT_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
         dolibImportFiles "${LIB_SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
     fi
 
@@ -222,8 +242,8 @@ if [ ! "${DOLIBS_LOADED}" ]; then
         # dolibs core functions dirs
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
 
-        # Update lib if rquired
-        dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}"
+        # Update lib if required
+        dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}"
 
         # If lib was updated, update others required
         if [ ${?} != 0 ]; then

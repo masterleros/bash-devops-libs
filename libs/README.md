@@ -96,7 +96,6 @@ myfunc.my_public_function
 # Hi from my function!
 # Hi from my other function!
 ```
-
 > **Note:** `$(dirname ${BASH_SOURCE[0]})` will make the path to be respected even if you execute the script from other working folder.
 
 ## Implementation example:
@@ -145,4 +144,3 @@ myfuncs.doSomething Hi There From DevOps Libs!
 # Arg1 = There
 # Others = From DevOps Libs!
 # My path is: <lib path>
-```

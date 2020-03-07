@@ -33,12 +33,6 @@ function runTest() {
     local _testPath=${1}
     local _bashArgs=${2}
     local _bashArgsText=$([ ! "${_bashArgs}" ] || echo " (Args: ${_bashArgs})")
-    local _test=$(basename "${_testPath}")"${_bashArgsText}"
-    
-    _showTestTitle " START TEST ${_test} "
-
-    # grant execution permissions
-    chmod +x "${_testPath}"
 
     # Execute the test
     if [ "${_bashArgs}" ]; then bash -c "${_bashArgs}; ${_testPath}"

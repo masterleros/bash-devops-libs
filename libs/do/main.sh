@@ -71,7 +71,7 @@ function import() {
             local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
             local _libSubDir="${_libNamespace[@]:1}"; _libSubDir=${_libSubDir// /\/}
             local _libSourceConfig=${_libRootDir}/.source.cfg
-            local _libDir=${DOLIBS_LIBS_DIR}/${_libPathDir}
+            local _libDir=${DOLIBS_LIBS_DIR}/${_libPathDir}            
 
             # Check if source config exists
             [ -f "${_libSourceConfig}" ] || exitOnError "Source configuration '${_libSourceConfig}' not found for '${_lib}'"
@@ -93,6 +93,8 @@ function import() {
 
                 # Get the git folder (if is a git source)
                 assign _libGitDir=self configInFile "${_libSourceConfig}" GIT_DIR
+                assign _libGitRepo=self configInFile "${_libSourceConfig}" SOURCE_REPO
+                assign _libGitBranch=self configInFile "${_libSourceConfig}" SOURCE_BRANCH
 
                 # If is not at the root level, add the sub-namespaces as sub-folders
                 if [ "${_libSubDir}" ]; then
@@ -100,7 +102,7 @@ function import() {
                 fi
 
                 # Update lib if rquired
-                dolibUpdate "${_lib}" "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}"
+                dolibUpdate "${_lib}" "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}" "${_libGitRepo}" "${_libGitBranch}"
 
                 # Create/update documentation if lib was updated
                 [ ${?} == 0 ] || self document "${_libRootDir}" "${DOLIBS_DOCUMENTATION_DIR}/${_libNamespace}.md" "${_libNamespace}"                

@@ -1,0 +1,4 @@
+*.*
+!sample-script.sh
+!run-tests.sh
+!test-*.sh
