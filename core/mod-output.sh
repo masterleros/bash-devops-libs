@@ -13,28 +13,59 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-### Show a info text
-# usage: echoInfo <text>
-function echoInfo() {
+# Bash color options
+# https://misc.flogisoft.com/bash/tip_colors_and_formatting
+
+### Set current color
+# usage: _addColorText <text>
+function _addColorText() {
+    _text="${_text}\e[${1}m${@}"
+}
+
+### Echo the required text
+# usage: _echo <text>
+function _echo() {
+    local _stdRedirect="${1}"; shift
+    local _textToPrint="${1}"; shift
+    local _textToPrintColor="${1}"; shift
+    local _text="${@/'\n'/$'\n'}"
+
+    # For each line
     local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="INFO:  "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}"
+    for _line in ${_text[@]}; do
+        echo -e "\e[1m\e[${_textToPrintColor}m${_textToPrint} \e[0m${_line}" >&${_stdRedirect}
         _textToPrint="       "
     done
 }
 
-### Show a test in the stderr
+### Show debug information
+# usage: echoDebug <text>
+function echoDebug() {
+    [ "${DOLIBS_DEBUG}" != "true" ] || _echo 1 "DEBUG: " 36 ${@}
+}
+
+### Show a info text
+# usage: echoInfo <text>
+function echoInfo() {
+    _echo 1 "INFO:  " 32 "${@}"
+}
+
+### Show a warning text
+# usage: echoWarn <text>
+function echoWarn() {
+    _echo 1 "WARN:  " 33 ${@}
+}
+
+### Show an error text (stderr)
 # usage: echoError <text>
 function echoError() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="ERROR: "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}" >&2
-        _textToPrint="       "
-    done
+    _echo 2 "ERROR: " 31 "${@}"
+}
+
+### Show a tittle
+# usage: echoError <text>
+function echoTittle() {
+    echo
+    echo -e "\e[1m        ${@}"
+    echo
 }

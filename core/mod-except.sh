@@ -13,45 +13,39 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-DOLIB_EXCEPTION_CATCH=""
+# Try execution in a subshel so that will not exit the program in case of failure
+try() {
 
-#  https://stackoverflow.com/questions/22009364/is-there-a-try-catch-command-in-bash
+    # If it is an assigment
+    if [ "${1}" == "assign" ]; then            
+        local _tmpFile="${DOLIBS_TMPDIR}/.try-${RANDOM}.tmp"
+        local _assigments=${2}
+        local _returnVar=${_assigments%%"="*}
+        local _returnFunc=${_assigments##*"="}        
+        shift 2
 
-# Set execution when an exception is raised
-function catch() {
-    DOLIB_EXCEPTION_CATCH=("${@}")
-}
+        # Remove tmp file if exists
+        [ -f "${_tmpFile}" ] && rm "${_tmpFile}"
 
-# Raise an exception
-function raise() {
-    local _eCode=${?}
-    if [ "${_eCode}" != 0 ]; then
-        [ "${DOLIB_EXCEPTION_CATCH}" ] && \
-        [ "$(trap -- | grep tryCatch)" ] || \
-            echoError "Unhandled exception at '${BASH_SOURCE[-1]}' - line ${BASH_LINENO[-2]} (code: ${_eCode})"
-        kill -SIGTERM ${$}
+        (
+        # Set that is being executed in a try context
+        DOLIB_TRY_CONTEXT=true        
+        ${_returnFunc} ${@}        
+        declare | egrep ^_return= | cut -d '=' -f2- > "${_tmpFile}"
+        )
+        local _result=${?}
+    
+        # Restore the value if was written
+        [ -f "${_tmpFile}" ] && eval "${_returnVar}"=$(cat "${_tmpFile}")
+
+    # If is a normal function
+    else
+        ${@}
+        local _result=${?}
     fi
-    return ${_eCode}
-}
 
-# Catch execution in the exception
-function try() {
+    # Show message
+    [ "${_result}" == 0 ] || echoWarn "Caught exception At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
 
-    # Function when catch the try
-    function tryCatch() {
-        # Execute the exception code
-        if [ "${DOLIB_EXCEPTION_CATCH}" ]; then
-            "${DOLIB_EXCEPTION_CATCH[@]}"
-            unset -v DOLIB_EXCEPTION_CATCH
-        fi
-
-        # Unset the trap
-        trap - SIGTERM        
-    }
-
-    # Set thy trap
-    trap tryCatch SIGTERM
-
-    # Execute the command
-    ${@}
+    return ${_result}
 }

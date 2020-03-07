@@ -34,6 +34,7 @@ while [ "${1}" != "" ]; do
         # clone mode
         "--online") DOLIBS_MODE='online'; shift 1;;
         "--auto") DOLIBS_MODE='auto'; shift 1;;
+        "--debug") DOLIBS_DEBUG='true'; shift 1;;
         "--offline")
             # if online mode, use same source as included            
             DOLIBS_DIR=${DOLIBS_ROOTDIR}
@@ -49,9 +50,9 @@ while [ "${1}" != "" ]; do
 done
 
 # If not mode offline
-DOLIBS_BOSTRAP="${DOLIBS_DIR}/boostrap-${DOLIBS_BRANCH//\//-}.sh"
+DOLIBS_BOSTRAP="${DOLIBS_DIR}/boostrap.sh"
 if [ "${DOLIBS_MODE}" != "offline" ]; then
-    # Clone the boostrap if in online mode or it does not exist (auto mode)
+    # Clone the boostrap if in online mode or it does not exist (auto mode)    
     if [ "${DOLIBS_MODE}" == "online" ] || [ ! -f "${DOLIBS_BOSTRAP}" ]; then
 
         # Create the lib folder
@@ -63,6 +64,7 @@ if [ "${DOLIBS_MODE}" != "offline" ]; then
         if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then
             cp "${DOLIBS_LOCAL_SOURCE_DIR}/boostrap.sh" "${DOLIBS_BOSTRAP}"
         else
+            DOLIBS_BOSTRAP="${DOLIBS_DIR}/boostrap-${DOLIBS_BRANCH//\//-}.sh"
             curl -s -H 'Cache-Control: no-cache' --fail "${DOLIBS_GIT_BOSTRAP}" -o "${DOLIBS_BOSTRAP}"            
         fi
 

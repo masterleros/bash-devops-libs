@@ -15,19 +15,8 @@
 
 # Rework imported code
 function __rework() {
-
     # returnOnError
     _body=${_body//returnOnError/local _eCode='${?}'; [ '${_eCode}' == 0 ] || return '${_eCode}'}    
-
-    # raiseOnError
-    _body=${_body//raiseOnError/raise || return '${_eCode}'}
-
-    # exitOnError
-    _body=${_body//exitOnError/raise || return '${_eCode}'}
-    #if [ "$(echo "${_body}" | grep getArgs)" ]; then
-    #    echoError "'exitOnError()' is not allowed in functions, use instead 'returnOnError()' or 'raiseOnError()'"
-    #    exitOnError "in function '${_funct}()' at '${_file}'" -1
-    #fi    
 }
 
 ### Exit program with text when last exit code is non-zero ###
@@ -35,13 +24,20 @@ function __rework() {
 function exitOnError() {
     local _errorCode=${2:-$?}
     local _errorText=${1}
+
+    # If there is an error
     if [ "${_errorCode}" -ne 0 ]; then
-        if [ ! -z "${_errorText}" ]; then
-            echoError "${_errorText}"
-        else
-            echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
+
+        # If it is in a try context
+        if [ "${DOLIB_TRY_CONTEXT}" != "true" ]; then    
+            if [ ! -z "${_errorText}" ]; then
+                echoError "${_errorText}"
+            else
+                echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
+            fi
+            echo "Exiting (${_errorCode})..."            
         fi
-        echo "Exiting (${_errorCode})..."
+
         exit "${_errorCode}"
     fi
 }
