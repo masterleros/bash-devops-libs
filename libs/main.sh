@@ -4,7 +4,7 @@
 # Usage: _importLibFiles <lib>
 function _importLibFiles() {
     
-    getArgs "_lib _libPath _libTmpPath _libTmpMain" "${@}"
+    getArgs "_lib _libPath _libTmpPath _libTmpMain"
 
     # Check if the lib is available from download
     if [ -f ${_libTmpMain} ]; then
@@ -21,7 +21,7 @@ function _importLibFiles() {
 ### Check if a value exists in an array ###
 # usage: _valueInArray <value> <array>
 function _valueInArray() {
-    getArgs "_value &@_values" "${@}"
+    getArgs "_value @_values"
     local _val
     for _val in "${_values[@]}"; do
         if [[ "${_val}" == "${_value}" ]]; then return 1; fi

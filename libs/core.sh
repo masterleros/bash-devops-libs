@@ -133,7 +133,7 @@ function verifyDeps() {
 }
 
 ### get arguments ###
-# usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
+# usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>"
 # when a variable name starts with @<var> it will take the rest of values
 # when a variable name starts with &<var> it is optional and script will not fail case there is no value for it
 # when a variable has an <var>=<value> format, it will take a default value
@@ -187,7 +187,7 @@ function getArgs() {
 # Usage: _createLibFunctions <lib alias> <func1> <func2> ... <funcN>
 function _createLibFunctions() {
 
-    getArgs "&_libAlias &_funcHeader @_libFuncts" "${@}"
+    getArgs "_libAlias= _funcHeader= @_libFuncts"
 
     # Make as part of do namespace
     local _libAlias="do"$([ ! "${_libAlias}" ] || echo ".${_libAlias}")
