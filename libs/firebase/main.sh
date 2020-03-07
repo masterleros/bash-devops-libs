@@ -29,7 +29,7 @@ if [ "${FIREBASE_TOKEN}" ]; then FIREBASE_OPTS="--non-interactive --token ${FIRE
 #   validateProject <project> <id>
 function validateProject() {
 
-    getArgs "project id" "${@}"
+    getArgs "project id"
 
     # Get tha APP ID
     firebase "${FIREBASE_OPTS}" projects:list 2>&1 | grep "${project}" | grep "${id}" > /dev/null
@@ -40,7 +40,7 @@ function validateProject() {
 # usage: createProject <project> <id>
 function createProject() {
 
-    getArgs "project id" "${@}"
+    getArgs "project id"
 
     # Check if app already exists
     self validateProject "${project}" "${id}"
@@ -59,7 +59,7 @@ function createProject() {
 # usage: validateApp <project> <application> <type>
 function validateApp() {
 
-    getArgs "project application type" "${@}"
+    getArgs "project application type"
 
     # Get tha APP ID
     firebase "${FIREBASE_OPTS}" apps:list --project="${project}" 2>&1 | grep "${type}" | grep "${application}" > /dev/null
@@ -70,7 +70,7 @@ function validateApp() {
 # usage: createApp <project> <application> <type>
 function createApp() {
 
-    getArgs "project application type" "${@}"
+    getArgs "project application type"
 
     # Check if app already exists
     self validateApp "${project}" "${application}" "${type}"
@@ -89,7 +89,7 @@ function createApp() {
 # usage: getAppId <project> <type> <app>
 function getAppId() {
     
-    getArgs "project type app" "${@}"
+    getArgs "project type app"
 
     # Print the APP ID
     appType=$(echo "${type}" | tr '[:upper:]' '[:lower:]')
@@ -100,7 +100,7 @@ function getAppId() {
 # usage: getAppSdkConfig <project> <type> <file>
 function getAppSdkConfig() {
 
-    getArgs "project type app file" "${@}"
+    getArgs "project type app file"
 
     # Get the App Id
     assign app_id=self getAppId "${project}" "${type}" "${app}"

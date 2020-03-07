@@ -20,7 +20,7 @@ do.verifyDeps gcloud || return ${?}
 ### Set the requested project and then get credentials for the cluster ###
 # usage: loginCluster <cluster_name> <zone> <gcp_project_id>
 function loginCluster() {
-    getArgs "cluster_name zone project" "${@}"
+    getArgs "cluster_name zone project"
  
     # Gets credentials to use the cluster
     gcloud --quiet --project="${project}" container clusters get-credentials "${cluster_name}" --zone="${zone}"
@@ -30,7 +30,7 @@ function loginCluster() {
 ### Describe cluster ###
 # usage describeCluster <cluster_name> <zone>
 function describeCluster() {
-    getArgs "cluster_name zone project" "${@}"
+    getArgs "cluster_name zone project"
 
     # Describe cluster
     gcloud --quiet --project="${project}" container clusters describe "${cluster_name}" --zone="${zone}"

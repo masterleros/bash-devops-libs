@@ -60,7 +60,7 @@ function verifyDeps() {
 # @example 
 #   assign valPos=valueInArray <value> <array>
 function valueInArray() {
-    getArgs "_value &@_values" "${@}"
+    getArgs "_value @_values"
     local _val
     local _pos=0
     for _val in "${_values[@]}"; do
@@ -82,7 +82,7 @@ function valueInArray() {
 # @example 
 #   assign myVar=configInFile <file> <key>
 function configInFile() {
-    getArgs "_file _key" "${@}"
+    getArgs "_file _key"
     _return=$(< "${_file}" grep "${_key}" | cut -d':' -f2-)
     return $?
 }

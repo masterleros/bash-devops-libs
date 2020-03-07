@@ -21,7 +21,7 @@ do.use utils.tokens
 # usage: deploy <path> [version]
 function deploy {
 
-    getArgs "path &version" "${@}"
+    getArgs "path version="
     
     # Detokenize the file
     echoInfo "Creating detokenized yaml..."

@@ -29,7 +29,7 @@ function getCurrentUser() {
 ### Get a value from the credential json file ###
 # usage: getValueFromCredential <credential_file> <key>
 function getValueFromCredential {
-    getArgs "credential_path key" "${@}"
+    getArgs "credential_path key"
 
     # Verify if SA credential file exist
     [ -f "${credential_path}" ] || exitOnError "Cannot find SA credential file '${credential_path}'"
@@ -42,7 +42,7 @@ function getValueFromCredential {
 # usage: createSA <project> <sa_id> [description]
 function createSA {
 
-    getArgs "project sa_id &description" "${@}"
+    getArgs "project sa_id description="
 
     # Create sa email value
     sa_mail="${sa_id}@${project}.iam.gserviceaccount.com"
@@ -61,7 +61,7 @@ function createSA {
 # usage: useSA <credential_file>
 function useSA {
 
-    getArgs "credential_path" "${@}"
+    getArgs "credential_path"
 
     # Get SA user email
     assign _client_mail=self getValueFromCredential "${credential_path}" client_email
@@ -76,7 +76,7 @@ function useSA {
 # usage: revokeSA <credential_file>
 function revokeSA {
     
-    getArgs "credential_path" "${@}"
+    getArgs "credential_path"
 
     # Get SA user email
     assign _client_mail=self getValueFromCredential "${credential_path}" client_email
@@ -91,7 +91,7 @@ function revokeSA {
 # usage: createCredential <project> <credential_path> <sa_mail>
 function createCredential {
 
-    getArgs "project credential_path sa_mail" "${@}"
+    getArgs "project credential_path sa_mail"
 
     # Check if account is already created
     if [ -f "${credential_path}" ]; then  
@@ -111,7 +111,7 @@ function createCredential {
 # usage: createCredential <project> <credential_path> <sa_mail>
 function deleteCredential {
 
-    getArgs "project credential_path sa_mail" "${@}"
+    getArgs "project credential_path sa_mail"
 
     # Check if account is already created
     if [ -f "${credential_path}" ]; then

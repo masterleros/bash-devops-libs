@@ -125,7 +125,7 @@ function import() {
 # Usage: _addSource <type> <namespace> <data>
 function _addSource() {
 
-    getArgs "_sourceType _libNamespace _libRootDir _data" "${@}"
+    getArgs "_sourceType _libNamespace _libRootDir _data"
 
     # Check namespace
     [[ ${_libNamespace} != "do" ]] || exitOnError "Namespace '${_libNamespace}' is reserved"
@@ -152,7 +152,7 @@ function _addSource() {
 #   addGitSource <namespace> <repo> <branch> <dir>
 function addGitSource() {
 
-    getArgs "_libNamespace _gitRepo _gitBranch _libSubDir" "${@}"
+    getArgs "_libNamespace _gitRepo _gitBranch _libSubDir"
 
     # Create the source data
     local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
@@ -178,7 +178,7 @@ GIT_DIR:${_gitDir}"
 #   addLocalSource <namespace> <path>
 function addLocalSource() {
 
-    getArgs "_libNamespace _path" "${@}"
+    getArgs "_libNamespace _path"
 
     # Set required vars
     local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}
@@ -195,7 +195,7 @@ function addLocalSource() {
 #   addLocalSource <namespace> <path>
 function addLocalLib() {
 
-    getArgs "_libNamespace _path" "${@}"
+    getArgs "_libNamespace _path"
 
     # Set required vars
     local _libRootDir=${DOLIBS_LIBS_DIR}/${_libNamespace}

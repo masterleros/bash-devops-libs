@@ -21,7 +21,7 @@ do.verifyDeps git || return ${?}
 # usage: sync <git_url>
 function sync() {
 
-    getArgs "url branch" "${@}"
+    getArgs "url branch"
 
     # Verify Dependencies
     do.verifyDeps git || return ${?}

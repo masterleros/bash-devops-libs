@@ -164,7 +164,7 @@ This is very usefull to define variables/definitions accesibles to your project'
 export MY_PROJECT_DESCRIPTION="My cool project!"
 
 function customFunct() {
-  getArgs "arg" "${@}"
+  getArgs "arg"
   echo "My arg is: '${arg}'"
 }
 ```

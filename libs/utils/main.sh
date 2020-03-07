@@ -21,7 +21,7 @@
 # @arg text text Titles's text
 function showTitle() {
 
-    getArgs "text" "${@}"
+    getArgs "text"
 
     len=$(echo "# ${text} #"| wc -c)
     separator=$(eval printf '\#%.0s' {2.."${len}"})
@@ -38,7 +38,7 @@ function showTitle() {
 # @arg $cmd string command to be executed
 function retryExecution() {
     
-    getArgs "retries @cmd" "${@}"
+    getArgs "retries @cmd"
 
     for retry in $(seq $((retries+1))); do
         eval "${cmd}"
@@ -57,7 +57,7 @@ function retryExecution() {
 # usage: showTextUntil <cmd> <text>
 function showTextUntil {
     
-    getArgs "cmd text" "${@}"
+    getArgs "cmd text"
 
     # Wait until firebase project is available
     shownInstruction=0

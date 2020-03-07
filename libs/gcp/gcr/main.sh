@@ -79,7 +79,7 @@ function dockerLogoff() {
 # usage: getImageDigest <project_id> <docker_image_name> <docker_image_tag>
 function getImageDigest() {
     # Get the arguments
-    getArgs "_project_id _docker_image_name _docker_image_tag" "${@}"
+    getArgs "_project_id _docker_image_name _docker_image_tag"
 
     # Create the image tag and retrieve the digest
     DOCKER_IMAGE="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}"
@@ -93,7 +93,7 @@ function getImageDigest() {
 # usage: getFullDigestTag <project_id> <docker_image_name> <docker_image_tag>
 function getFullDigestTag() {
     # Get the arguments
-    getArgs "_project_id _docker_image_name _docker_image_tag" "${@}"
+    getArgs "_project_id _docker_image_name _docker_image_tag"
 
     # Get the image tag digest
     assign _tagDigest=self getImageDigest "${_project_id}" "${_docker_image_name}" "${_docker_image_tag}"
@@ -109,7 +109,7 @@ function getFullDigestTag() {
 function buildAndPublish() {
 
     # Get the arguments
-    getArgs "_project_id _docker_dir _docker_file _docker_image_name &@_docker_build_args" "${@}"
+    getArgs "_project_id _docker_dir _docker_file _docker_image_name @_docker_build_args"
 
     # Create the full image tag
     DOCKER_IMAGE_TAG_LATEST="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}:latest"

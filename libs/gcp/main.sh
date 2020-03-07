@@ -21,7 +21,7 @@ do.verifyDeps gcloud || return ${?}
 # usage: useProject <project_id>
 function useProject() {
 
-    getArgs "project" "${@}"
+    getArgs "project"
     
     # Check project    
     gcloud projects list | grep "${project}" &> /dev/null
@@ -36,7 +36,7 @@ function useProject() {
 ### Set default configuration for project and zone ###
 # usage: setDefaultZone <zone>
 function setDefaultZone() {
-    getArgs "zone" "${@}"
+    getArgs "zone"
 
     # Set zone
     gcloud config set compute/zone "${zone}"

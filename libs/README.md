@@ -44,7 +44,7 @@ When you develop a new library, some steps should be followed:
     ``` sh    
     # Validate and get the required arguments
     # Special chars: '&' = not mandatory / '@' = get rest of arguments    
-    getArgs "arg1 arg2 &@other_args" "${@}"
+    getArgs "arg1 arg2 @other_args"
 
     echo ${arg1} # This will print first argume passed
     ```
@@ -56,7 +56,7 @@ When you develop a new library, some steps should be followed:
 - Use `assign <var>=<function> <args>` in addition to `_return=<value>` inside the called function to return values from functions, example:
     ``` sh    
     function myFunction() {
-        getArgs "text" "${@}"
+        getArgs "text"
         _return="Hello ${text}"
     }
 
@@ -123,7 +123,7 @@ function doOtherThing() {
 }
 
 function doSomething() {
-    getArgs "arg1 arg2 &@other_args" "${@}"
+    getArgs "arg1 arg2 @other_args"
     assign myLibDir=self doOtherThing
     echoInfo "Arg1 = ${arg1}"
     echoInfo "Arg2 = ${arg2}"

@@ -72,11 +72,18 @@ function runModArgsTestRest_1() {
 runModArgsTest runModArgsTestRest_1
 
 echoInfo "Test getArgs 2nd @Rest"
-function runModArgsTestRest_1() {
+function runModArgsTestRest_2() {
   getArgs "@b"
   [[ "${b[0]} ${b[1]} ${b[2]}" == "1 2 3" ]] || testFailed
 }
-runModArgsTest runModArgsTestRest_1
+runModArgsTest runModArgsTestRest_2
+
+echoInfo "Test getArgs empty @Rest"
+function runModArgsTestRest_3() {
+  getArgs "a b c @d"
+  [[ "${a} ${b} ${c} ${d[0]}" == "1 2 3 " ]] || testFailed
+}
+runModArgsTest runModArgsTestRest_3
 
 echoInfo "Test get-Args succeed"
 ### YOUR CODE ###
