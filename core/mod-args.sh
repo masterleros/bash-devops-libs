@@ -31,12 +31,20 @@ function __rework() {
                 var=${var/&}; var=${var/@}; 
                 definitions="${definitions} local ${var}${newline}"            
                 reworked="${reworked} ${var/=*}"
-            done
+            done            
 
             # Update the code
             _body=${_body/"${lineFound}"/"${definitions} getArgs \"${reworked}\" \"\${@}\""}
         fi
     done
+
+    # # For each assign 
+    # local IFS=$'\n'
+    # local _assigments=$(echo "${_body}" | egrep -o "assign .*")
+    # for lineFound in ${_assigments}; do        
+    #     local _var=$(echo "${lineFound}" | cut -d ' ' -f2 | cut -d '=' -f1)        
+    #     _body=${_body/"${lineFound}"/"local ${_var};${lineFound}"}        
+    # done
 }
 
 ### Consume an internal library ###
@@ -78,7 +86,7 @@ function assign() {
     if [ ${_returnVar} != "_return" ]; then 
         # Copy _return to the desired variable
         local _declaration=$(declare | egrep ^_return=)
-        eval ${_declaration/_return=/${_returnVar}=}
+        eval "${_declaration/_return=/${_returnVar}=}"
         unset _return
 
         # Copy back _return value if existed

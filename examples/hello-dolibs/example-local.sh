@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (offline)
+# Enable dolibs
 source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --online -f /tmp/dolibs -l ../.. # source local at ../..
 
 # Echo options

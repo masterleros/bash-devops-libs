@@ -19,7 +19,7 @@ DOLIBS_VER="0.2"
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
 ### Temporary functions ###
-function _echo() { echo -e "${2} ${3}" >&${1}; }
+function _echo() { echo -e "${2} ${3}" >&"${1}"; }
 function echoDebug() { [[ "${DOLIBS_DEBUG}" != *"libs"* ]] || _echo 1 "\e[1m\e[36mDEBUG: \e[0m" "${@}"; }
 function echoCore() { [[ "${DOLIBS_DEBUG}" != *"core"* ]] || _echo 1 "\e[1m\e[35mDEBUG: \e[0m" "${@}"; }
 function echoInfo()  { _echo 1 "\e[1m\e[32mINFO:  \e[0m" "${@}"; }

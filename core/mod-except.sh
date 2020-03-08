@@ -28,8 +28,7 @@ try() {
         [ -f "${_tmpFile}" ] && rm "${_tmpFile}"
 
         (
-        # Set that is being executed in a try context
-        DOLIB_TRY_CONTEXT=true        
+        # Execute the actual function
         ${_returnFunc} "${@}"
         declare | egrep ^_return= | cut -d '=' -f2- > "${_tmpFile}"
         )

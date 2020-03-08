@@ -17,4 +17,4 @@
 source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --online -f /tmp/dolibs # mode auto
 
 # Echo options
-echoTitle "Hello DevOps Libs from local!"
+echoTitle "Hello DevOps Libs from remote!"
