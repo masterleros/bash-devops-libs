@@ -31,11 +31,10 @@ function exitOnError() {
         # If it is in a try context
         if [ "${DOLIB_TRY_CONTEXT}" != "true" ]; then    
             if [ ! -z "${_errorText}" ]; then
-                echoError "${_errorText}"
+                echoError "${_errorText}\nExiting (${_errorCode})..."
             else
-                echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
+                echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})\nExiting (${_errorCode})..."
             fi
-            echo "Exiting (${_errorCode})..."            
         fi
 
         exit "${_errorCode}"

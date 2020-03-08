@@ -13,11 +13,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs
+# Enable dolibs (offline)
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
 
-# Import required libs
-do.use utils # add your required libs
+# Set global definitions path (if not set, will use default at same folder as dolibs.sh)
+DOLIBS_GLOBALS_PATH="${PWD}/globals.sh"
 
-### YOUR CODE ###
-utils.showTitle "Hello World!"
-### YOUR CODE ###
+# Import global definitions
+do.use globals
+
+# Use global defined resources
+globals.globalFunction
+echoInfo "GLOBAL_VALUE = '${GLOBAL_VALUE}'"

@@ -32,13 +32,14 @@ DOLIBS_GIT_BOSTRAP="https://raw.githubusercontent.com/masterleros/bash-devops-li
 while [ "${1}" != "" ]; do
     case "${1}" in
         # clone mode
-        "--online") DOLIBS_MODE='online'; shift 1;;
-        "--auto") DOLIBS_MODE='auto'; shift 1;;
-        "--debug") DOLIBS_DEBUG='true'; shift 1;;
+        "--online") DOLIBS_MODE="online"; shift 1;;
+        "--auto") DOLIBS_MODE="auto"; shift 1;;
+        "--debug") DOLIBS_DEBUG="${DOLIBS_DEBUG} libs"; shift 1;;
+        "--debug-core") DOLIBS_DEBUG="${DOLIBS_DEBUG} core"; shift 1;;
         "--offline")
             # if online mode, use same source as included            
             DOLIBS_DIR=${DOLIBS_ROOTDIR}
-            DOLIBS_MODE='offline'; shift 1;;
+            DOLIBS_MODE="offline"; shift 1;;
         # dolibs folder    
         "-f") DOLIBS_DIR=${2}; shift 2;;
         # Local source folder (default is git)
@@ -73,17 +74,11 @@ if [ "${DOLIBS_MODE}" != "offline" ]; then
     fi
 fi
 
-# Check and enable set e and if is, disable
-# set_e_enabled=${-//[^e]/}
-# [ ${set_e_enabled} ] || set -e
-
 # Execute the boostrap if is present
 if [ ! -f "${DOLIBS_BOSTRAP}" ]; then
     echo "ERROR: It was not possible to find the boostrap at '${DOLIBS_BOSTRAP}' (offline mode?)"
     exit -1
 fi
 
-echo "executing ${DOLIBS_BOSTRAP}"
+# Execute the bootstrap
 . "${DOLIBS_BOSTRAP}"
-
-#[ ${set_e_enabled} ] || set +e # Disable set e if was enabled

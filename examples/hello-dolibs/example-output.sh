@@ -13,14 +13,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp/dolibs)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -l ../.. -f /tmp/dolibs
+# Enable dolibs (offline)
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline # --debug
 
-# Set the local lib source
-do.addLocalSource $(dirname "${BASH_SOURCE[0]}")/../../libs
+# echo flawors
+echoDebug "I'm a debug message, I'll appear only when '--debug' flag is used"
 
-# Import the required lib from custom namespace
-do.import local.utils
+echoInfo "Hello! I'm an informative message!"
 
-# Use the needed lib
-local.utils.showTitle "Hello Local DevOps Libs!"
+echoWarn "Ey! this is a warning message"
+
+echoError "Unfortunately, this is a error message"

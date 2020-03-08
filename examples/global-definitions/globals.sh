@@ -13,14 +13,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp/dolibs)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --online -f /tmp/dolibs -l ../..
+# Define global validations
+checkVars I_DO_NOT_EXIST ME_NEITHER
+checkBins invalid_binary other_inexistent_binary
+# exitOnError can be used to exit if values where not found
 
-# Set the custom lib source
-do.addGitSource myremotelib "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs
+# Define global function
+function globalFunction() {
+    echoInfo "Hello from '${FUNCNAME}()'"
+}
 
-# Import the required lib from custom namespace
-do.import myremotelib.utils
-
-# Use the needed lib
-myremotelib.utils.showTitle "Hello DevOps Libs!"
+# Define global function
+export GLOBAL_VALUE="I'm a global value!"

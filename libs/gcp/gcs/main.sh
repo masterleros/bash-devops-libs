@@ -15,7 +15,7 @@
 
 
 # Verify Dependencies
-do.verifyDeps gsutil
+checkBins gsutil
 
 ### Check bucket exists ###
 # usage: validateBucket <project> <bucket>

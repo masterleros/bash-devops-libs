@@ -13,23 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
-### Print a nice title ###
-# usage: showTitle "title text"
-
-# @description Print a nice title
-# @arg text text Titles's text
-function showTitle() {
-
-    getArgs "text" "${@}"
-
-    len=$(echo "# ${text} #"| wc -c)
-    separator=$(eval printf '\#%.0s' {2.."${len}"})
-    echo "        ${separator}"
-    echo "        # ${text} #"
-    echo "        ${separator}"
-}
-
 ### Execute a command until success within a retries ###
 # usage: retryExecution "command"
 

@@ -15,7 +15,7 @@
 
 
 # Verify Dependencies
-do.verifyDeps firebase || return ${?}
+checkBins firebase || return ${?}
 
 # Set firebase options
 if [ "${FIREBASE_TOKEN}" ]; then FIREBASE_OPTS="--non-interactive --token ${FIREBASE_TOKEN}"; fi

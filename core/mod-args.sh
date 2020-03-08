@@ -64,31 +64,28 @@ function assign() {
         _returnFunc=${SELF_LIB}.${_returnFunc}        
     fi
 
-    # If desired varibla is not return
+    # If desired variable is not return
     if [ "${_returnVar}" != "_return" ]; then 
         # Store last _return value
         local _returnTmp=("${_return[@]}")
-        # Clean new _return
-        unset _return
     fi
 
-    # Execute the function and store the result    
+    # Clear _return, execute the function and store the exit code    
+    unset _return
     ${_returnFunc} "${@}"
-    local _result=${?}
+    local _eCode=${?}
 
-    if [[ ${_returnVar} != "_return" ]]; then 
+    if [ ${_returnVar} != "_return" ]; then 
         # Copy _return to the desired variable
-        local _returnVal
-        local _argPos=0
-        for _returnVal in "${_return[@]}"; do 
-            eval $(echo "${_returnVar}"["${_argPos}"]="'${_returnVal}'")
-            ((_argPos+=1))
-        done
-        # Copy back _return value
-        _return=("${_returnTmp[@]}")
+        local _declaration=$(declare | egrep ^_return=)
+        eval ${_declaration/_return=/${_returnVar}=}
+        unset _return
+
+        # Copy back _return value if existed
+        [ ! "${_returnTmp}" ] || _return=("${_returnTmp[@]}")
     fi
 
-    return ${_result}
+    return ${_eCode}
 }
 
 ### get arguments ###

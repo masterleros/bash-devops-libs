@@ -30,7 +30,7 @@ try() {
         (
         # Set that is being executed in a try context
         DOLIB_TRY_CONTEXT=true        
-        ${_returnFunc} ${@}        
+        ${_returnFunc} "${@}"
         declare | egrep ^_return= | cut -d '=' -f2- > "${_tmpFile}"
         )
         local _result=${?}
@@ -40,7 +40,9 @@ try() {
 
     # If is a normal function
     else
-        ${@}
+        (
+        "${@}"
+        )
         local _result=${?}
     fi
 

@@ -1,5 +1,5 @@
-* [do.validateVars()](#dovalidatevars)
-* [do.verifyDeps()](#doverifydeps)
+* [do.checkVars()](#docheckVars)
+* [do.checkBins()](#docheckBins)
 * [do.valueInArray()](#dovalueinarray)
 * [do.configInFile()](#doconfiginfile)
 * [do.document()](#dodocument)
@@ -11,7 +11,7 @@
 
 
 
-# do.validateVars()
+# do.checkVars()
 
 Validate if the specified variables are defined
 
@@ -31,10 +31,10 @@ Validate if the specified variables are defined
 ### Example
 
 ```bash
-validateVars <var1> <var2> ... <varN>
+checkVars <var1> <var2> ... <varN>
 ```
 
-# do.verifyDeps()
+# do.checkBins()
 
 Verify if the specified binaries dependencies are available
 
@@ -54,7 +54,7 @@ Verify if the specified binaries dependencies are available
 ### Example
 
 ```bash
-verifyDeps <bin1> <bin2> ... <binN>
+checkBins <bin1> <bin2> ... <binN>
 ```
 
 # do.valueInArray()

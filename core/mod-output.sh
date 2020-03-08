@@ -16,56 +16,32 @@
 # Bash color options
 # https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
-### Set current color
-# usage: _addColorText <text>
-function _addColorText() {
-    _text="${_text}\e[${1}m${@}"
-}
-
 ### Echo the required text
 # usage: _echo <text>
 function _echo() {
+
     local _stdRedirect="${1}"; shift
     local _textToPrint="${1}"; shift
-    local _textToPrintColor="${1}"; shift
     local _text="${@/'\n'/$'\n'}"
 
     # For each line
     local IFS=$'\n'
     for _line in ${_text[@]}; do
-        echo -e "\e[1m\e[${_textToPrintColor}m${_textToPrint} \e[0m${_line}" >&${_stdRedirect}
+        echo -e "${_textToPrint} ${_line}" >&${_stdRedirect}
         _textToPrint="       "
     done
 }
 
-### Show debug information
-# usage: echoDebug <text>
-function echoDebug() {
-    [ "${DOLIBS_DEBUG}" != "true" ] || _echo 1 "DEBUG: " 36 ${@}
-}
-
-### Show a info text
-# usage: echoInfo <text>
-function echoInfo() {
-    _echo 1 "INFO:  " 32 "${@}"
-}
-
-### Show a warning text
-# usage: echoWarn <text>
-function echoWarn() {
-    _echo 1 "WARN:  " 33 ${@}
-}
-
-### Show an error text (stderr)
+### Show a title
 # usage: echoError <text>
-function echoError() {
-    _echo 2 "ERROR: " 31 "${@}"
-}
-
-### Show a tittle
-# usage: echoError <text>
-function echoTittle() {
+function echoTitle() {
     echo
-    echo -e "\e[1m        ${@}"
+    _echo 1 "" "\e[1m       ${@}"
     echo
 }
+
+# Initiated on boostrap
+# function echoDebug() { [ "${DOLIBS_DEBUG}" != "true" ] || _echo 1 "\e[1m\e[36mDEBUG: \e[0m" "${@}"; }
+# function echoInfo()  { _echo 1 "\e[1m\e[32mINFO:  \e[0m ${@}"; }
+# function echoWarn()  { _echo 1 "\e[1m\e[33mWARN:  \e[0m" "${@}"; }
+# function echoError() { _echo 2 "\e[1m\e[31mERROR: \e[0m" "${@}"; }

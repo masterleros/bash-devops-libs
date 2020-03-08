@@ -15,18 +15,22 @@
 
 export DOLIBS_MAIN_FILE="main.sh"
 DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
+DOLIBS_VER="0.2"
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
 ### Temporary functions ###
+function _echo() { echo -e "${2} ${3}" >&${1}; }
+function echoDebug() { [[ "${DOLIBS_DEBUG}" == *"libs"* ]] && _echo 1 "\e[1m\e[36mDEBUG: \e[0m" "${@}"; }
+function echoCore() { [[ "${DOLIBS_DEBUG}" == *"core"* ]] && _echo 1 "\e[1m\e[35mDEBUG: \e[0m" "${@}"; }
+function echoInfo()  { _echo 1 "\e[1m\e[32mINFO:  \e[0m" "${@}"; }
+function echoWarn()  { _echo 1 "\e[1m\e[33mWARN:  \e[0m" "${@}"; }
+function echoError() { _echo 2 "\e[1m\e[31mERROR: \e[0m" "${@}"; }
 function exitOnError() {
     if [ "${2:-$?}" != 0 ]; then
-        echo "ERROR:  ${1}"
-        echo "Exiting (${_errorCode})..."
+        echoError "${1}"
+        echoError "Exiting (${_errorCode})..."
         exit "${_errorCode}"
     fi
-}
-function echoInfo() {
-    echo "INFO:   ${1}"
 }
 ### Temporary functions ###
 
@@ -45,10 +49,10 @@ function dolibGitClone() {
 
     # Get the code        
     if [ ! -d "${GIT_DIR}" ]; then            
-        echoInfo "Cloning Libs code from '${GIT_REPO}'..."
+        echoCore "Cloning Libs code from '${GIT_REPO}'..."
         git clone -q -b "${GIT_BRANCH}" --single-branch "${GIT_REPO}" "${GIT_DIR}"
     else
-        echoInfo "Updating Libs code from '${GIT_REPO}'..."
+        echoCore "Updating Libs code from '${GIT_REPO}'..."
         git -C "${GIT_DIR}" pull -q
     fi
     exitOnError "It was not possible to clone the GIT code"
@@ -126,7 +130,7 @@ function dolibImportFiles() {
     local LIB=${3}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
 
-    echoInfo "Installing '${LIB}' code..."
+    echoCore "Installing '${LIB}' code..."
 
     # Check if the lib entrypoint exists
     [ -f "${LIB_SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${LIB_SOURCE_DIR}' not found! (does it need add source?)"
@@ -184,21 +188,21 @@ function dolibUpdate() {
     if [ "${DOLIBS_MODE}" == 'auto' ]; then
         # If the lib is not integral, needs to update
         if dolibNotIntegral "${LIB_DIR}"; then
-            echoInfo "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
+            echoCore "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
             _result=1
         elif [ "${GIT_DIR}" ] && dolibGitWrongBranch "${LIB_ROOT_DIR}" "${GIT_BRANCH}"; then
-            echoInfo "Source branch has changed, trying to get its code..."
+            echoCore "Source branch has changed, trying to get its code..."
             _result=2
         fi
     # ONLINE mode
     elif [ "${DOLIBS_MODE}" == 'online' ]; then
         # If the lib is outdated, clone it
         if [ "${GIT_DIR}" ] && dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
-            echoInfo "GIT Source has changed for '${LIB}', trying to get its code..."
+            echoCore "GIT Source has changed for '${LIB}', trying to get its code..."
             _result=3
         # If the lib is outdated, copy it
         elif dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
-            echoInfo "Local source has changed for '${LIB}', trying to get its code..."
+            echoCore "Local source has changed for '${LIB}', trying to get its code..."
             _result=4
         fi
     fi
@@ -213,12 +217,14 @@ function dolibUpdate() {
 }
 
 # Show operation mode
-if [ "${DOLIBS_MODE}" == 'offline' ]; then 
-    echoInfo "---> dolibs Libs (${DOLIBS_MODE}) <---"
-elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
-    echoInfo "---> dolibs Local Source dir: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
-else
-    echoInfo "---> dolibs GIT source branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
+echo
+echoInfo "Initializing \e[1mdolibs\e[0m (v${DOLIBS_VER})"
+if [ "${DOLIBS_MODE}" != 'offline' ]; then 
+    if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
+        echoInfo "(${DOLIBS_MODE}) from local source - '${DOLIBS_LOCAL_SOURCE_DIR}'"
+    else
+        echoInfo "(${DOLIBS_MODE}) from GIT source - branch '${DOLIBS_BRANCH}'"
+    fi
 fi
 
 # If Core library was not yet loaded

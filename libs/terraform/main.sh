@@ -15,7 +15,7 @@
 
 
 # Verify Dependencies
-do.verifyDeps terraform || return ${?}
+checkBins terraform || return ${?}
 
 ### Init terraform plan
 # usage: init <terraform path>
@@ -55,7 +55,7 @@ function createBackEndGCP() {
     getArgs "terraform_path bucket prefix" "${@}"
 
     # Validate required vars and dependencies
-    do.validateVars GOOGLE_APPLICATION_CREDENTIALS
+    checkVars GOOGLE_APPLICATION_CREDENTIALS
     exitOnError "'GOOGLE_APPLICATION_CREDENTIALS' Variable must be set for backend configuration"
 
     # Create backend config

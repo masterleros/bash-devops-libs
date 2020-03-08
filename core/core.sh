@@ -87,11 +87,9 @@ function dolibCreateLibFunctions() {
 
     # Set the function local context, this is required because    
     # these values can be used when sourcing the new lib code
-    local SELF_LIB="${_lib}"
-    local SELF_LIB_DIR="${_libDir}"
     local _funcHeader='
-    local SELF_LIB='${SELF_LIB}'
-    local SELF_LIB_DIR='${SELF_LIB_DIR}'
+    local SELF_LIB='${_lib}'
+    local SELF_LIB_DIR='${_libDir}'
     if [ ${-//[^e]/} ]; then 
         set +e
         ${FUNCNAME} "${@}"
@@ -109,6 +107,8 @@ function dolibCreateLibFunctions() {
     local _currFuncts=$(typeset -F)
 
     # Import lib
+    local SELF_LIB="${_lib}"
+    local SELF_LIB_DIR="${_libDir}"
     source "${_libEntrypoint}"
     exitOnError "Error importing '${_libEntrypoint}'"
 

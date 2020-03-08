@@ -13,44 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
-# @description Validate if the specified variables are defined
-# @arg $@ list variables names to be validated
-# @exitcode 0 If all are defined
-# @exitcode >0 Amount of variables not defined
-# @stdout Variables not declared
-# @example 
-#   validateVars <var1> <var2> ... <varN>
-function validateVars() {
-    local _result=0
-    for var in ${@}; do
-        if [ -z "${!var}" ]; then
-            echoError "Environment varirable '${var}' is not declared!"
-            ((_result+=1))
-        fi
-    done
-    return ${_result}
-}
-
-# @description Verify if the specified binaries dependencies are available
-# @arg $@ list binaries to be verified
-# @exitcode 0 If all are found
-# @exitcode >0 Amount of binaries not found
-# @stderr Binaries not found
-# @example 
-#   verifyDeps <bin1> <bin2> ... <binN>
-function verifyDeps() {
-    local _result=0
-    for dep in ${@}; do
-        which "${dep}" &> /dev/null
-        if [[ $? -ne 0 ]]; then
-            echoError "Binary dependency '${dep}' not found!"
-            ((_result+=1))
-        fi
-    done
-    return ${_result}
-}
-
 # @description Check if a value exists in an array
 # @arg value value Value to look for
 # @arg array array Array to look for the value

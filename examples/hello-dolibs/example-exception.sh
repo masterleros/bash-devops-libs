@@ -14,7 +14,24 @@
 #    limitations under the License.
 
 # Enable dolibs (offline)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline # --debug
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
 
-# Echo options
-echoTitle "Hello DevOps Libs in offline mode!"
+# Define a custom function
+function myOwnFunction() {
+    
+    echoInfo "Hello from '${FUNCNAME}()'..."
+
+    # Execute a failure
+    ls i-do-not-exist
+    exitOnError "Something went wrong"
+
+    echoInfo "I will not appear as there is an error above"
+}
+
+# Executing using 'try' will catch the exception
+try myOwnFunction "a value"
+echoInfo "This message appear because exception was caught"
+
+# Executing not using 'try' will exit the script
+myOwnFunction "another value"
+echoInfo "This message will not appear as is behind an undandled exception"

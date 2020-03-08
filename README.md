@@ -54,19 +54,20 @@ The following options are available when you include **dolibs** by passing them 
 - **Operation Mode:** Indicate how updated are managed
 - **Folder:** dolibs working folder
 - **Local Source (optional):** Use a local dolibs source insted of remote (i.e: development)
+- **Debug:** Run in debug mode, it will print additional debugging information
+- **Debug Core:** Run in core debug mode, it will print additional debugging information from the core engine
 
 Other options are global and will change **dolibs** for any include, to change them, you need to edit the `dolibs.sh` file:
 
 - **DOLIBS_MODE:** Default operation mode (default: auto)
 - **DOLIBS_BRANCH:** dolibs branch (default: master)
-- **DOLIBS_REPO:** dolibs source repo (it will not change if you are note forking the project)
 
 ### OPTION: Operation Mode
 This mode indicate how `dolibs` will manage the updates, there are 3 operation modes:
 
 |Mode|Argument|Description|
 |-|-|-|
-|**Auto (default)**|N/A|This mode will download/copy the libraries if not found locally or if there is no local consistency|
+|**Auto (default)**|N/A|This mode will download/copy the libraries if not found locally or if there is consistency|
 |**Online**|--online|This mode will check the source's updates and will download/copy and update the libraries automatically|
 |**Offline**|--offline|This Mode will use available libraries, if it is not found nor consistent, it will fail|
 
@@ -77,13 +78,19 @@ source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh --offline
 ```
 > **Tip:** To change default operation mode, update `DOLIBS_MODE` variable value editing `dolibs.sh` file.
 
-### OPTION: Folder
+### OPTION: Folder (-f)
 By default, `dolibs.sh` will use the `<dolibs.sh dir>/dolibs` folder to download/copy and install all the requested libs. \
 It is possible to use **dolibs** in a custom directory, to do so, you need to specify the `-f <path>` argument when sourcing `dolibs.sh`.
 
-### OPTION: Local Source
+### OPTION: Local Source (-l)
 By default, when in `auto` or `online` mode, **dolibs** will clone its own code from GIT. \
 Instead, it is possible to specify a local source (folder) to copy from the `dolibs` code. Using in that way it is possible to develop `dolibs` libraries locally and test without the need of commit your `dolibs` code all the times.
+
+### OPTION: Debug (--debug)
+This will enable `echoDebug` calls from libs or even from final developer code
+
+### OPTION: Debug (--debug-core)
+This will enable code debugging logs
 
 # Libraries Sources
 `dolibs` allows to add external sources to be used whitin same scripts. \
@@ -109,10 +116,10 @@ source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
 do.addGitSource myremotelib "https://github.com/masterleros/bash-devops-libs.git" master
 
 # Import the required lib from custom namespace
-do.import myremotelib.utils
+do.import myremotelib.dummy
 
 # Use the needed lib
-do.myremotelib.utils.showTitle "Hello DevOps Libs!"
+myremotelib.dummy.doIt "Hello DevOps Libs!"
 ```
 
 ## Local Source
@@ -128,10 +135,10 @@ source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
 do.addLocalSource $(dirname ${BASH_SOURCE[0]})/../../libs
 
 # Import the required lib from custom namespace
-do.import mylocallib.utils
+do.import mylocallib.dummy
 
 # Use the custom lib
-mylocallib.utils.showTitle "Hello DevOps Libs!"
+mylocallib.dummy.doIt "Hello DevOps Libs!"
 ```
 
 ## Local Libraries
@@ -147,20 +154,23 @@ source $(dirname ${BASH_SOURCE[0]})/../../dolibs.sh
 do.addLocalLib "<my source>/mylibs"
 
 # Import the required lib from custom namespace
-do.import mylibs.utils
+do.import mylibs.dummy
 
 # Use the custom lib
-mylibs.utils.showTitle "Hello DevOps Libs!"
+mylibs.dummy.doIt "Hello DevOps Libs!"
 ```
 
 # Good Practices
 
 ## Global definitions
-As a good practice for your own scripts centralize your project's configurations/validations. `dolibs` provides the **definitions** lib which will include the file `definitions.sh` automatically. \
-This is very usefull to define variables/definitions accesibles to your project's scripts globaly. Example:
+As a good practice for your own scripts centralize your project's configurations/validations. `dolibs` provides the **globals** lib which will source your script defined in `DOLIBS_GLOBALS_PATH` variable, if not defined, the default value is `globals.sh` file placed in the `dolibs.sh` folder \
+This is very usefull to define validations/functions/variables/definitions accesibles to your project's scripts globaly. Example:
 
-**definitions.sh**
+**globals.sh**
 ``` sh
+checkVars A_VARIABLE
+checkBins a_binary
+
 export MY_PROJECT_DESCRIPTION="My cool project!"
 
 function customFunct() {
@@ -173,8 +183,8 @@ The above environment variable `MY_PROJECT_DESCRIPTION` and custom function `cus
 
 **my-script.sh**
 ``` sh
-do.import definitions
-do.definitions.customFunct "${MY_PROJECT_DESCRIPTION}"
+do.use globals
+globals.customFunct "${MY_PROJECT_DESCRIPTION}"
 
 # Output: My arg is: 'My cool project!'
 ```

@@ -24,8 +24,8 @@
       gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
 
       # Validate required vars and dependencies
-      do.validateVars DOCKERFILE_PATH IMAGE_TAG
-      do.verifyDeps docker
+      checkVars DOCKERFILE_PATH IMAGE_TAG
+      checkBins docker
 
   script:
   - | 

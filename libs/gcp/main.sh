@@ -15,7 +15,7 @@
 
 
 # Verify Dependencies
-do.verifyDeps gcloud || return ${?}
+checkBins gcloud || return ${?}
 
 ### Validate and set the requested project ###
 # usage: useProject <project_id>
