@@ -27,7 +27,7 @@ function _echo() {
     # For each line
     local IFS=$'\n'
     for _line in ${_text[@]}; do
-        echo -e "${_textToPrint} ${_line}" >&${_stdRedirect}
+        echo -e "${_textToPrint} ${_line}" >&"${_stdRedirect}"
         _textToPrint="       "
     done
 }

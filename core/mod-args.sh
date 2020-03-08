@@ -83,7 +83,7 @@ function assign() {
     ${_returnFunc} "${@}"
     local _eCode=${?}
 
-    if [ ${_returnVar} != "_return" ]; then 
+    if [ "${_returnVar}" != "_return" ]; then 
         # Copy _return to the desired variable
         local _declaration=$(declare | egrep ^_return=)
         eval "${_declaration/_return=/${_returnVar}=}"
