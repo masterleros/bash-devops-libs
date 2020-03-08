@@ -1,8 +1,5 @@
-* [do.checkVars()](#docheckVars)
-* [do.checkBins()](#docheckBins)
-* [do.valueInArray()](#dovalueinarray)
-* [do.configInFile()](#doconfiginfile)
 * [do.document()](#dodocument)
+* [do.configInFile()](#doconfiginfile)
 * [do.use()](#douse)
 * [do.import()](#doimport)
 * [do.addGitSource()](#doaddgitsource)
@@ -11,75 +8,24 @@
 
 
 
-# do.checkVars()
+# do.document()
 
-Validate if the specified variables are defined
+Generate the markdown documentation of a lib
 
 ### Arguments
 
-* **...** (list): variables names to be validated
-
-### Exit codes
-
-* **0**: If all are defined
-* **>0**: Amount of variables not defined
-
-### Output on stdout
-
-* Variables not declared
+* **dir** (path): Directory of the library to be documented
+* **doc** (path): md file (markdown) to be generated
+* **namespace** (string): (optional) library's namespace
 
 ### Example
 
 ```bash
-checkVars <var1> <var2> ... <varN>
+document <dir> <file> [namespace]
 ```
 
-# do.checkBins()
 
-Verify if the specified binaries dependencies are available
 
-### Arguments
-
-* **...** (list): binaries to be verified
-
-### Exit codes
-
-* **0**: If all are found
-* **>0**: Amount of binaries not found
-
-### Output on stderr
-
-* Binaries not found
-
-### Example
-
-```bash
-checkBins <bin1> <bin2> ... <binN>
-```
-
-# do.valueInArray()
-
-Check if a value exists in an array
-
-### Arguments
-
-* **value** (value): Value to look for
-* **array** (array): Array to look for the value
-
-### Return value
-
-* Found value position
-
-### Exit codes
-
-* **0**: Value was found
-* **1**: Value not found
-
-### Example
-
-```bash
-assign valPos=valueInArray <value> <array>
-```
 
 # do.configInFile()
 
@@ -104,28 +50,6 @@ Get a value from a config file in format <key>:<value>
 ```bash
 assign myVar=configInFile <file> <key>
 ```
-
-
-
-
-# do.document()
-
-Generate the markdown documentation of a lib
-
-### Arguments
-
-* **dir** (path): Directory of the library to be documented
-* **doc** (path): md file (markdown) to be generated
-* **namespace** (string): (optional) library's namespace
-
-### Example
-
-```bash
-document <dir> <file> [namespace]
-```
-
-
-
 
 # do.use()
 

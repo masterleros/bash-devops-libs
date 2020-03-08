@@ -29,7 +29,7 @@ I'm running from '${SELF_LIB_DIR}'
 and current up-time is: $(uptime -p)"
 }
 
-# @description Exit for purpouse of demostrate try functionality
+# @description Exit with error for purpouse of demostrate try functionality
 function breakIt() {
     echoInfo "${FUNCNAME}(): I am a problematic function and will break now"
     exitOnError "${FUNCNAME}(): I told you!" 1

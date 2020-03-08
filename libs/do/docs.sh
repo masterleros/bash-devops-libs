@@ -42,8 +42,16 @@ function document() {
 
     echoInfo "Generating documentation for '${_libRootDir}'"
 
-    # Process all lib files
+    # Get all lib files
     SHDOC_FILES=($(find "${_libRootDir}" -name "*.sh" | sort ))
+
+    # If there are no files to be processed
+    if [ ! "${SHDOC_FILES}" ]; then
+        echoWarn "It was not found any file to document at '${_libRootDir}'"
+        return
+    fi
+
+    # Process all lib files
     for SHDOC_FILE in ${SHDOC_FILES[@]}; do
         # Set the lib subspace
         SHDOC_LIB_SUBSPACE="$(realpath -s --relative-to="${_libRootDir}" $(dirname "${SHDOC_FILE}") | cut -d'.' -f2 | sed "s#/#.#")"

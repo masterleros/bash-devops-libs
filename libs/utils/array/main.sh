@@ -34,17 +34,3 @@ function valueInArray() {
     done
     return 1
 }
-
-# @description Get a value from a config file in format <key>:<value>
-# @arg file path Path to the file
-# @arg key Key of the required value
-# @return Value of the key
-# @exitcode 0 Key found
-# @exitcode 1 Key not found
-# @example 
-#   assign myVar=configInFile <file> <key>
-function configInFile() {
-    getArgs "_file _key" "${@}"
-    _return=$(< "${_file}" grep "${_key}" | cut -d':' -f2-)
-    return $?
-}
