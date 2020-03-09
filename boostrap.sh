@@ -15,24 +15,28 @@
 
 export DOLIBS_MAIN_FILE="main.sh"
 DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
+DOLIBS_VER="0.2"
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
 ### Temporary functions ###
+function _echo() { echo -e "${2} ${3}" >&"${1}"; }
+function echoDebug() { [[ "${DOLIBS_DEBUG}" != *"libs"* ]] || _echo 1 "\e[1m\e[36mDEBUG: \e[0m" "${@}"; }
+function echoCore() { [[ "${DOLIBS_DEBUG}" != *"core"* ]] || _echo 1 "\e[1m\e[35mDEBUG: \e[0m" "${@}"; }
+function echoInfo()  { _echo 1 "\e[1m\e[32mINFO:  \e[0m" "${@}"; }
+function echoWarn()  { _echo 1 "\e[1m\e[33mWARN:  \e[0m" "${@}"; }
+function echoError() { _echo 2 "\e[1m\e[31mERROR: \e[0m" "${@}"; }
 function exitOnError() {
     if [ "${2:-$?}" != 0 ]; then
-        echo "ERROR:  ${1}"
-        echo "Exiting (${_errorCode})..."
+        echoError "${1}"
+        echoError "Exiting (${_errorCode})..."
         exit "${_errorCode}"
     fi
-}
-function echoInfo() {
-    echo "INFO:   ${1}"
 }
 ### Temporary functions ###
 
 ### Function to clone the lib code ###
-# usage: dolibGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
-function dolibGitClone() {
+# usage: _dolibGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
+function _dolibGitClone() {
 
     local GIT_REPO=${1}
     local GIT_BRANCH=${2}
@@ -45,10 +49,10 @@ function dolibGitClone() {
 
     # Get the code        
     if [ ! -d "${GIT_DIR}" ]; then            
-        echoInfo "Cloning Libs code from '${GIT_REPO}'..."
+        echoCore "Cloning Libs code from '${GIT_REPO}'..."
         git clone -q -b "${GIT_BRANCH}" --single-branch "${GIT_REPO}" "${GIT_DIR}"
     else
-        echoInfo "Updating Libs code from '${GIT_REPO}'..."
+        echoCore "Updating Libs code from '${GIT_REPO}'..."
         git -C "${GIT_DIR}" pull -q
     fi
     exitOnError "It was not possible to clone the GIT code"
@@ -68,8 +72,8 @@ EOF
 }
 
 ### Function to indicate if the lib code is outdated ###
-# usage: dolibGitOutDated <LIB_ROOT_DIR>
-function dolibGitOutDated() {
+# usage: _dolibGitOutDated <LIB_ROOT_DIR>
+function _dolibGitOutDated() {
 
     local LIB_ROOT_DIR=${1}
     local GIT_DIR=${2}
@@ -92,9 +96,9 @@ function dolibGitOutDated() {
     [ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]
 }
 
-### Function to indicate if the lib code is outdated ###
-# usage: dolibGitWrongBranch <LIB_ROOT_DIR> <GIT_BRANCH>
-function dolibGitWrongBranch() {
+### Function to indicate if the lib code branch has changed ###
+# usage: _dolibGitWrongBranch <LIB_ROOT_DIR> <GIT_BRANCH>
+function _dolibGitWrongBranch() {
 
     local LIB_ROOT_DIR=${1}
     local GIT_BRANCH=${2}
@@ -107,9 +111,9 @@ function dolibGitWrongBranch() {
     [ "${GIT_BRANCH}" != $(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-) ]
 }
 
-### Function to indicate if the source if different than the lib ###
-# usage: dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
-function dolibSourceUpdated() {
+### Function to indicate if the local source (or cache) is different than the lib ###
+# usage: _dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
+function _dolibSourceUpdated() {
     local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
 
@@ -118,15 +122,15 @@ function dolibSourceUpdated() {
 }
 
 ### Import Lib files ###
-# Usage: dolibImportFiles <SOURCE_DIR> <LIB_DIR>
-function dolibImportFiles() {
+# Usage: _dolibImportFiles <SOURCE_DIR> <LIB_DIR>
+function _dolibImportFiles() {
     
     local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
     local LIB=${3}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
 
-    echoInfo "Installing '${LIB}' code..."
+    echoCore "Installing '${LIB}' code..."
 
     # Check if the lib entrypoint exists
     [ -f "${LIB_SOURCE_DIR}/${DOLIBS_MAIN_FILE}" ] || exitOnError "Library source '${LIB_SOURCE_DIR}' not found! (does it need add source?)"
@@ -145,8 +149,8 @@ function dolibImportFiles() {
 }
 
 ### Check if the libs files are valid ###
-# Usage: dolibNotIntegral <LIB_DIR>
-function dolibNotIntegral() {
+# Usage: _dolibNotIntegral <LIB_DIR>
+function _dolibNotIntegral() {
     
     local LIB_DIR=${1}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
@@ -164,11 +168,11 @@ function dolibNotIntegral() {
     [ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]    
 }
 
-### Detect if code needs to be updated ###
-# Usage: libNeedsUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
+### Update the a lib code if it is required ###
+# Usage: _dolibUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
 # obs: if not GIT_DIR is provided, it's threated as local source
 # return 0 if updated, 1 if not present, 2 if auto mode but branch changed, 3 if git updated, 4 if source updated
-function dolibUpdate() {
+function _dolibUpdate() {
 
     local LIB=${1}
     local LIB_SOURCE_DIR=${2}
@@ -183,42 +187,44 @@ function dolibUpdate() {
     # AUTO mode
     if [ "${DOLIBS_MODE}" == 'auto' ]; then
         # If the lib is not integral, needs to update
-        if dolibNotIntegral "${LIB_DIR}"; then
-            echoInfo "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
+        if _dolibNotIntegral "${LIB_DIR}"; then
+            echoCore "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
             _result=1
-        elif [ "${GIT_DIR}" ] && dolibGitWrongBranch "${LIB_ROOT_DIR}" "${GIT_BRANCH}"; then
-            echoInfo "Source branch has changed, trying to get its code..."
+        elif [ "${GIT_DIR}" ] && _dolibGitWrongBranch "${LIB_ROOT_DIR}" "${GIT_BRANCH}"; then
+            echoCore "Source branch has changed, trying to get its code..."
             _result=2
         fi
     # ONLINE mode
     elif [ "${DOLIBS_MODE}" == 'online' ]; then
         # If the lib is outdated, clone it
-        if [ "${GIT_DIR}" ] && dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
-            echoInfo "GIT Source has changed for '${LIB}', trying to get its code..."
+        if [ "${GIT_DIR}" ] && _dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
+            echoCore "GIT Source has changed for '${LIB}', trying to get its code..."
             _result=3
         # If the lib is outdated, copy it
-        elif dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
-            echoInfo "Local source has changed for '${LIB}', trying to get its code..."
+        elif _dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
+            echoCore "Local source has changed for '${LIB}', trying to get its code..."
             _result=4
         fi
     fi
 
     # if needs to update
     if [ "${_result}" != 0 ]; then
-        [ "${GIT_DIR}" ] && dolibGitClone "${GIT_REPO}" "${GIT_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
-        dolibImportFiles "${LIB_SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
+        [ "${GIT_DIR}" ] && _dolibGitClone "${GIT_REPO}" "${GIT_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
+        _dolibImportFiles "${LIB_SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
     fi
 
     return ${_result}
 }
 
 # Show operation mode
-if [ "${DOLIBS_MODE}" == 'offline' ]; then 
-    echoInfo "---> dolibs Libs (${DOLIBS_MODE}) <---"
-elif [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
-    echoInfo "---> dolibs Local Source dir: '${DOLIBS_LOCAL_SOURCE_DIR}' (${DOLIBS_MODE}) <---"        
-else
-    echoInfo "---> dolibs GIT source branch: '${DOLIBS_BRANCH}' (${DOLIBS_MODE}) <---"        
+echo
+echoInfo "Initializing \e[1mdolibs\e[0m (v${DOLIBS_VER})"
+if [ "${DOLIBS_MODE}" != 'offline' ]; then 
+    if [ "${DOLIBS_LOCAL_SOURCE_DIR}" ]; then 
+        echoInfo "(${DOLIBS_MODE}) from local source - '${DOLIBS_LOCAL_SOURCE_DIR}'"
+    else
+        echoInfo "(${DOLIBS_MODE}) from GIT source - branch '${DOLIBS_BRANCH}'"
+    fi
 fi
 
 # If Core library was not yet loaded
@@ -243,7 +249,7 @@ if [ ! "${DOLIBS_LOADED}" ]; then
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
 
         # Update lib if required
-        dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}"
+        _dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}"
 
         # If lib was updated, update others required
         if [ ${?} != 0 ]; then

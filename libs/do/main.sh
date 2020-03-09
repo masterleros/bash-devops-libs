@@ -15,8 +15,21 @@
 
 
 # Include its components
-. "${SELF_LIB_DIR}/base.sh"
 . "${SELF_LIB_DIR}/docs.sh"
+
+# @description Get a value from a config file in format <key>:<value>
+# @arg file path Path to the file
+# @arg key Key of the required value
+# @return Value of the key
+# @exitcode 0 Key found
+# @exitcode 1 Key not found
+# @example 
+#   assign myVar=configInFile <file> <key>
+function configInFile() {
+    getArgs "_file _key" "${@}"
+    _return=$(< "${_file}" grep "${_key}" | cut -d':' -f2-)
+    return $?
+}
 
 # @description Use build-in libraries to be used in a script
 # @arg $@ list List of libraries names
@@ -102,14 +115,14 @@ function import() {
                 fi
 
                 # Update lib if rquired
-                dolibUpdate "${_lib}" "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}" "${_libGitRepo}" "${_libGitBranch}"
+                _dolibUpdate "${_lib}" "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}" "${_libGitRepo}" "${_libGitBranch}"
 
                 # Create/update documentation if lib was updated
                 [ ${?} == 0 ] || self document "${_libRootDir}" "${DOLIBS_DOCUMENTATION_DIR}/${_libNamespace}.md" "${_libNamespace}"                
             fi
 
             # Create the libs and set as imported
-            assign funcCount=dolibCreateLibFunctions "${_lib}" "${_libDir}"
+            assign funcCount=dolibImportLib "${_lib}" "${_libDir}"
 
             # Set as imported
             export DOLIBS_IMPORTED="${DOLIBS_IMPORTED};${_lib}"            

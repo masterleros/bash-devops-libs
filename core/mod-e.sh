@@ -13,17 +13,22 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# @file definitions
-# @brief This lib will include your `definitions.sh` file placed in the `dolibs.sh` folder by doing a ```source <path>/definition.sh```. 
-# @brief 
-# @brief Doin so, will enable the lib to use centralized values defined for your scripts.
+# This is the legacy "set -e" support, now disabled but 
+# maintained with code in case of future re-use
 
-export DOLIBS_DEFINITIONS=${DOLIBS_ROOTDIR}/definitions.sh
+# Rework imported code
+# function __rework() {
 
-# Check if file exists
-if [ -f "${DOLIBS_DEFINITIONS}" ]; then
-    source "${DOLIBS_DEFINITIONS}"
-    echoInfo "Definitions file is included now!"
-else
-    exitOnError "Defintions file '${DOLIBS_DEFINITIONS}' was not found"
-fi
+#     # Set the function local context, this is required because    
+#     local _funcHeader='
+#     if [ ${-//[^e]/} ]; then 
+#         set +e
+#         ${FUNCNAME} "${@}"
+#         _result=${?}
+#         set -e
+#         return ${_result}
+#     fi'
+
+#     # rework code
+#     _body="${_funcHeader}; ${_body}"
+# }

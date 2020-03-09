@@ -15,7 +15,7 @@
 
 
 # Verify Dependencies
-verifyDeps gcloud || return ${?}
+checkBins gcloud || return ${?}
 
 ### Deploy Cloud Function ###
 # usage: deploy <function name> <aditional_parameters_array_list>

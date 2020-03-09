@@ -1,11 +1,38 @@
+* [utils.array.valueInArray()](#utilsarrayvalueinarray)
 * [utils.configs.setVariablesFromFile()](#utilsconfigssetvariablesfromfile)
 * [utils.files.findAndCallback()](#utilsfilesfindandcallback)
-* [utils.showTitle()](#utilsshowtitle)
 * [utils.retryExecution()](#utilsretryexecution)
 * [utils.tokens.get()](#utilstokensget)
 * [utils.tokens.getNames()](#utilstokensgetnames)
 * [utils.tokens.replaceFromFile()](#utilstokensreplacefromfile)
 * [utils.tokens.replaceFromFileToFile()](#utilstokensreplacefromfiletofile)
+
+
+
+# utils.array.valueInArray()
+
+Check if a value exists in an array
+
+### Arguments
+
+* **value** (value): Value to look for
+* **array** (array): Array to look for the value
+
+### Return value
+
+* Found value position
+
+### Exit codes
+
+* **0**: Value was found
+* **1**: Value not found
+
+### Example
+
+```bash
+assign valPos=valueInArray <value> <array>
+```
+
 
 
 
@@ -55,14 +82,6 @@ findAndCallback <dir> <file> <callback> [args]
 
 
 
-
-# utils.showTitle()
-
-Print a nice title
-
-### Arguments
-
-* **text** (text): Titles's text
 
 # utils.retryExecution()
 

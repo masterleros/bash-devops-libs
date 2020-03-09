@@ -13,4 +13,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs
+# Enable dolibs (offline)
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline --debug
+
+# echo flawors
+echoDebug "I'm a debug message, I'll appear only when '--debug' flag is used"
+
+echoInfo "Hello! I'm an informative message!"
+
+echoWarn "Ey! this is a warning message"
+
+echoError "Unfortunately, this is a error message"

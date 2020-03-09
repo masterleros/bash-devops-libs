@@ -15,7 +15,7 @@
 
 
 # Verify Dependencies
-do.verifyDeps git || return ${?}
+checkBins git || return ${?}
 
 ### Synchronize a GIT repository with current code
 # usage: sync <git_url>
@@ -24,7 +24,7 @@ function sync() {
     getArgs "url branch" "${@}"
 
     # Verify Dependencies
-    do.verifyDeps git || return ${?}
+    checkBins git || return ${?}
 
     # Remote repository to sync and current branch
     remote="gitsync"

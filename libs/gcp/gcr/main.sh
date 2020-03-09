@@ -15,7 +15,7 @@
 
 
 # Validate required packages
-verifyDeps gcloud docker || return ${?}
+checkBins gcloud docker || return ${?}
 
 # Define the GCloud registry host
 export GCLOUD_DOCKER_REGISTRY_HOST="gcr.io"
@@ -30,7 +30,7 @@ function dockerLogin() {
     do.import gcp
 
     # Check if credential definition is present
-    validateVars GOOGLE_APPLICATION_CREDENTIALS
+    checkVars GOOGLE_APPLICATION_CREDENTIALS
     exitOnError "Required credentials not found"
 
     # Get credential user

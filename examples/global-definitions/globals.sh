@@ -13,16 +13,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-source $(dirname ${BASH_SOURCE[0]})/../dolibs.sh -f .. --offline
+# Define global validations
+checkVars I_DO_NOT_EXIST ME_NEITHER
+checkBins invalid_binary other_inexistent_binary
+# exitOnError can be used to exit if values where not found
 
-# Generate documentaton for the core lib
-do.document ${DOLIBS_CORE_DIR} core.md do
+# Define global function
+function globalFunction() {
+    echoInfo "Hello from '${FUNCNAME}()'"
+}
 
-# For each included lib
-INCLUDED_DOLIBS=($(find ${DOLIBS_LIBS_DIR} -maxdepth 1 -mindepth 1 -type d))
-for INCLUDED_DOLIB in ${INCLUDED_DOLIBS[@]}; do
-    CURRENT=$(basename ${INCLUDED_DOLIB})
-
-    # Generate documentaton for the current lib
-    do.document ${INCLUDED_DOLIB} $(dirname ${BASH_SOURCE[0]})/../docs/${CURRENT}.md ${CURRENT}
-done
+# Define global function
+export GLOBAL_VALUE="I'm a global value!"

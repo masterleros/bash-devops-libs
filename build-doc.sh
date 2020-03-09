@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +13,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Docker template
-.docker-template:
-  before_script:
-    - | 
-      # .docker-template before_script      
+source $(dirname "${BASH_SOURCE[0]}")/dolibs.sh --offline
 
-      # Import DevOps Libs and convert environment variables
-      source ${DEVOPS_LIBS_DIR}/dolibs.sh
-      do.use gitlab
-      gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
+# Generate documentaton for the core lib
+do.document "${DOLIBS_CORE_DIR}" "${DOLIBS_DIR}"/docs/core.md
 
-      # Validate required vars and dependencies
-      checkVars DOCKERFILE_PATH IMAGE_TAG
-      checkBins docker
+# For each included lib
+INCLUDED_DOLIBS=($(find "${DOLIBS_LIBS_DIR}" -maxdepth 1 -mindepth 1 -type d))
+for INCLUDED_DOLIB in ${INCLUDED_DOLIBS[@]}; do
+    CURRENT=$(basename "${INCLUDED_DOLIB}")
 
-  script:
-  - | 
-    # Build docker image
-    docker build -t ${IMAGE_TAG} -f ${DOCKERFILE_PATH} $(dirname ${DOCKERFILE_PATH})
+    # Generate documentaton for the current lib
+    do.document "${INCLUDED_DOLIB}" "${DOLIBS_DIR}"/docs/"${CURRENT}".md "${CURRENT}"
+done

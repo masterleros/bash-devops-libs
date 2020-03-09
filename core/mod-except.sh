@@ -13,55 +13,44 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-DOLIB_EXCEPTION_CATCH=""
+# @description Try execution in a subshel so that will not exit the program in case of failure
+# @arg $@ list Command to be executed
+# @exitcode last Last execution exit code
+# @example
+#   try <command>
+try() {
 
-#  https://stackoverflow.com/questions/22009364/is-there-a-try-catch-command-in-bash
+    # If it is an assigment
+    if [ "${1}" == "assign" ]; then            
+        local _tmpFile="${DOLIBS_TMPDIR}/.try-${RANDOM}.tmp"
+        local _assigments=${2}
+        local _returnVar=${_assigments%%"="*}
+        local _returnFunc=${_assigments##*"="}        
+        shift 2
 
-# Rework imported code
-function __rework() {
-    # rework function content
-    body=${body//raiseOnError/local _eCode='${?}'; [ '${_eCode}' == 0 ] || raise '${_eCode}' && return '${_eCode}'}
-}
+        # Remove tmp file if exists
+        [ -f "${_tmpFile}" ] && rm "${_tmpFile}"
 
-
-# Raise an exception in case of an error
-# function raiseOnError() {
-#     local _errorCode=${?}
-#     [ "${_errorCode}" == 0 ] || raise ${_errorCode} 1
-#     return ${_errorCode}
-# }
-
-# Set execution when an exception is raised
-function catch() {
-    DOLIB_EXCEPTION_CATCH=("${@}")
-}
-
-# Raise an exception
-function raise() {
-    local _errorCode=${?}
-    local _errIndex=${1}
-    [ "${_errIndex}" ] || _errIndex=0
-    [ "${DOLIB_EXCEPTION_CATCH}" ] && [ "$(trap -- | grep tryCatch)" ] || \
-        echoError "Unhandled exception at '${BASH_SOURCE["${_errIndex}"]}' - line ${BASH_LINENO["${_errIndex}"]} (code: ${_errorCode})"
-    kill -SIGTERM ${$}
-    return ${_errorCode}
-}
-
-# Catch execution in the exception
-function try() {
-
-    # Function when catch the try
-    function tryCatch() {
-        # Execute the exception code
-        if [ "${DOLIB_EXCEPTION_CATCH}" ]; then
-            "${DOLIB_EXCEPTION_CATCH[@]}"
-            unset -v DOLIB_EXCEPTION_CATCH
-        fi
-
-        # Unset the trap
-        trap - SIGTERM        
-    }
+        (
+        # Execute the actual function
+        ${_returnFunc} "${@}"
+        declare | egrep ^_return= | cut -d '=' -f2- > "${_tmpFile}"
+        )
+        local _result=${?}
     
-    # Set thy trap
-    trap tryCatch SIGTERM
+        # Restore the value if was written
+        [ -f "${_tmpFile}" ] && eval "${_returnVar}"=$(cat "${_tmpFile}")
+
+    # If is a normal function
+    else
+        (
+        "${@}"
+        )
+        local _result=${?}
+    fi
+
+    # Show message
+    [ "${_result}" == 0 ] || echoWarn "Caught exception At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
+
+    return ${_result}
 }

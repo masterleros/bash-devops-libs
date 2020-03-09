@@ -71,24 +71,22 @@ My Deploy Job:
   stage: Deploy
   extends: .gcp-template.docker
   script:
-    - do.use utils
-    - utils.showTitle "Deploying to the below instances"
+    - echoTitle "Deploying to the below instances"
     - gcloud --project ${GCP_PROJECT_ID} compute instances list
-    - utils.showTitle "Hey I was deployed! =D"
+    - echoInfo "Hey I was deployed! =D"
 
 My Test Job:
   stage: Test
   extends: .base-template.docker
   script:
-    - do.use utils
-    - utils.showTitle "Hey! I'm testing something here!"
+    - echoTitle "Hey! I'm testing something here!"
     
 My Promote Job:
   stage: Promote
   extends: .base-template.docker
   script:
-    - do.use utils gitlab
-    - utils.showTitle "Promoting Code to master!"
+    - do.use gitlab
+    - echoTitle "Promoting Code to master!"
     - export
-    - utils.showTitle ${CI_PROJECT_URL}
+    - echoInfo ${CI_PROJECT_URL}
     - gitlab.promoteToBranch master

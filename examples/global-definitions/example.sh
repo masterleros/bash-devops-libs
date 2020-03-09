@@ -13,14 +13,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp/dolibs)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --online -f /tmp/dolibs -l ../..
+# Enable dolibs (offline)
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
 
-# Set the custom lib source
-do.addGitSource myremotelib "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs
+# Set global definitions path (if not set, will use default at same folder as dolibs.sh)
+DOLIBS_GLOBALS_PATH="${PWD}/globals.sh"
 
-# Import the required lib from custom namespace
-do.import myremotelib.utils
+# Import global definitions
+do.use globals
 
-# Use the needed lib
-myremotelib.utils.showTitle "Hello DevOps Libs!"
+# Use global defined resources
+globals.globalFunction
+echoInfo "GLOBAL_VALUE = '${GLOBAL_VALUE}'"

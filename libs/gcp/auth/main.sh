@@ -13,9 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
 # Verify Dependencies
-do.verifyDeps gcloud || return ${?}
+checkBins gcloud || return ${?}
 
 ### Get a value from the credential json file ###
 # usage: getCurrentUser
