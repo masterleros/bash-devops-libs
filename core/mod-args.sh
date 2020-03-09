@@ -13,30 +13,45 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Rework imported code
+# Rework imported cde
 function __rework() {
-
     # For each instance found
-    for lineFound in "$(echo "${body}" | grep getArgs)"; do
+    # TODO: allow getArgs in comments/strings
+    body=$(echo "${body}" | grep getArgs | while read -r lineFound; do
         if [ "${lineFound}" ]; then
-            
             local var
-            local definitions=""
+            local val
+
+            local reworkedCode=""
             local reworked=""
             local newline=$'\n'
-            local toRework=($(echo "${lineFound}" | cut -d '"' -f2))    
 
             # Get each defined var
-            for var in ${toRework[@]}; do
-                var=${var/&}; var=${var/@}; 
-                definitions="${definitions} local ${var}${newline}"            
-                reworked="${reworked} ${var/=*}"
+            for var in $(echo "${lineFound}" | cut -d '"' -f2); do
+                if [[ ${var} == *"="* ]]; then # Default variables=default
+                  local var_value=(${var/=/ })
+                  reworkedCode="${reworkedCode} local ${var_value[0]}=\${1:-${var_value[1]}}; shift;${newline}"
+                  unset -v var_value
+                elif [[ ${var} == "@"* ]]; then # Rest
+                  var=${var/@};
+                  reworkedCode="${reworkedCode}
+  local rest_index=0;
+  while [ \${1} ]; do
+     local ${var}[\${rest_index}]=\${1}; shift;
+     ((rest_index+=1)); 
+  done;${newline}"
+                  break
+                else
+                  reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && echoError \"Values for argument '${var}' not found!\";
+local ${var}=\${1}; shift;${newline}"
+                fi
+                ((arg_pos+=1))
             done
-
             # Update the code
-            body=${body/"${lineFound}"/"${definitions} getArgs \"${reworked}\" \"\${@}\""}
+            body=${body/"${lineFound}"/"${reworkedCode}"}
         fi
-    done
+        echo "${body}"
+    done)
 }
 
 ### Consume an internal library ###
@@ -91,43 +106,3 @@ function assign() {
     return ${_result}
 }
 
-### get arguments ###
-# usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
-# when a variable name starts with @<var> it will take the rest of values
-# when a variable name starts with &<var> it is optional and script will not fail case there is no value for it
-function getArgs() {
-
-    local _result=0
-    local _args=(${1})
-    local _var
-
-    for _var in "${_args[@]}"; do
-        shift        
-        # if has # the argument is optional
-        if [[ ${_var} == "&"* ]]; then
-            #_var=$(echo "${_var}"| sed 's/&//')
-            _var=${_var/&/}
-        elif [ ! "${1}" ]; then
-            echoError "Values for argument '${_var}' not found!"
-            _var=""
-            ((_result+=1))
-        fi
-
-        # if has @ will get all the rest of arguments
-        if [[ "${_var}" == "@"* ]]; then
-            #_var=$(echo "${_var}"| sed 's/@//')
-            _var=${_var/@/}
-            local _argPos=0
-            unset -v ${_var} # Clean up the array before assign values
-            while [ "${1}" ]; do         
-                eval "$(echo ${_var}[${_argPos}]='${1}')"
-                shift; ((_argPos+=1))
-            done
-        # else get only one argument
-        elif [ "${_var}" ]; then
-            eval "$(echo ${_var}='${1}')"
-        fi
-    done
-
-    exitOnError "Invalid arguments at '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})\nUsage: ${FUNCNAME[1]} \"$(echo ${_args[@]})\"" ${_result}    
-}
