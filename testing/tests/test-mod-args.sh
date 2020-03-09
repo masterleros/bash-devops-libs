@@ -1,5 +1,5 @@
 #!/bin/bash
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs
 
 ### YOUR CODE ###
 function testFailed() {
