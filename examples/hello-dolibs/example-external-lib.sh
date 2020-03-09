@@ -13,19 +13,27 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -l ../.. -f /tmp/dolibs
+# Enable dolibs
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs -l ../.. --online
 
-# Set the custom remote lib source
+# Add the external lib source from GIT into the 'myremotelib' namespace
+# and import one of its modules
 do.addGitSource gitlib "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs
 exitOnError
 do.import gitlib.dummy
 
-# Set the custom lib source
+# Add the external local lib source into the  'locallib' namespcae
+# and import one of its modules
 do.addLocalSource locallib $(dirname "${BASH_SOURCE[0]}")/../../libs
 exitOnError
 do.import locallib.dummy
 
-### YOUR CODE ###
-gitlib.dummy.doIt "External lib import test!"
-locallib.dummy.doIt "Local lib import test!"
-### YOUR CODE ###
+# Use external gitlib
+echoInfo "Testing from 'gitlib'"
+gitlib.dummy.doIt "any value"
+
+# Use external locallib
+echoInfo "Testing from 'locallib'"
+locallib.dummy.doIt "any value"
+
+echoInfo "See you!"

@@ -54,4 +54,5 @@ assign elapsed=time.elapsed DEPLOY_TIMER
 assign human=time.human "${elapsed}"
 echoInfo "Elapsed time: ${human}"
 
+# If any process has failed, exit with error
 exitOnError "Some processes failed" ${waitResult}

@@ -15,6 +15,11 @@
 
 # Rework imported cde
 function __rework() {
+    ############## Header ##############
+    # Add to the function the lib context
+    _body="local SELF_LIB='${_lib}'; local SELF_LIB_DIR='${_libDir}'; ${_body}"
+    ############## Header ##############
+
     # For each instance found
     # TODO: allow getArgs in comments/strings
     body=$(echo "${body}" | grep getArgs | while read -r lineFound; do
@@ -54,19 +59,34 @@ local ${var}=\${1}; shift;${newline}"
     done)
 }
 
-### Consume an internal library ###
-# Usage: self <function> <args>
+# @description Execute a function within same library module
+# @exitcode any passed command execution exit code
+# @example 
+#   self <function> <args>
+#
+#   # Can be used in combination of assign
+#   assign <var>=self <function> <args>
 function self() {
     _function=${1}; shift
-    "${SELF_LIB}.${_function}" "${@}"
+    if [ "${SELF_LIB}" ]; then 
+        "${SELF_LIB}.${_function}" "${@}"
+    else
+        "${_function}" "${@}"
+    fi
     return ${?}
 }
 
-### Consume an internal library ###
-# Usage: assign <retvar>=<function> <args>
-############################################################
-# Obs: your function needs to return values on _return var #
-############################################################
+# @description Assign the returned value to a variable
+#   > Obs: your function needs to return values on the global `_return` variable
+# @arg $@ list variable=command and args
+# @exitcode any passed command execution exit code
+# @example
+#   function myFunc()
+#   {
+#       _return="value"
+#   }
+#   assign var=myFunc <args>
+#   echo ${var} # this will print 'value'
 function assign() {
 
     local _assigments=${1}; shift
@@ -79,31 +99,28 @@ function assign() {
         _returnFunc=${SELF_LIB}.${_returnFunc}        
     fi
 
-    # If desired varibla is not return
+    # If desired variable is not return
     if [ "${_returnVar}" != "_return" ]; then 
         # Store last _return value
         local _returnTmp=("${_return[@]}")
-        # Clean new _return
-        unset _return
     fi
 
-    # Execute the function and store the result    
+    # Clear _return, execute the function and store the exit code    
+    unset _return
     ${_returnFunc} "${@}"
-    local _result=${?}
+    local _eCode=${?}
 
-    if [[ ${_returnVar} != "_return" ]]; then 
+    if [ "${_returnVar}" != "_return" ]; then 
         # Copy _return to the desired variable
-        local _returnVal
-        local _argPos=0
-        for _returnVal in "${_return[@]}"; do 
-            eval $(echo "${_returnVar}"["${_argPos}"]="'${_returnVal}'")
-            ((_argPos+=1))
-        done
-        # Copy back _return value
-        _return=("${_returnTmp[@]}")
+        local _declaration=$(declare | egrep ^_return=)
+        eval "${_declaration/_return=/${_returnVar}=}"
+        unset _return
+
+        # Copy back _return value if existed
+        [ ! "${_returnTmp}" ] || _return=("${_returnTmp[@]}")
     fi
 
-    return ${_result}
+    return ${_eCode}
 }
 
 # @description Process the passed values in the required variables \
@@ -127,6 +144,6 @@ function assign() {
 #   echo ${var1} # will print what was passed in ${1}
 #   echo ${var2} # optional
 function getArgs() {
-  echoError "getArgs call was not been reworked!"
+  echoError "getArgs call was not been reworked! (have you used dolibReworkFunction() on your function?)"
   exit -1
 }

@@ -15,7 +15,7 @@
 
 
 # Verify Dependencies
-do.verifyDeps ps tr egrep time || return ${?}
+checkBins ps tr egrep time || return ${?}
 
 # Required variables
 _LIBPROC_PIDS=""

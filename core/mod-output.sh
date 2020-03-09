@@ -13,45 +13,50 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# Bash color options
+# https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
-### Show a info text
-# usage: echoInfo <text>
-function echoInfo() {
+### Echo the required text
+# usage: _echo <text>
+function _echo() {
+
+    local _stdRedirect="${1}"; shift
+    local _textToPrint="${1}"; shift
+    local _text="${@/'\n'/$'\n'}"
+
+    # For each line
     local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="INFO:  "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}"
+    for _line in ${_text[@]}; do
+        echo -e "${_textToPrint} ${_line}" >&"${_stdRedirect}"
         _textToPrint="       "
     done
 }
 
-### Show a test in the stderr
-# usage: echoError <text>
-function echoError() {
-    local IFS=$'\n'
-    local _text="${1/'\n'/$'\n'}"
-    local _lines=(${_text})
-    local _textToPrint="ERROR: "
-    for _line in "${_lines[@]}"; do
-        echo "${_textToPrint} ${_line}" >&2
-        _textToPrint="       "
-    done
+# @description Show a title
+# @arg $@ string Tittle's text
+# @example
+#   echoTitle <text>
+function echoTitle() {
+    echo
+    _echo 1 "" "\e[1m       ${@}"
+    echo
 }
 
-### Exit program with text when last exit code is non-zero ###
-# usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
-function exitOnError() {
-    local _errorCode=${2:-$?}
-    local _errorText=${1}
-    if [ "${_errorCode}" -ne 0 ]; then
-        if [ ! -z "${_errorText}" ]; then
-            echoError "${_errorText}"
-        else
-            echoError "At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
-        fi
-        echo "Exiting (${_errorCode})..."
-        exit "${_errorCode}"
-    fi
-}
+# Internal function to debug core, already defined in boostrat.sh
+# function echoCore() { [[ "${DOLIBS_DEBUG}" != *"core"* ]] || _echo 1 "\e[1m\e[35mDEBUG: \e[0m" "${@}"; }
+
+# @description Show a debug message (will print only when --debug flag is used)
+# @arg $@ string Text to be printed
+function echoDebug() { [[ "${DOLIBS_DEBUG}" != *"libs"* ]] || _echo 1 "\e[1m\e[36mDEBUG: \e[0m" "${@}"; }
+
+# @description Show an informative message
+# @arg $@ string Text to be printed
+function echoInfo()  { _echo 1 "\e[1m\e[32mINFO:  \e[0m" "${@}"; }
+
+# @description Show a warning message
+# @arg $@ string Text to be printed
+function echoWarn()  { _echo 1 "\e[1m\e[33mWARN:  \e[0m" "${@}"; }
+
+# @description Show an error message, this will be printed to the `stderr`
+# @arg $@ string Text to be printed
+function echoError() { _echo 2 "\e[1m\e[31mERROR: \e[0m" "${@}"; }

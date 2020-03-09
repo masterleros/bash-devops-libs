@@ -14,10 +14,7 @@
 #    limitations under the License.
 
 # Enable dolibs (offline)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f ../.. --offline
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline # --debug
 
-# Import the required lib
-do.use utils
-
-# Use the needed lib
-utils.showTitle "Hello DevOps Libs from local!"
+# Echo options
+echoTitle "Hello DevOps Libs in offline mode!"

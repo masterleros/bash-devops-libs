@@ -10,10 +10,10 @@ When you develop a new library, some steps should be followed:
 2. Verify the required dependencies for your execution, example:
     ``` sh
     # Validate available variables (if applicable) and return if error
-    do.validateVars <var1> <var2> ... <varN> || return ${?}
+    checkVars <var1> <var2> ... <varN> || return ${?}
 
     # Verify Dependencies (if applicable) and return if error
-    do.verifyDeps <dep1> <dep2> ... <depN> || return ${?}
+    checkBins <dep1> <dep2> ... <depN> || return ${?}
     ```
 
 3. Include your files:
@@ -28,12 +28,13 @@ When you develop a new library, some steps should be followed:
 4. Include other libraries:
     Use the `do.import` function to import other libraries for your library, example:
     ``` sh
-    # This will import the utils library
-    do.use utils
+    # This will import the dummy library
+    do.use dummy
 
     # Then You can access the library from your functions
     function myTest() {
-        utils.showTitle "This is a test!"
+        echoTitle "This is a test!"
+        dummy.doIt "Hello there!"
     }
     ```
 5. Document your library properly in the library folder and include a reference in this README.md file    
@@ -65,6 +66,45 @@ When you develop a new library, some steps should be followed:
 
     # This will print "Hello my name"
     ```
+
+## Printing text
+
+dolibs include some basic function to print text in a prefomated way, you will find the following ways to do it:
+
+- `echoDebug "text"` - Will print a debug message (only when dolis is started with --debug)
+- `echoInfo "text"` - Will print an info message
+- `echoWarn "text"` - Will print a warning message
+- `echoError "text"` - Will print an error message (this will be printed to stderr)
+
+## Error threatment 
+
+In order to control the flow of you script and make errors meaningfull and blocker for mayor issues, you should use the following function for validation of your script executions:
+
+- `exitOnError <message>` - This function will exit your script with a message if last exit code is not success
+- `returnOnError` - This function will return if last exit code is not success
+
+## Exceptions
+
+When you execute code, it may fail and request the script to exit (i.e: exitOnError). Sometimes your script may want to threat this exception, for that, the script cannot exit as it was requested.\
+For this pourpouse, you can use the `try` command that will execute in a secure subprocess and will brin you the exit code of the required execution, example:
+
+**test.sh**
+``` sh
+#!/bin/bash
+source $(dirname ${BASH_SOURCE[0]})/<relative path to>/dolibs.sh
+
+function problematic() {
+    ls i_do_not_exist
+    exitOnError
+}
+
+# This call will not allow the function to exit and script will continue and you can see result in the exit code
+try problematic
+
+# Without 'try' this will exit your script at this point
+problematic
+
+```
 
 ## Self Functions
 
@@ -106,10 +146,10 @@ myfunc.my_public_function
 #!/bin/bash
 
 # Validate Variables
-do.validateVars example_var || return ${?}
+checkVars example_var || return ${?}
 
 # Verify Dependencies
-do.verifyDeps example_dep || return ${?}
+checkBins example_dep || return ${?}
 
 # Import sub-modules
 source ${SELF_LIB_DIR}/additional_functions.sh || return ${?}

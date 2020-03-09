@@ -1,0 +1,39 @@
+#!/bin/bash
+#    Copyright 2020 Leonardo Andres Morales
+
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+
+#      http://www.apache.org/licenses/LICENSE-2.0
+
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+# Enable dolibs (offline)
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
+
+# Define a custom function
+function myOwnFunction() {
+    
+    echoInfo "Hello from '${FUNCNAME}()'..."
+
+    # Execute a failure
+    ls i-do-not-exist
+    exitOnError "Something went wrong"
+
+    echoInfo "I will not appear as there is an error above"
+}
+
+# Executing using 'try' will catch the exception
+echoTitle "Below we will generate a controlled error"
+try myOwnFunction "a value"
+echoInfo "This message appear because exception was caught"
+
+# Executing not using 'try' will exit the script
+echoTitle "Below we will generate an uncontrolled error"
+myOwnFunction "another value"
+echoInfo "This message will not appear as is behind an undandled exception"

@@ -13,14 +13,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Enable dolibs (clone to /tmp/dolibs)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -l ../.. -f /tmp/dolibs
+# @file global
+# @brief This lib will source your script defined in 'DOLIBS_GLOBALS_PATH' variable, if not defined, the default value is `globals.sh` file placed in the `dolibs.sh` folder.
+# @brief 
+# @brief Doin so, will enable the lib to use centralized values defined for your scripts.
 
-# Set the local lib source
-do.addLocalSource $(dirname "${BASH_SOURCE[0]}")/../../libs
+[ "${DOLIBS_GLOBALS_PATH}" ] || DOLIBS_GLOBALS_PATH=${DOLIBS_ROOTDIR}/globals.sh
 
-# Import the required lib from custom namespace
-do.import local.utils
-
-# Use the needed lib
-local.utils.showTitle "Hello Local DevOps Libs!"
+# Check if file exists
+if [ -f "${DOLIBS_GLOBALS_PATH}" ]; then
+    source "${DOLIBS_GLOBALS_PATH}"
+    echoInfo "Global definition file is included now!"
+else
+    exitOnError "Global defintion file '${DOLIBS_GLOBALS_PATH}' was not found"
+fi
