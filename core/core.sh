@@ -72,7 +72,7 @@ function dolibReworkFunction() {
     _dolibReworkCode
 
     # Export the reworked function
-    eval "$(echo "${_newFunc}() {"; echo "${_funcHeader}"; echo "${_body}"; echo "}")"
+    eval "$(echo "${_newFunc}() {"; echo "${_body}"; echo "}")"
 
     # Unset old function name if is different than original
     [ "${_funct}" == "${_newFunc}" ] || unset -f "${_funct}"
@@ -93,20 +93,6 @@ function dolibImportLib() {
 
     local _lib=${1}
     local _libDir=${2}
-
-    # Set the function local context, this is required because    
-    # these values can be used when sourcing the new lib code
-    local _funcHeader='
-    local SELF_LIB='${_lib}'
-    local SELF_LIB_DIR='${_libDir}'
-    if [ ${-//[^e]/} ]; then 
-        set +e
-        ${FUNCNAME} "${@}"
-        _result=${?}
-        set -e
-        return ${_result}
-    fi'
-    ############################
 
     # Check the lib entrypoint
     local _libEntrypoint=${_libDir}/${DOLIBS_MAIN_FILE}

@@ -16,6 +16,11 @@
 # Rework imported code
 function __rework() {
 
+    ############## Header ##############
+    # Add to the function the lib context
+    _body="local SELF_LIB='${_lib}'; local SELF_LIB_DIR='${_libDir}'; ${_body}"
+    ############## Header ##############
+
     # For each instance found
     for lineFound in "$(echo "${body}" | grep getArgs)"; do
         if [ "${lineFound}" ]; then
@@ -56,7 +61,11 @@ function __rework() {
 #   assign <var>=self <function> <args>
 function self() {
     _function=${1}; shift
-    "${SELF_LIB}.${_function}" "${@}"
+    if [ "${SELF_LIB}" ]; then 
+        "${SELF_LIB}.${_function}" "${@}"
+    else
+        "${_function}" "${@}"
+    fi
     return ${?}
 }
 

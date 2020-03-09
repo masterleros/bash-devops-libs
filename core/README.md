@@ -24,10 +24,19 @@ dolibs requires some global variables in order to operate, the following variabl
 |DOLIBS_LIBS_DIR|`dolibs` built-in libs folder|*default: [root]/libs*|No|Yes|
 |DOLIBS_TMPDIR|Temporary folder for GIT clone (added to .gitignore)|*default: [root]/.libtmp*|No|Yes|
 
-## The boostrap
+# Boostrap
 
 In order to start `dolibs`, there is a key component named `boostrap`. This component is implemented in the `boostrap.sh` file and is the core initializer script. \
 Its execution will define and perform several functionalities:
+
+### Code import 
+TODO
+
+### Code validation
+TODO
+
+### Operation mode
+TODO
 
 |Function|Description|Usage|
 |-|-|-|
@@ -39,7 +48,18 @@ Its execution will define and perform several functionalities:
 |**_dolibNotIntegral()**|Check if the libs files are valid|`_dolibNotIntegral <LIB_DIR>`|
 |**_dolibUpdate()**|Update the a lib code if it is required|`_dolibUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]`|
 
-## The Core
+# Core
+The core itself is the mechanism to source (import) other code and modify it to add the embeeded functionalities which are defined on the `core modules`.
+
+### Library import
+When a library is requested to be imported, the core library will source the library `main.sh` file, this will allow to the library to execute any validation, definition, etc on its `main.sh` body (even used to source other files). \
+After the library `main.sh` file is source, the core will get all imported functions from this and will rename them to respect the folder convention (e.g: mylib/test/main.sh -> will be mylib.test.[function])
+
+> Check the [library development section](../libs/README.md)
+
+### Function rework
+As mentioned above, when library is imported, the imported functions are reworked, this means that its name will be updated to include the library namespace and additionally all the core modules will be executed to process their body. Check below the `code modules` section.
+
 
 |Function|Description|Usage|
 |-|-|-|
@@ -50,7 +70,20 @@ Its execution will define and perform several functionalities:
 
 ## CORE modules
 `dolibs` implements a feature called **core modules**. These modules are names as `mod-<name>.sh` and placed at same folder as the core's code.\
-A `core module` is a piece of core functionality that will be loaded when core is bootstraped, currently there are some `core modules` already packgaged and are cucial for the internal libs functionalities.
+A `core module` is a piece of core functionality that will be loaded when core is bootstraped, currently there are some `core modules` already packgaged and are cucial for the internal libs functionalities. 
+
+Modules can modify/update the imported lib functions in order to add functionalities to the imported code, for that, when a module is imported to the core, the `__rework()` function is invoked. This function will receive the libs function's code every time one is imported. In this way the module can update the function code accordingly. When this function is invoked, the following values are available:
+
+|Variable|Description|
+|-|-|
+|**_funct**|Current function name|
+|**_newFunc**|New function name (if changing)|
+|**_file**|File from where the function comes from|
+|**_body**|Function's body (this variable will be rewriten back to function, so that needs to be updated with changes)|
+|**_lib**|Library namespace|
+|**_libDir**|Library folder|
+
+### Current build-in core modules:
 
 |Module|Description|
 |-|-|

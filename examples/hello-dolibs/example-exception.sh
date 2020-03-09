@@ -29,9 +29,11 @@ function myOwnFunction() {
 }
 
 # Executing using 'try' will catch the exception
+echoTitle "Below we will generate a controlled error"
 try myOwnFunction "a value"
 echoInfo "This message appear because exception was caught"
 
 # Executing not using 'try' will exit the script
+echoTitle "Below we will generate an uncontrolled error"
 myOwnFunction "another value"
 echoInfo "This message will not appear as is behind an undandled exception"
