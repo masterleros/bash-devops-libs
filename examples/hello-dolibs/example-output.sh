@@ -14,7 +14,7 @@
 #    limitations under the License.
 
 # Enable dolibs (offline)
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline # --debug
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline --debug
 
 # echo flawors
 echoDebug "I'm a debug message, I'll appear only when '--debug' flag is used"
