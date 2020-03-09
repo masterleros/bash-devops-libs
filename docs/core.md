@@ -104,7 +104,7 @@ Process the passed values in the required variables \
 
 ```bash
 # If any of the arguments is not provided, it will fail
-getArgs "var1 va2 ... varN>" "${@}"
+getArgs "var1 va2 ... varN>"
 echo ${var1} # will print what was passed in ${1}
 echo ${var2} # will print what was passed in ${2}
 # Same for the rest of arguments
@@ -114,7 +114,7 @@ echo ${var2} # will print what was passed in ${2}
 
 ```bash
 # var2 will be an array and will take all the remaining arguments 
-getArgs "var1 @var2" "${@}"
+getArgs "var1 @var2"
 echo ${var1} # will print what was passed in ${1}
 echo ${var2[@]} # will print all the rest of passed values
 ```
@@ -123,7 +123,7 @@ echo ${var2[@]} # will print all the rest of passed values
 
 ```bash
 # var2 is optional and if not passed will print nothing
-getArgs "var1 $var2" "${@}"
+getArgs "var1 $var2"
 echo ${var1} # will print what was passed in ${1}
 echo ${var2} # optional
 ```

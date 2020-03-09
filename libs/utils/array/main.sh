@@ -22,7 +22,7 @@
 # @example 
 #   assign valPos=valueInArray <value> <array>
 function valueInArray() {
-    getArgs "_value &@_values" "${@}"
+    getArgs "_value &@_values"
     local _val
     local _pos=0
     for _val in "${_values[@]}"; do

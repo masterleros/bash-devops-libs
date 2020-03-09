@@ -19,7 +19,7 @@ source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline --debug
 # Define a custom function
 function myOwnFunction() {
     
-    getArgs "var1 var2 @array" "${@}"
+    getArgs "var1 var2 @array"
 
     # Show the values received    
     echoInfo "var1 value is '${var1}'"

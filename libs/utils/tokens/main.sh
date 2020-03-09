@@ -22,7 +22,7 @@
 #   "${token1}" "${token2}" "${tokenN}"
 function get() {
 
-    getArgs "@data" "${@}"
+    getArgs "@data"
 
     # Get tokens
     _return=($(echo "${data}" | egrep -o '\$\{([a-zA-Z0-9_]+)\}'))
@@ -40,7 +40,7 @@ function get() {
 #   "token1" "token2" "tokenN"
 function getNames() {
 
-    getArgs "@data" "${@}"
+    getArgs "@data"
 
     # Get the tokens
     assign _return=self get "${data}"
@@ -61,7 +61,7 @@ function getNames() {
 #   replaceFromFile <file> [errors]
 function replaceFromFile() {
 
-    getArgs "file &errors" "${@}"
+    getArgs "file &errors"
 
     # Check if file exists
     [ -f "${file}" ] || exitOnError "File '${file}' not found"
@@ -98,7 +98,7 @@ function replaceFromFile() {
 #   replaceFromFileToFile <source> <target> [errors]
 function replaceFromFileToFile() {
 
-    getArgs "path_source path_target &errors" "${@}"
+    getArgs "path_source path_target &errors"
 
     # Get the content updated
     assign content=self replaceFromFile "${path_source}" "${errors}"

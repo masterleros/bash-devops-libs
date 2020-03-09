@@ -21,7 +21,7 @@ checkBins terraform || return ${?}
 # usage: init <terraform path>
 function init() {
 
-    getArgs "terraform_path" "${@}"
+    getArgs "terraform_path"
 
     cd "${terraform_path}"
 
@@ -33,7 +33,7 @@ function init() {
 # usage: apply <terraform path>
 function apply() {
     
-    getArgs "terraform_path &quiet" "${@}"
+    getArgs "terraform_path &quiet"
 
     cd "${terraform_path}"
 
@@ -52,7 +52,7 @@ function apply() {
 # usage: createBackEndGCP <terraform path> <bucket> <prefix>
 function createBackEndGCP() {
 
-    getArgs "terraform_path bucket prefix" "${@}"
+    getArgs "terraform_path bucket prefix"
 
     # Validate required vars and dependencies
     checkVars GOOGLE_APPLICATION_CREDENTIALS

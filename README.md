@@ -174,7 +174,7 @@ checkBins a_binary
 export MY_PROJECT_DESCRIPTION="My cool project!"
 
 function customFunct() {
-  getArgs "arg" "${@}"
+  getArgs "arg"
   echo "My arg is: '${arg}'"
 }
 ```

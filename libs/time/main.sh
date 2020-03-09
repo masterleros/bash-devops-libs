@@ -22,7 +22,7 @@ declare -a _LIBTIME_TIMERS
 # @example
 #   startTimer <name>
 function startTimer() {
-    getArgs "name" "${@}"
+    getArgs "name"
     _LIBTIME_TIMERS["${name}"]=${SECONDS}
 }
 
@@ -32,7 +32,7 @@ function startTimer() {
 # @example
 #   elapsed <name>
 function elapsed() {
-    getArgs "name" "${@}"
+    getArgs "name"
     _return=$(( SECONDS - ${_LIBTIME_TIMERS["${name}"]} ))
 }
 
@@ -42,7 +42,7 @@ function elapsed() {
 # @example
 #   human <seconds>
 function human() {
-    getArgs "seconds" "${@}"
+    getArgs "seconds"
 
     # Separate the time units
     local shiff=${seconds}

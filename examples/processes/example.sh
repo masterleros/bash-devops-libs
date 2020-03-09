@@ -21,7 +21,7 @@ do.use process time
 
 # This function will be executed when waiting the subprocess and it fails
 function endCallback() {
-    getArgs "_code _pid _cmd _logFile _elapsed" "${@}"
+    getArgs "_code _pid _cmd _logFile _elapsed"
 
     # Depending on the exit code
     if [ "${_code}" == 0 ]; then

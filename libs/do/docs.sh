@@ -26,7 +26,7 @@ export DOLIBS_SHDOC_BIN=${SELF_LIB_DIR}/shdoc.awk
 #   document <dir> <file> [namespace]
 function document() {
     
-    getArgs "_libRootDir _docPath &_namespace" "${@}"
+    getArgs "_libRootDir _docPath &_namespace"
 
     # Check lib folder
     [ -d "${_libRootDir}" ] || exitOnError "Folder '${_libRootDir}' not found"

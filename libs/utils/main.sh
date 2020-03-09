@@ -21,7 +21,7 @@
 # @arg $cmd string command to be executed
 function retryExecution() {
     
-    getArgs "retries @cmd" "${@}"
+    getArgs "retries @cmd"
 
     for retry in $(seq $((retries+1))); do
         eval "${cmd}"
@@ -40,7 +40,7 @@ function retryExecution() {
 # usage: showTextUntil <cmd> <text>
 function showTextUntil {
     
-    getArgs "cmd text" "${@}"
+    getArgs "cmd text"
 
     # Wait until firebase project is available
     shownInstruction=0

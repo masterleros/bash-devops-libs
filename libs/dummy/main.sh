@@ -22,7 +22,7 @@ checkBins uptime || return ${?}
 # @description Print the computer uptime
 # @arg var string Any value to be shown
 function doIt() {
-    getArgs "var" "${@}"
+    getArgs "var"
     echoTitle "Hello from '${SELF_LIB}' lib!"
     echoInfo "You have provided the the value '${var}'
 I'm running from '${SELF_LIB_DIR}'

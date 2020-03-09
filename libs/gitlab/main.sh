@@ -24,7 +24,7 @@
 #
 function convertEnvVars() {
 
-    getArgs "CI_COMMIT_REF_NAME @DOLIBS_BRANCHES_DEFINITION" "${@}"
+    getArgs "CI_COMMIT_REF_NAME @DOLIBS_BRANCHES_DEFINITION"
 
     # Set environment depending on branches definition
     for _definition in "${DOLIBS_BRANCHES_DEFINITION[@]}"; do
@@ -64,7 +64,7 @@ function convertEnvVars() {
 # usage: promoteToBranch <branch>
 function promoteToBranch() {
 
-    getArgs "branch" "${@}"
+    getArgs "branch"
 
     # Check if key was set
     checkVars GITLAB_USER_PRIVATE_KEY
