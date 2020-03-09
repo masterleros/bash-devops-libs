@@ -13,14 +13,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-### Empty function that receives the function/code 
-#content to be reworked
-function dolibReworkCode() {
+### INTERNAL FUNCTION ###
+# Empty function that receives the function/code rework from
+# core modules functions __rework()
+### INTERNAL FUNCTION ###
+function _dolibReworkCode() {
     ${PLUGIN_PLACEHOLDER}
 }
 
-### Import a module
-function dolibImportModule() {
+### INTERNAL FUNCTION ###
+# Import a core module
+### INTERNAL FUNCTION ###
+function _dolibImportModule() {
 
     # Import the module
     . "${1}"
@@ -32,21 +36,23 @@ function dolibImportModule() {
         local newCode=$(declare -f __rework | tail -n +3 | head -n -1)
 
         # Get current rework code
-        local funcCode=$(declare -f dolibReworkCode | tail -n +3 | head -n -1)
+        local funcCode=$(declare -f _dolibReworkCode | tail -n +3 | head -n -1)
         # Redeclare the function with the  new modules rework code
-        eval "$(echo "dolibReworkCode() {"; echo "${funcCode/'${PLUGIN_PLACEHOLDER}'/"${newCode}"';${PLUGIN_PLACEHOLDER}'}"; echo "}")"
+        eval "$(echo "_dolibReworkCode() {"; echo "${funcCode/'${PLUGIN_PLACEHOLDER}'/"${newCode}"';${PLUGIN_PLACEHOLDER}'}"; echo "}")"
 
         # Unset the module rework function    
         unset -f __rework
 
         # Export the new function for sub-processes
-        export -f dolibReworkCode
+        export -f _dolibReworkCode
     fi
 }
 
-### Rework a function
-# Usage: dolibReworkFunction <_funct> [_newFunc]
-# obs: _newFunc is optional in case of changing its name
+# @description Rework a function to enable dolibs features
+# @arg $func string Current function name
+# @arg $newFunc string (optional) New function name in case of renaming
+# @example
+#   dolibReworkFunction <func> <newFunc>
 function dolibReworkFunction() {
 
     local _funct=${1}
@@ -63,7 +69,7 @@ function dolibReworkFunction() {
     [ "${_body}" ] || exitOnError "Function '${_funct}' does not exist"
     
     # Execute the modules rework
-    dolibReworkCode
+    _dolibReworkCode
 
     # Export the reworked function
     eval "$(echo "${_newFunc}() {"; echo "${_funcHeader}"; echo "${_body}"; echo "}")"
@@ -78,9 +84,12 @@ function dolibReworkFunction() {
     #echo "Reworked function:  ${_libFunct} -> ${_libFunctNew}()"    
 }
 
-### Consume an internal library ###
-# Usage: dolibCreateLibFunctions <_lib> <lib_dir>
-function dolibCreateLibFunctions() {
+# @description Import a library (this function is not intended to be used manually, instead use do.use or do.import)
+# @arg $lib string Library namespace
+# @arg $libDir path Folder where the library files are hosted
+# @example
+#   dolibImportLib <lib> <libDir>
+function dolibImportLib() {
 
     local _lib=${1}
     local _libDir=${2}

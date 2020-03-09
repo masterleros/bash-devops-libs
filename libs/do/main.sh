@@ -115,14 +115,14 @@ function import() {
                 fi
 
                 # Update lib if rquired
-                dolibUpdate "${_lib}" "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}" "${_libGitRepo}" "${_libGitBranch}"
+                _dolibUpdate "${_lib}" "${_libSourceDir}" "${_libRootDir}" "${_libSubDir}" "${_libGitDir}" "${_libGitRepo}" "${_libGitBranch}"
 
                 # Create/update documentation if lib was updated
                 [ ${?} == 0 ] || self document "${_libRootDir}" "${DOLIBS_DOCUMENTATION_DIR}/${_libNamespace}.md" "${_libNamespace}"                
             fi
 
             # Create the libs and set as imported
-            assign funcCount=dolibCreateLibFunctions "${_lib}" "${_libDir}"
+            assign funcCount=dolibImportLib "${_lib}" "${_libDir}"
 
             # Set as imported
             export DOLIBS_IMPORTED="${DOLIBS_IMPORTED};${_lib}"            

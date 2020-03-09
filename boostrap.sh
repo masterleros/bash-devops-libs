@@ -35,8 +35,8 @@ function exitOnError() {
 ### Temporary functions ###
 
 ### Function to clone the lib code ###
-# usage: dolibGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
-function dolibGitClone() {
+# usage: _dolibGitClone <GIT_REPO> <GIT_BRANCH> <GIT_DIR> <LIB_ROOT_DIR>
+function _dolibGitClone() {
 
     local GIT_REPO=${1}
     local GIT_BRANCH=${2}
@@ -72,8 +72,8 @@ EOF
 }
 
 ### Function to indicate if the lib code is outdated ###
-# usage: dolibGitOutDated <LIB_ROOT_DIR>
-function dolibGitOutDated() {
+# usage: _dolibGitOutDated <LIB_ROOT_DIR>
+function _dolibGitOutDated() {
 
     local LIB_ROOT_DIR=${1}
     local GIT_DIR=${2}
@@ -97,8 +97,8 @@ function dolibGitOutDated() {
 }
 
 ### Function to indicate if the lib code is outdated ###
-# usage: dolibGitWrongBranch <LIB_ROOT_DIR> <GIT_BRANCH>
-function dolibGitWrongBranch() {
+# usage: _dolibGitWrongBranch <LIB_ROOT_DIR> <GIT_BRANCH>
+function _dolibGitWrongBranch() {
 
     local LIB_ROOT_DIR=${1}
     local GIT_BRANCH=${2}
@@ -112,8 +112,8 @@ function dolibGitWrongBranch() {
 }
 
 ### Function to indicate if the source if different than the lib ###
-# usage: dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
-function dolibSourceUpdated() {
+# usage: _dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
+function _dolibSourceUpdated() {
     local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
 
@@ -122,8 +122,8 @@ function dolibSourceUpdated() {
 }
 
 ### Import Lib files ###
-# Usage: dolibImportFiles <SOURCE_DIR> <LIB_DIR>
-function dolibImportFiles() {
+# Usage: _dolibImportFiles <SOURCE_DIR> <LIB_DIR>
+function _dolibImportFiles() {
     
     local LIB_SOURCE_DIR=${1}
     local LIB_DIR=${2}
@@ -149,8 +149,8 @@ function dolibImportFiles() {
 }
 
 ### Check if the libs files are valid ###
-# Usage: dolibNotIntegral <LIB_DIR>
-function dolibNotIntegral() {
+# Usage: _dolibNotIntegral <LIB_DIR>
+function _dolibNotIntegral() {
     
     local LIB_DIR=${1}
     local LIB_SHASUM_PATH="${LIB_DIR}/.lib.shasum"
@@ -172,7 +172,7 @@ function dolibNotIntegral() {
 # Usage: libNeedsUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
 # obs: if not GIT_DIR is provided, it's threated as local source
 # return 0 if updated, 1 if not present, 2 if auto mode but branch changed, 3 if git updated, 4 if source updated
-function dolibUpdate() {
+function _dolibUpdate() {
 
     local LIB=${1}
     local LIB_SOURCE_DIR=${2}
@@ -187,21 +187,21 @@ function dolibUpdate() {
     # AUTO mode
     if [ "${DOLIBS_MODE}" == 'auto' ]; then
         # If the lib is not integral, needs to update
-        if dolibNotIntegral "${LIB_DIR}"; then
+        if _dolibNotIntegral "${LIB_DIR}"; then
             echoCore "It was not possible to check '${LIB}' lib integrity, trying to get its code..."
             _result=1
-        elif [ "${GIT_DIR}" ] && dolibGitWrongBranch "${LIB_ROOT_DIR}" "${GIT_BRANCH}"; then
+        elif [ "${GIT_DIR}" ] && _dolibGitWrongBranch "${LIB_ROOT_DIR}" "${GIT_BRANCH}"; then
             echoCore "Source branch has changed, trying to get its code..."
             _result=2
         fi
     # ONLINE mode
     elif [ "${DOLIBS_MODE}" == 'online' ]; then
         # If the lib is outdated, clone it
-        if [ "${GIT_DIR}" ] && dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
+        if [ "${GIT_DIR}" ] && _dolibGitOutDated "${LIB_ROOT_DIR}" "${GIT_DIR}" ]; then
             echoCore "GIT Source has changed for '${LIB}', trying to get its code..."
             _result=3
         # If the lib is outdated, copy it
-        elif dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
+        elif _dolibSourceUpdated "${LIB_SOURCE_DIR}" "${LIB_DIR}"; then
             echoCore "Local source has changed for '${LIB}', trying to get its code..."
             _result=4
         fi
@@ -209,8 +209,8 @@ function dolibUpdate() {
 
     # if needs to update
     if [ "${_result}" != 0 ]; then
-        [ "${GIT_DIR}" ] && dolibGitClone "${GIT_REPO}" "${GIT_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
-        dolibImportFiles "${LIB_SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
+        [ "${GIT_DIR}" ] && _dolibGitClone "${GIT_REPO}" "${GIT_BRANCH}" "${GIT_DIR}" "${LIB_ROOT_DIR}"
+        _dolibImportFiles "${LIB_SOURCE_DIR}" "${LIB_DIR}" "${LIB}"
     fi
 
     return ${_result}
@@ -249,7 +249,7 @@ if [ ! "${DOLIBS_LOADED}" ]; then
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
 
         # Update lib if required
-        dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}"
+        _dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}"
 
         # If lib was updated, update others required
         if [ ${?} != 0 ]; then

@@ -32,16 +32,31 @@ function _echo() {
     done
 }
 
-### Show a title
-# usage: echoError <text>
+# @description Show a title
+# @arg $@ string Tittle's text
+# @example
+#   echoTitle <text>
 function echoTitle() {
     echo
     _echo 1 "" "\e[1m       ${@}"
     echo
 }
 
-# Initiated on boostrap
-# function echoDebug() { [ "${DOLIBS_DEBUG}" != "true" ] || _echo 1 "\e[1m\e[36mDEBUG: \e[0m" "${@}"; }
-# function echoInfo()  { _echo 1 "\e[1m\e[32mINFO:  \e[0m ${@}"; }
-# function echoWarn()  { _echo 1 "\e[1m\e[33mWARN:  \e[0m" "${@}"; }
-# function echoError() { _echo 2 "\e[1m\e[31mERROR: \e[0m" "${@}"; }
+# Internal function to debug core, already defined in boostrat.sh
+# function echoCore() { [[ "${DOLIBS_DEBUG}" != *"core"* ]] || _echo 1 "\e[1m\e[35mDEBUG: \e[0m" "${@}"; }
+
+# @description Show a debug message (will print only when --debug flag is used)
+# @arg $@ string Text to be printed
+function echoDebug() { [[ "${DOLIBS_DEBUG}" != *"libs"* ]] || _echo 1 "\e[1m\e[36mDEBUG: \e[0m" "${@}"; }
+
+# @description Show an informative message
+# @arg $@ string Text to be printed
+function echoInfo()  { _echo 1 "\e[1m\e[32mINFO:  \e[0m" "${@}"; }
+
+# @description Show a warning message
+# @arg $@ string Text to be printed
+function echoWarn()  { _echo 1 "\e[1m\e[33mWARN:  \e[0m" "${@}"; }
+
+# @description Show an error message, this will be printed to the `stderr`
+# @arg $@ string Text to be printed
+function echoError() { _echo 2 "\e[1m\e[31mERROR: \e[0m" "${@}"; }

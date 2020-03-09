@@ -26,7 +26,7 @@ exitOnError "Bash version needs to be '4.3' or newer (current: ${BASH_VERSINFO[0
 # Import modules
 for DOLIBS_MODULE in $(ls "${DOLIBS_CORE_DIR}/"mod-*.*); do
     echoCore "Loading '${DOLIBS_MODULE}' module..."
-    dolibImportModule "${DOLIBS_MODULE}"
+    _dolibImportModule "${DOLIBS_MODULE}"
 done
 
 # Export all values required for sub-processes
@@ -44,8 +44,8 @@ export DOLIBS_LIBS_DIR=${DOLIBS_DIR}/libs
 export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
 
 # Import main do functions (to manage libs)
-dolibUpdate "do" "${DOLIBS_SOURCE_LIBS_DIR}/do" "${DOLIBS_LIBS_DIR}" "do"
-dolibCreateLibFunctions "do" "${DOLIBS_LIBS_DIR}/do"
+_dolibUpdate "do" "${DOLIBS_SOURCE_LIBS_DIR}/do" "${DOLIBS_LIBS_DIR}" "do"
+dolibImportLib "do" "${DOLIBS_LIBS_DIR}/do"
 
 # Core loaded
 echoInfo "dolibs started!\n "

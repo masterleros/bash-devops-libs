@@ -42,7 +42,7 @@ BEGIN {
     styles["github", "return", "from"] = "(.*)"
     styles["github", "return", "to"] = "\\1"
 
-    styles["github", "exitcode", "from"] = "([>!]?[0-9]{1,3}) (.*)"
+    styles["github", "exitcode", "from"] = "([>!]?[0-9]{1,3}|any|last) (.*)"
     styles["github", "exitcode", "to"] = "**\\1**: \\2"
 }
 

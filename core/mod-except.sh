@@ -13,7 +13,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Try execution in a subshel so that will not exit the program in case of failure
+# @description Try execution in a subshel so that will not exit the program in case of failure
+# @arg $@ list Command to be executed
+# @exitcode last Last execution exit code
+# @example
+#   try <command>
 try() {
 
     # If it is an assigment

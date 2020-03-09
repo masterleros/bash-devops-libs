@@ -19,8 +19,16 @@ function __rework() {
     _body=${_body//returnOnError/local _eCode='${?}'; [ '${_eCode}' == 0 ] || return '${_eCode}'}    
 }
 
-### Exit program with text when last exit code is non-zero ###
-# usage: exitOnError <output_message> [optional: forced code (defaul:exit code)]
+# @description If the last command was not success, it will return the function with the last command exit code
+# @exitcode last Last execution exit code
+function returnOnError() { _return ${?}; }
+
+# @description If the last command was not success, it will exit the program with the last command exit code
+# @arg $message string Message to be shown if the command failed
+# @arg $code integer (optional) provide the exit code instead of use last command exit code
+# @exitcode last Last execution exit code
+# @example
+#   exitOnError <output_message> <exit_code>
 function exitOnError() {
     local _errorCode=${2:-$?}
     local _errorText=${1}

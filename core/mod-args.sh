@@ -47,19 +47,30 @@ function __rework() {
     # done
 }
 
-### Consume an internal library ###
-# Usage: self <function> <args>
+# @description Execute a function within same library module
+# @exitcode any passed command execution exit code
+# @example 
+#   self <function> <args>
+#
+#   # Can be used in combination of assign
+#   assign <var>=self <function> <args>
 function self() {
     _function=${1}; shift
     "${SELF_LIB}.${_function}" "${@}"
     return ${?}
 }
 
-### Consume an internal library ###
-# Usage: assign <retvar>=<function> <args>
-############################################################
-# Obs: your function needs to return values on _return var #
-############################################################
+# @description Assign the returned value to a variable
+#   > Obs: your function needs to return values on the global `_return` variable
+# @arg $@ list variable=command and args
+# @exitcode any passed command execution exit code
+# @example
+#   function myFunc()
+#   {
+#       _return="value"
+#   }
+#   assign var=myFunc <args>
+#   echo ${var} # this will print 'value'
 function assign() {
 
     local _assigments=${1}; shift
@@ -96,10 +107,26 @@ function assign() {
     return ${_eCode}
 }
 
-### get arguments ###
-# usage: getArgs "<arg_name1> <arg_name2> ... <arg_nameN>" ${@}
-# when a variable name starts with @<var> it will take the rest of values
-# when a variable name starts with &<var> it is optional and script will not fail case there is no value for it
+# @description Process the passed values in the required variables \
+# - A variable starting with `@`<var> will take the rest of values \
+# - A variable starting with `&`<var> is optional and script will not fail case there is no value for it
+# @arg $args string names of variables to be assigned
+# @example
+#   # If any of the arguments is not provided, it will fail
+#   getArgs "var1 va2 ... varN>" "${@}"
+#   echo ${var1} # will print what was passed in ${1}
+#   echo ${var2} # will print what was passed in ${2}
+#   # Same for the rest of arguments
+# @example
+#   # var2 will be an array and will take all the remaining arguments 
+#   getArgs "var1 @var2" "${@}"
+#   echo ${var1} # will print what was passed in ${1}
+#   echo ${var2[@]} # will print all the rest of passed values
+# @example
+#   # var2 is optional and if not passed will print nothing
+#   getArgs "var1 $var2" "${@}"
+#   echo ${var1} # will print what was passed in ${1}
+#   echo ${var2} # optional
 function getArgs() {
 
     local _result=0

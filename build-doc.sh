@@ -16,7 +16,7 @@
 source $(dirname "${BASH_SOURCE[0]}")/dolibs.sh --offline
 
 # Generate documentaton for the core lib
-do.document "${DOLIBS_CORE_DIR}" core.md do
+do.document "${DOLIBS_CORE_DIR}" "${DOLIBS_DIR}"/docs/core.md
 
 # For each included lib
 INCLUDED_DOLIBS=($(find "${DOLIBS_LIBS_DIR}" -maxdepth 1 -mindepth 1 -type d))
@@ -24,5 +24,5 @@ for INCLUDED_DOLIB in ${INCLUDED_DOLIBS[@]}; do
     CURRENT=$(basename "${INCLUDED_DOLIB}")
 
     # Generate documentaton for the current lib
-    do.document "${INCLUDED_DOLIB}" $(dirname "${BASH_SOURCE[0]}")/../docs/"${CURRENT}".md "${CURRENT}"
+    do.document "${INCLUDED_DOLIB}" "${DOLIBS_DIR}"/docs/"${CURRENT}".md "${CURRENT}"
 done
