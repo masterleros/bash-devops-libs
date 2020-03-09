@@ -96,7 +96,7 @@ function _dolibGitOutDated() {
     [ "${GIT_ORIGIN_HASH}" != "${GIT_HASH}" ]
 }
 
-### Function to indicate if the lib code is outdated ###
+### Function to indicate if the lib code branch has changed ###
 # usage: _dolibGitWrongBranch <LIB_ROOT_DIR> <GIT_BRANCH>
 function _dolibGitWrongBranch() {
 
@@ -111,7 +111,7 @@ function _dolibGitWrongBranch() {
     [ "${GIT_BRANCH}" != $(< "${SOURCE_STATE}" grep GIT_BRANCH | cut -d':' -f2-) ]
 }
 
-### Function to indicate if the source if different than the lib ###
+### Function to indicate if the local source (or cache) is different than the lib ###
 # usage: _dolibSourceUpdated <SOURCE_DIR> <LIB_DIR>
 function _dolibSourceUpdated() {
     local LIB_SOURCE_DIR=${1}
@@ -168,8 +168,8 @@ function _dolibNotIntegral() {
     [ "${LIB_SHASUM}" != "${CALCULATED_SHASUM}" ]    
 }
 
-### Detect if code needs to be updated ###
-# Usage: libNeedsUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
+### Update the a lib code if it is required ###
+# Usage: _dolibUpdate <MODE> <SOURCE_DIR> <TARGET_DIR> [GIT_DIR]
 # obs: if not GIT_DIR is provided, it's threated as local source
 # return 0 if updated, 1 if not present, 2 if auto mode but branch changed, 3 if git updated, 4 if source updated
 function _dolibUpdate() {
