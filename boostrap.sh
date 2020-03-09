@@ -14,7 +14,7 @@
 #    limitations under the License.
 
 export DOLIBS_MAIN_FILE="main.sh"
-DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
+DOLIBS_REPO="https://github.com/frbaroni/bash-devops-libs.git"
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
 
 ### Temporary functions ###

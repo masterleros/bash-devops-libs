@@ -21,11 +21,11 @@ if [ ! "${BASH}" ]; then echo "Current OS is not running on bash interpreter" >&
 
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_MODE="auto"
-DOLIBS_BRANCH="develop"
+DOLIBS_BRANCH="feature/mod-args"
 ### DEVOPS LIBS DEFINITIONS ###
 DOLIBS_ROOTDIR=$(cd $(dirname "${BASH_SOURCE[0]}")/ >/dev/null 2>&1 && pwd)
 DOLIBS_DIR=${DOLIBS_ROOTDIR}/dolibs
-DOLIBS_GIT_BOSTRAP="https://raw.githubusercontent.com/masterleros/bash-devops-libs/${DOLIBS_BRANCH}/boostrap.sh"
+DOLIBS_GIT_BOSTRAP="https://raw.githubusercontent.com/frbaroni/bash-devops-libs/${DOLIBS_BRANCH}/boostrap.sh"
 ### DEVOPS LIBS DEFINITIONS ###
 
 # DevOps libs options
