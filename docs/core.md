@@ -180,6 +180,9 @@ checkBins <bin1> <bin2> ... <binN>
 
 
 
+
+
+
 # returnOnError()
 
 If the last command was not success, it will return the function with the last command exit code
