@@ -1,0 +1,40 @@
+\e[1m\e[32mINFO:  \e[0mExecuting: 'ls -l'
+total 28
+-rwxrwxrwx 1 master master 1373 Mar  9 18:59 example-exception.sh
+-rwxrwxrwx 1 master master 1336 Mar  9 18:59 example-external-lib.sh
+-rwxrwxrwx 1 master master  836 Mar 10 19:34 example-local.sh
+-rwxrwxrwx 1 master master  787 Mar  9 18:59 example-offline.sh
+-rwxrwxrwx 1 master master  957 Mar  9 18:59 example-output.sh
+-rwxrwxrwx 1 master master  790 Mar  9 18:59 example-remote.sh
+-rwxrwxrwx 1 master master 1359 Mar  9 18:59 example-vars.sh
+-rwxrwxrwx 1 master master   42 Mar 10 19:36 test.log
+[1m[32mINFO:  [0mExecuting: 'ls -l'
+total 29
+-rwxrwxrwx 1 master master 1373 Mar  9 18:59 example-exception.sh
+-rwxrwxrwx 1 master master 1336 Mar  9 18:59 example-external-lib.sh
+-rwxrwxrwx 1 master master  836 Mar 10 19:34 example-local.sh
+-rwxrwxrwx 1 master master  787 Mar  9 18:59 example-offline.sh
+-rwxrwxrwx 1 master master  957 Mar  9 18:59 example-output.sh
+-rwxrwxrwx 1 master master  790 Mar  9 18:59 example-remote.sh
+-rwxrwxrwx 1 master master 1359 Mar  9 18:59 example-vars.sh
+-rwxrwxrwx 1 master master  592 Mar 10 19:36 test.log
+INFO:  Executing: 'ls -l'
+total 32
+-rwxrwxrwx 1 master master 1373 Mar  9 18:59 example-exception.sh
+-rwxrwxrwx 1 master master 1336 Mar  9 18:59 example-external-lib.sh
+-rwxrwxrwx 1 master master  836 Mar 10 19:34 example-local.sh
+-rwxrwxrwx 1 master master  787 Mar  9 18:59 example-offline.sh
+-rwxrwxrwx 1 master master  957 Mar  9 18:59 example-output.sh
+-rwxrwxrwx 1 master master  790 Mar  9 18:59 example-remote.sh
+-rwxrwxrwx 1 master master 1359 Mar  9 18:59 example-vars.sh
+-rwxrwxrwx 1 master master 1129 Mar 10 19:36 test.log
+INFO:  Executing: 'ls -l'
+total 32
+-rwxrwxrwx 1 master master 1373 Mar  9 18:59 example-exception.sh
+-rwxrwxrwx 1 master master 1336 Mar  9 18:59 example-external-lib.sh
+-rwxrwxrwx 1 master master  836 Mar 10 19:34 example-local.sh
+-rwxrwxrwx 1 master master  787 Mar  9 18:59 example-offline.sh
+-rwxrwxrwx 1 master master  957 Mar  9 18:59 example-output.sh
+-rwxrwxrwx 1 master master  790 Mar  9 18:59 example-remote.sh
+-rwxrwxrwx 1 master master 1359 Mar  9 18:59 example-vars.sh
+-rwxrwxrwx 1 master master 1666 Mar 10 19:37 test.log

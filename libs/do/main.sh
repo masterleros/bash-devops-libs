@@ -18,8 +18,8 @@
 . "${SELF_LIB_DIR}/docs.sh"
 
 # @description Get a value from a config file in format <key>:<value>
-# @arg file path Path to the file
-# @arg key Key of the required value
+# @arg $file path Path to the file
+# @arg $key Key of the required value
 # @return Value of the key
 # @exitcode 0 Key found
 # @exitcode 1 Key not found
@@ -159,10 +159,10 @@ function _addSource() {
 }
 
 # @description Add a git repository source of lib
-# @arg namespace string Namespace to import the source's libraries
-# @arg repo string Github repository path (i.e: owner/repo)
-# @arg branch string Branch name
-# @arg dir path Relative path for the lib folder (if libs are in root, use '.')
+# @arg $namespace string Namespace to import the source's libraries
+# @arg $repo string Github repository path (i.e: owner/repo)
+# @arg $branch string Branch name
+# @arg $dir path Relative path for the lib folder (if libs are in root, use '.')
 # @example 
 #   addGitSource <namespace> <repo> <branch> <dir>
 function addGitSource() {
@@ -187,8 +187,8 @@ GIT_DIR:${_gitDir}"
 }
 
 # @description Add a local source of libs (to be copied)
-# @arg namespace string Namespace to import the source's libraries
-# @arg path path Path to the local directory where the libs are hosted
+# @arg $namespace string Namespace to import the source's libraries
+# @arg $path path Path to the local directory where the libs are hosted
 # @example 
 #   addLocalSource <namespace> <path>
 function addLocalSource() {
@@ -204,8 +204,8 @@ function addLocalSource() {
 }
 
 # @description Add local libs (to be used from where they are)
-# @arg namespace string Namespace to import the source's libraries
-# @arg path path Path to the local directory where the libs are hosted
+# @arg $namespace string Namespace to import the source's libraries
+# @arg $path path Path to the local directory where the libs are hosted
 # @example 
 #   addLocalSource <namespace> <path>
 function addLocalLib() {

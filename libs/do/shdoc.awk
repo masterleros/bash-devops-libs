@@ -24,7 +24,7 @@ BEGIN {
 
     styles["github", "/code", "to"] = "```"
 
-    styles["github", "argN", "from"] = "^([[:alnum:]]{1,}) (\\S+)"
+    styles["github", "argN", "from"] = "^\\$([[:alnum:]]*){1,} (\\S+)"
     styles["github", "argN", "to"] = "**\\1** (\\2):"
 
     styles["github", "arg@", "from"] = "^\\$@ (\\S+)"

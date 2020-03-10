@@ -19,9 +19,9 @@ export DOLIBS_DOCUMENTATION_DIR=${DOLIBS_DIR}/docs
 export DOLIBS_SHDOC_BIN=${SELF_LIB_DIR}/shdoc.awk
 
 # @description Generate the markdown documentation of a lib
-# @arg dir path Directory of the library to be documented
-# @arg doc path md file (markdown) to be generated
-# @arg namespace string (optional) library's namespace
+# @arg $dir path Directory of the library to be documented
+# @arg $doc path md file (markdown) to be generated
+# @arg $namespace string (optional) library's namespace
 # @example 
 #   document <dir> <file> [namespace]
 function document() {

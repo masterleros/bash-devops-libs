@@ -89,8 +89,8 @@ Execute a command until success within a retries
 
 ### Arguments
 
-* $retries number ammount of retries
-* $cmd string command to be executed
+* **retries** (number): ammount of retries
+* **cmd** (string): command to be executed
 
 
 
@@ -142,7 +142,6 @@ Echo the content of a file with tokens updated to values from defined environmen
 ### Arguments
 
 * **file** (path): Path to file
-* **errors** (bool): (optional) if specified (true) tokens not found will be reported and exitcode will be != 0
 
 ### Return value
 
@@ -151,16 +150,12 @@ Echo the content of a file with tokens updated to values from defined environmen
 ### Exit codes
 
 * **0**: All token replaced
-* **1**: Some tokens not found defined to be replaced (only with arg errors=true)
-
-### Output on stderr
-
-* Tokens not found (only with arg errors=true)
+* **>0**: Count of tokens not found to be replaced
 
 ### Example
 
 ```bash
-replaceFromFile <file> [errors]
+replaceFromFile <file>
 ```
 
 # utils.tokens.replaceFromFileToFile()
@@ -171,20 +166,15 @@ Dump to a target file the content of a source file with tokens updated to values
 
 * **source** (path): Path to source file
 * **target** (path): Path to target file
-* **errors** (bool): (optional) if specified (true) tokens not found will be reported and exitcode will be != 0
 
 ### Exit codes
 
 * **0**: All token replaced
-* **1**: Some tokens not found defined to be replaced (only with arg errors=true)
-
-### Output on stderr
-
-* Tokens not found (only with arg errors=true)
+* **>0**: Count of tokens not found to be replaced
 
 ### Example
 
 ```bash
-replaceFromFileToFile <source> <target> [errors]
+replaceFromFileToFile <source> <target>
 ```
 

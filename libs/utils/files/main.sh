@@ -14,10 +14,10 @@
 #    limitations under the License.
 
 # @description Find all files in a folder and execute a callback function for each
-# @arg dir path Path to dir to look for files with the specified name
-# @arg file string File to look for
-# @arg callback function Function name to be called when file is found (will receive 1st argument the found file path)
-# @arg args args Optional arguments to be passed to the callback function
+# @arg $dir path Path to dir to look for files with the specified name
+# @arg $file string File to look for
+# @arg $callback function Function name to be called when file is found (will receive 1st argument the found file path)
+# @arg $args args Optional arguments to be passed to the callback function
 # @exitcode 0 Files found and all the callback functions reported exitcode=0
 # @exitcode 1 Files where not found
 # @example 

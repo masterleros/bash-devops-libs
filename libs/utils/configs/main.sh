@@ -14,8 +14,8 @@
 #    limitations under the License.
 
 # @description Get values from file's variables and set into same given variable names
-# @arg file path Path to the file
-# @arg args list Variables names to be set
+# @arg $file path Path to the file
+# @arg $args list Variables names to be set
 # @exitcode 1 File not found
 # @example 
 #   setVariablesFromFile <file> <var1> <var2> ... <varN>
