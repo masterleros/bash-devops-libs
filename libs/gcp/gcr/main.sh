@@ -109,7 +109,7 @@ function getFullDigestTag() {
 function buildAndPublish() {
 
     # Get the arguments
-    getArgs "_project_id _docker_dir _docker_file _docker_image_name &@_docker_build_args"
+    getArgs "_project_id _docker_dir _docker_file _docker_image_name @_docker_build_args="
 
     # Create the full image tag
     DOCKER_IMAGE_TAG_LATEST="${GCLOUD_DOCKER_REGISTRY_HOST}/${_project_id}/${_docker_image_name}:latest"

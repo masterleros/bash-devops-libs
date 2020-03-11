@@ -61,7 +61,7 @@ function getNames() {
 #   replaceFromFile <file> [errors]
 function replaceFromFile() {
 
-    getArgs "file &errors"
+    getArgs "file errors="
 
     # Check if file exists
     [ -f "${file}" ] || exitOnError "File '${file}' not found"
@@ -98,7 +98,7 @@ function replaceFromFile() {
 #   replaceFromFileToFile <source> <target> [errors]
 function replaceFromFileToFile() {
 
-    getArgs "path_source path_target &errors"
+    getArgs "path_source path_target errors="
 
     # Get the content updated
     assign content=self replaceFromFile "${path_source}" "${errors}"

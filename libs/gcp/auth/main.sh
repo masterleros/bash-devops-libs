@@ -41,7 +41,7 @@ function getValueFromCredential {
 # usage: createSA <project> <sa_id> [description]
 function createSA {
 
-    getArgs "project sa_id &description"
+    getArgs "project sa_id description="
 
     # Create sa email value
     sa_mail="${sa_id}@${project}.iam.gserviceaccount.com"

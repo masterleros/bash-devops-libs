@@ -33,7 +33,7 @@ function init() {
 # usage: apply <terraform path>
 function apply() {
     
-    getArgs "terraform_path &quiet"
+    getArgs "terraform_path quiet="
 
     cd "${terraform_path}"
 

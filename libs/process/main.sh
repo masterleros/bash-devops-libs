@@ -74,7 +74,7 @@ function executeWithInfo() {
 #   }
 function waitAll() {
 
-    getArgs "_endCallbackFunc &_timeout"
+    getArgs "_endCallbackFunc _timeout="
 
     local _result=0
 
