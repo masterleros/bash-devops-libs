@@ -28,29 +28,45 @@ function __rework() {
             local val
 
             local reworkedCode=""
-            local reworked=""
             local newline=$'\n'
+            local has_default=false
 
             # Get each defined var
-            for var in $(echo "${lineFound}" | cut -d '"' -f2); do
-                if [[ ${var} == *"="* ]]; then # Default variables=default
-                  local var_value=(${var/=/ })
-                  reworkedCode="${reworkedCode} local ${var_value[0]}=\${1:-${var_value[1]}}; shift;${newline}"
-                  unset -v var_value
-                elif [[ ${var} == "@"* ]]; then # Rest
-                  var=${var/@};
-                  reworkedCode="${reworkedCode}
-  local rest_index=0;
-  while [ \${1} ]; do
-     local ${var}[\${rest_index}]=\${1}; shift;
-     ((rest_index+=1)); 
-  done;${newline}"
-                  break
-                else
-                  reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && echoError \"Values for argument '${var}' not found!\";
-local ${var}=\${1}; shift;${newline}"
+            for var_name in $(echo "${lineFound}" | cut -d '"' -f2); do
+                local var_value="\${1}"
+                local var_required=true
+                local var_rest=false
+
+                if [[ "${var_name}" == "@"* ]]; then # @Rest
+                  var_name=${var_name/@};
+                  var_rest=true
                 fi
-                ((arg_pos+=1))
+
+                if [[ "${var_name}" == *"="* ]]; then # Default variables=default
+                  local name_value=(${var_name/=/ })
+                  var_name=${name_value[0]}
+                  var_value="\${1:-${name_value[1]}}"
+                  var_required=false
+                  unset -v name_value
+                  has_default=true
+                elif [[ "${has_default}"; then
+                  echoError "Warning! REQUIRED variable found AFTER default!"
+                fi
+
+                if [[ "${var_required}" == "true" ]]; then
+                    reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && echoError \"Values for argument '${var_name}' not found!\"${newline}";
+                fi
+                local var_index=
+                if [[ "${var_rest}" == "true" ]]; then
+                  var_index="[\${rest_index}]"
+                  reworkedCode="${reworkedCode} local rest_index=0; while [ \${1} ]; do${newline}"
+                fi
+                reworkedCode="${reworkedCode} local ${var_name}${var_index}=${var_value}; shift;${newline}"
+                if [[ "${var_rest}" == "true" ]]; then
+                  var_index="[\${rest_index}]"
+                  reworkedCode="${reworkedCode} ((rest_index+=1));${newline}done;${newline}"
+                  break
+                fi
             done
             # Update the code
             body=${body/"${lineFound}"/"${reworkedCode}"}
