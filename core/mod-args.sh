@@ -49,7 +49,7 @@ function __rework() {
                   var_required=false
                   unset -v name_value
                   has_default=true
-                elif [[ "${has_default}"; then
+                elif [[ "${has_default}" == "true" ]]; then
                   echoError "Warning! REQUIRED variable found AFTER default!"
                 fi
 
