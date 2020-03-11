@@ -3,6 +3,15 @@
 ## Introduction
 **dolibs** is an small bash framework with a built-in set of common functionatilities and templates to accelerate DevOps setup processes.
 
+Example:
+``` sh
+INFO:   Initializing dolibs (v0.2)
+INFO:   (online) from GIT source - branch 'develop'
+INFO:   dolibs started!
+
+        Hello DevOps Libs from local!
+```
+
 # Using Libraries
 In order to use this library (i.e: local execution or in GitLab Pipeline) you need to include the DevOps Libs in your project.
 For that you need to follow the steps:

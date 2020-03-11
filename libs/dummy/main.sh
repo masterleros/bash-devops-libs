@@ -20,7 +20,7 @@ echoDebug "${SELF_LIB}: Doing something..."
 checkBins uptime || return ${?}
 
 # @description Print the computer uptime
-# @arg var string Any value to be shown
+# @arg $var string Any value to be shown
 function doIt() {
     getArgs "var"
     echoTitle "Hello from '${SELF_LIB}' lib!"

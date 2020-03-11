@@ -14,7 +14,7 @@
 #    limitations under the License.
 
 # @description Echo the tokens found in a text (i.e: `${<token>}`)
-# @arg data string Data where the tokens are expected
+# @arg $data string Data where the tokens are expected
 # @return Array with the tokens found
 # @example 
 #   get <data>
@@ -32,7 +32,7 @@ function get() {
 }
 
 # @description Echo the tokens names found in a text
-# @arg data string Data where the tokens are expected
+# @arg $data string Data where the tokens are expected
 # @return Array with the token's names found
 # @example 
 #   getNames <data>
@@ -51,17 +51,15 @@ function getNames() {
 }
 
 # @description Echo the content of a file with tokens updated to values from defined environment vars
-# @arg file path Path to file
-# @arg errors bool (optional) if specified (true) tokens not found will be reported and exitcode will be != 0
+# @arg $file path Path to file
 # @return Content with token replaced
 # @exitcode 0 All token replaced
-# @exitcode 1 Some tokens not found defined to be replaced (only with arg errors=true)
-# @stderr Tokens not found (only with arg errors=true)
+# @exitcode >0 Count of tokens not found to be replaced
 # @example 
-#   replaceFromFile <file> [errors]
+#   replaceFromFile <file>
 function replaceFromFile() {
 
-    getArgs "file errors="
+    getArgs "file"
 
     # Check if file exists
     [ -f "${file}" ] || exitOnError "File '${file}' not found"
@@ -78,7 +76,6 @@ function replaceFromFile() {
         if [ "${!var}" ]; then
             _content=${_content//$token/${!var}}
         else
-            if [[ "${errors}" == "true" ]]; then echoError "Variable '${var}' is not defined!"; fi
             ((_result+=1))
         fi
     done
@@ -88,20 +85,18 @@ function replaceFromFile() {
 }
 
 # @description Dump to a target file the content of a source file with tokens updated to values from defined environment vars
-# @arg source path Path to source file
-# @arg target path Path to target file
-# @arg errors bool (optional) if specified (true) tokens not found will be reported and exitcode will be != 0
+# @arg $source path Path to source file
+# @arg $target path Path to target file
 # @exitcode 0 All token replaced
-# @exitcode 1 Some tokens not found defined to be replaced (only with arg errors=true)
-# @stderr Tokens not found (only with arg errors=true)
+# @exitcode >0 Count of tokens not found to be replaced
 # @example 
-#   replaceFromFileToFile <source> <target> [errors]
+#   replaceFromFileToFile <source> <target>
 function replaceFromFileToFile() {
 
-    getArgs "path_source path_target errors="
+    getArgs "path_source path_target"
 
     # Get the content updated
-    assign content=self replaceFromFile "${path_source}" "${errors}"
+    assign content=self replaceFromFile "${path_source}"
     local _result=${?}
 
     echo "${content}" > "${path_target}"   

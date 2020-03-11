@@ -14,8 +14,8 @@
 #    limitations under the License.
 
 # @description Check if a value exists in an array
-# @arg value value Value to look for
-# @arg array array Array to look for the value
+# @arg $value value Value to look for
+# @arg $array array Array to look for the value
 # @return Found value position
 # @exitcode 0 Value was found
 # @exitcode 1 Value not found

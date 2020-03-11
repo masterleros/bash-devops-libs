@@ -16,19 +16,25 @@
 # This is the legacy "set -e" support, now disabled but 
 # maintained with code in case of future re-use
 
-# Rework imported code
-# function __rework() {
+# If the code was executed with set -e
+# rework imported code
+if [ "${-//[^e]/}" ]; then
 
-#     # Set the function local context, this is required because    
-#     local _funcHeader='
-#     if [ ${-//[^e]/} ]; then 
-#         set +e
-#         ${FUNCNAME} "${@}"
-#         _result=${?}
-#         set -e
-#         return ${_result}
-#     fi'
+    echoCore "set -e detected, enabling mod-e"
 
-#     # rework code
-#     _body="${_funcHeader}; ${_body}"
-# }
+    function __rework() {
+
+        # Set the function local context, this is required because    
+        local _funcHeader='
+        if [ ${-//[^e]/} ]; then
+            set +e
+            ${FUNCNAME} "${@}"
+            _result=${?}
+            set -e
+            return ${_result}
+        fi'
+
+        # rework code
+        _body="${_funcHeader}; ${_body}"
+    }
+fi

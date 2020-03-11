@@ -16,3 +16,5 @@
 .source.cfg
 .source.state
 .lib.shasum
+*.log
+*.tmp

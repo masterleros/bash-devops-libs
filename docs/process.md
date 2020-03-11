@@ -11,8 +11,8 @@ Execute in a subprocess and redirect its outputs to the logfile
 
 ### Arguments
 
-* $outfile path Path to file where the outputs are redirected
-* $command string Command to be executed
+* **outfile** (path): Path to file where the outputs are redirected
+* **command** (string): Command to be executed
 
 ### Example
 
@@ -26,9 +26,9 @@ Execute in a subprocess and redirect its outputs to the logfile with a message
 
 ### Arguments
 
-* $info string Message to identy what was executed
-* $outfile path Path to file where the outputs are redirected
-* $command string Command to be executed
+* **info** (string): Message to identy what was executed
+* **outfile** (path): Path to file where the outputs are redirected
+* **command** (string): Command to be executed
 
 ### Example
 
@@ -43,7 +43,7 @@ Wait all executed processes with a timeout and an end callback function.
 
 ### Arguments
 
-* $endCallbackFunc function Path to file where the outputs are redirected
+* **endCallbackFunc** (function): Path to file where the outputs are redirected
 * $_command string Command to be executed
 
 ### Exit codes
