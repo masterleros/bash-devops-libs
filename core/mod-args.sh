@@ -22,7 +22,7 @@ function __rework() {
 
     # For each instance found
     # TODO: allow getArgs in comments/strings
-    body=$(echo "${body}" | grep getArgs | while read -r lineFound; do
+    _body=$(echo "${_body}" | grep getArgs | while read -r lineFound; do
         if [ "${lineFound}" ]; then
             local var
             local val
@@ -46,8 +46,8 @@ function __rework() {
                   local name_value=(${var_name/=/ })
                   var_name=${name_value[0]}
                   var_value="\${1:-${name_value[1]}}"
-                  var_required=false
                   unset -v name_value
+                  var_required=false
                   has_default=true
                 elif [[ "${has_default}" == "true" ]]; then
                   echoError "Warning! REQUIRED variable found AFTER default!"
@@ -59,7 +59,7 @@ function __rework() {
                 local var_index=
                 if [[ "${var_rest}" == "true" ]]; then
                   var_index="[\${rest_index}]"
-                  reworkedCode="${reworkedCode} local rest_index=0; while [ \${1} ]; do${newline}"
+                  reworkedCode="${reworkedCode} local rest_index=0; while [[ -n \"\${1}\" ]] || [[ "\${rest_index}" == 0 ]]; do${newline}"
                 fi
                 reworkedCode="${reworkedCode} local ${var_name}${var_index}=${var_value}; shift;${newline}"
                 if [[ "${var_rest}" == "true" ]]; then
@@ -69,9 +69,9 @@ function __rework() {
                 fi
             done
             # Update the code
-            body=${body/"${lineFound}"/"${reworkedCode}"}
+            _body=${_body/"${lineFound}"/"${reworkedCode}"}
         fi
-        echo "${body}"
+        echo "${_body}"
     done)
 }
 

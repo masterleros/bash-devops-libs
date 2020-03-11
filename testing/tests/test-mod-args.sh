@@ -1,5 +1,5 @@
 #!/bin/bash
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -f /tmp/dolibs
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
 
 ### YOUR CODE ###
 function testFailed() {
@@ -77,12 +77,20 @@ function runModArgsTestRest_2() {
 }
 runModArgsTest runModArgsTestRest_2
 
-echoInfo "Test getArgs empty @Rest"
+echoInfo "Test getArgs @Rest= default"
 function runModArgsTestRest_3() {
-  getArgs "a b c @d"
-  [[ "${a} ${b} ${c} ${d[0]}" == "1 2 3 " ]] || testFailed
+  getArgs "a b c @d=9"
+  [[ "${a} ${b} ${c} ${d[0]}" == "1 2 3 9" ]] || testFailed
 }
 runModArgsTest runModArgsTestRest_3
+
+echoInfo "Test getArgs @Rest= default 2"
+function runModArgsTestRest_4() {
+  getArgs "a b @c=8"
+  [[ "${a} ${b} ${c[0]}" == "1 2 3" ]] || testFailed
+}
+runModArgsTest runModArgsTestRest_4
+
 
 echoInfo "Test get-Args succeed"
 ### YOUR CODE ###
