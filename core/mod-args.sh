@@ -40,31 +40,30 @@ function __rework() {
                 if [[ "${var_name}" == "@"* ]]; then # @Rest
                   var_name=${var_name/@};
                   var_rest=true
+                  var_value="(\${@})"
                 fi
 
                 if [[ "${var_name}" == *"="* ]]; then # Default variables=default
                   local name_value=(${var_name/=/ })
                   var_name=${name_value[0]}
-                  var_value="\${1:-${name_value[1]}}"
+                  if [[ "${var_rest}" == "true" ]]; then
+                    var_value="(\${@:-${name_value[1]}})"
+                  else
+                    var_value="\${1:-${name_value[1]}}"
+                  fi
                   unset -v name_value
                   var_required=false
                   has_default=true
                 elif [[ "${has_default}" == "true" ]]; then
-                  echoError "Warning! REQUIRED variable found AFTER default!"
+                  echoWarn "Warning! REQUIRED variable found AFTER default!"
                 fi
 
                 if [[ "${var_required}" == "true" ]]; then
-                    reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && echoError \"Values for argument '${var_name}' not found!\"${newline}";
+                    reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && exitOnError \"Values for argument '${var_name}' not found!\" -1${newline}";
                 fi
-                local var_index=
+                reworkedCode="${reworkedCode} local ${var_name}=${var_value} && shift;${newline}"
+
                 if [[ "${var_rest}" == "true" ]]; then
-                  var_index="[\${rest_index}]"
-                  reworkedCode="${reworkedCode} local rest_index=0; while [[ -n \"\${1}\" ]] || [[ "\${rest_index}" == 0 ]]; do${newline}"
-                fi
-                reworkedCode="${reworkedCode} local ${var_name}${var_index}=${var_value}; shift;${newline}"
-                if [[ "${var_rest}" == "true" ]]; then
-                  var_index="[\${rest_index}]"
-                  reworkedCode="${reworkedCode} ((rest_index+=1));${newline}done;${newline}"
                   break
                 fi
             done
