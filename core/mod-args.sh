@@ -22,56 +22,51 @@ function __rework() {
 
     # For each instance found
     # TODO: allow getArgs in comments/strings
-    _body=$(echo "${_body}" | grep getArgs | while read -r lineFound; do
+    local IFS='\n'
+    for lineFound in "$(echo "${_body}" | grep getArgs)"; do
         if [ "${lineFound}" ]; then
-            local var
-            local val
-
             local reworkedCode=""
-            local newline=$'\n'
             local has_default=false
 
             # Get each defined var
-            for var_name in $(echo "${lineFound}" | cut -d '"' -f2); do
-                local var_value="\${1}"
-                local var_required=true
-                local var_rest=false
+            local IFS=' '
+            local var_name && for var_name in $(echo "${lineFound}" | cut -d '"' -f2); do
+                 local var_value="\${1}"
+                 local var_required=true
+                 local var_rest=false
+ 
+                 if [[ "${var_name}" == "@"* ]]; then # @Rest
+                   var_name=${var_name/@};
+                   var_rest=true
+                   var_value="(\${@})"
+                 fi
+ 
+                 if [[ "${var_name}" == *"="* ]]; then # Default variables=default
+                   local name_value=(${var_name/=/ })
+                   var_name=${name_value[0]}
+                   if [[ "${var_rest}" == "true" ]]; then
+                     var_value="(\${@:-${name_value[1]}})"
+                   else
+                     var_value="\${1:-${name_value[1]}}"
+                   fi
+                   unset -v name_value
+                   var_required=false
+                   has_default=true
+                 elif [[ "${has_default}" == "true" ]]; then
+                   echoWarn "Warning! REQUIRED variable found AFTER default!"
+                 fi
+ 
+                 [[ "${var_required}" == "true" ]] && reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && exitOnError \"Values for argument '${var_name}' not found!\" -1;"
 
-                if [[ "${var_name}" == "@"* ]]; then # @Rest
-                  var_name=${var_name/@};
-                  var_rest=true
-                  var_value="(\${@})"
-                fi
+                 reworkedCode="${reworkedCode} local ${var_name}=${var_value} && shift;"
+ 
+                 [[ "${var_rest}" == "true" ]] && break
+             done
 
-                if [[ "${var_name}" == *"="* ]]; then # Default variables=default
-                  local name_value=(${var_name/=/ })
-                  var_name=${name_value[0]}
-                  if [[ "${var_rest}" == "true" ]]; then
-                    var_value="(\${@:-${name_value[1]}})"
-                  else
-                    var_value="\${1:-${name_value[1]}}"
-                  fi
-                  unset -v name_value
-                  var_required=false
-                  has_default=true
-                elif [[ "${has_default}" == "true" ]]; then
-                  echoWarn "Warning! REQUIRED variable found AFTER default!"
-                fi
-
-                if [[ "${var_required}" == "true" ]]; then
-                    reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && exitOnError \"Values for argument '${var_name}' not found!\" -1${newline}";
-                fi
-                reworkedCode="${reworkedCode} local ${var_name}=${var_value} && shift;${newline}"
-
-                if [[ "${var_rest}" == "true" ]]; then
-                  break
-                fi
-            done
             # Update the code
             _body=${_body/"${lineFound}"/"${reworkedCode}"}
         fi
-        echo "${_body}"
-    done)
+    done
 }
 
 # @description Execute a function within same library module
