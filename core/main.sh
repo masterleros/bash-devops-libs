@@ -45,7 +45,14 @@ export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
 
 # Import main do functions (to manage libs)
 _dolibUpdate "do" "${DOLIBS_SOURCE_LIBS_DIR}/do" "${DOLIBS_LIBS_DIR}" "do"
+_dolibUpdated=${?}
 dolibImportLib "do" "${DOLIBS_LIBS_DIR}/do"
+
+# Generate core and do documentation
+if [ "${_dolibUpdated}" != 0 ]; then
+    do.document "${DOLIBS_CORE_DIR}" "${DOLIBS_DOCUMENTATION_DIR}"/core.md
+    do.document "${DOLIBS_LIBS_DIR}/do" "${DOLIBS_DOCUMENTATION_DIR}"/do.md "do"
+fi
 
 # Core loaded
 echoInfo "dolibs started!\n "

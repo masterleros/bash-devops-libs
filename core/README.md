@@ -2,8 +2,18 @@
 
 This is the kernel of the dolib, below it will be described how it works and how to develop for it.
 
+## Functions
+Different functions are provided in different parts of `dolibs` we will check the provided functions on each section below, but let see some definitions:
+
+There are 3 types of functions:
+|Starts with|Description|
+|-|-|
+|_[function]|Bash does not provide private functions, but when a function start with `_` it means that it needs to be threated as|
+|_dolib[function]|All core functions start with `dolibs`, this will maintain a clrear view of core functions|
+|[namespace].[lib].[function]|All the functions imported and managed by `dolibs` starts with a namespace (which can contain sub sections) and then the function name|
+
 ## Variables
-dolibs requires some global variables in order to operate, the following variables are defined as part of the core:
+Because `dolibs` requires some global variables in order to operate, the following variables are defined as part of the core:
 
 |Variable|Description|Possible Values|Required beforehand|Exported|
 |-|-|-|-|-|
@@ -24,19 +34,39 @@ dolibs requires some global variables in order to operate, the following variabl
 |DOLIBS_LIBS_DIR|`dolibs` built-in libs folder|*default: [root]/libs*|No|Yes|
 |DOLIBS_TMPDIR|Temporary folder for GIT clone (added to .gitignore)|*default: [root]/.libtmp*|No|Yes|
 
+## Coding style
+
+- **Funtions:** functions are written in camelCase
+- **local variables:** local scope variables are written in camelCase
+- **exported variables:** exported variables are written in UPPERCASE separated by underscore
+
 # Boostrap
 
 In order to start `dolibs`, there is a key component named `boostrap`. This component is implemented in the `boostrap.sh` file and is the core initializer script. \
 Its execution will define and perform several functionalities:
 
 ### Code import 
-TODO
+When the boostrap is initiated, it will get the code from where it was requested depending on the above configurations.
 
-### Code validation
-TODO
+|Source|Description|
+|-|-|
+|**GIT** (default)|It will use the Git repository as source of dolib|
+|**Local**|It will use a local folder as source of dolib (usefull for a lib development)|
+
+When sourcing from Git, after cloning/update the code, the `.source.state` will be created with all the details of the source (including hash). This will allow dolibs to validate source when required. \
+Another important file is the `.source.cfg` which defines the source of the code, it will be managed by the `do lib` (described below) but is still very important for 3rd party libraries being imported and managed by the boostrap functions.
 
 ### Operation mode
-TODO
+The operation mode will define how code and source are managed, the following modes are available:
+
+|Mode|Description|
+|-|-|
+|**offline**|Will use the code from where it's placed, if it does not exist, it fails|
+|**auto** (default)|Will source the code (copy) from where it placed, but if not found, it will try to copy from source|
+|**online**|Will check if code is up-to-date in respect to source, if not, it will source it (copy)|
+
+### Code validation
+Once boostrap is executed, it will check the integrity of the files by checking it last import `.source.shasum` created file, it contains a `sha1sum` result for all the files. Depending on the operation mode, it will trigger the update of the code from the defined source.
 
 |Function|Description|Usage|
 |-|-|-|
@@ -95,7 +125,30 @@ Modules can modify/update the imported lib functions in order to add functionali
 
 > Check all the modules functionalities at [core function documentation](../docs/core.md)
 
-## The do lib
+# The do lib
 Once the core is loaded, the `do` lib is loaded by the core. This lib will enable final-user friendly usage for using the libs.
+
+## Import libs
+This lib include the management of other libs, including the built-in (`do.use`) and 3rd party libs (`do.import`), which for them, the `.souce.cfg` configuration file is put in place. \
+This file can contain the bellow informations depending of the type of source:
+
+``` sh
+TYPE:<type>
+NAMESPACE:<namespace provided>
+```
+
+Additionally per each type, you will find:
+
+|Type|Values|Description|
+|-|-|-|
+|**GIT**|`SOURCE_REPO`<br>`SOURCE_BRANCH`<br>`SOURCE_DIR`<br>`GIT_DIR`|Will source (copy) the code based on the definitions|
+|**LOCAL**|`SOURCE_DIR`|Will source (copy) the code based on the definitions|
+|**OFFLINE**|`LIB_DIR`|Will use the code directly from it is hosted based on the definitions|
+
+## Documentation
+When `do` lib import others libs (built-in or 3rd party) it will generate automatically the documentation for them. \
+The documentation is created based in all `*.sh` files found starting at the root namespace (e.g: when importing `example.of.lib` will documenta all starting at `example`) \
+This documentation is by using a modified version of [shdoc](https://github.com/reconquest/shdoc) by following [this conventions](../libs/do/README.md)
+
 
 > Check **do library** [here](../docs/do.md)

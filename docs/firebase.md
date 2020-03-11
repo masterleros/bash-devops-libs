@@ -8,8 +8,8 @@ Check firebase project if exists
 
 ### Arguments
 
-* $project string GCP Project ID
-* $id string Firebase Project to be validated
+* **project** (string): GCP Project ID
+* **id** (string): Firebase Project to be validated
 
 ### Exit codes
 

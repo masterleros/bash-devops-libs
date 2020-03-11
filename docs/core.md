@@ -13,6 +13,7 @@
 * [echoInfo()](#echoinfo)
 * [echoWarn()](#echowarn)
 * [echoError()](#echoerror)
+* [logToFile()](#logtofile)
 
 
 
@@ -22,8 +23,8 @@ Rework a function to enable dolibs features
 
 ### Arguments
 
-* $func string Current function name
-* $newFunc string (optional) New function name in case of renaming
+* **func** (string): Current function name
+* **newFunc** (string): (optional) New function name in case of renaming
 
 ### Example
 
@@ -37,8 +38,8 @@ Import a library (this function is not intended to be used manually, instead use
 
 ### Arguments
 
-* $lib string Library namespace
-* $libDir path Folder where the library files are hosted
+* **lib** (string): Library namespace
+* **libDir** (path): Folder where the library files are hosted
 
 ### Example
 
@@ -98,7 +99,7 @@ Process the passed values in the required variables \
 
 ### Arguments
 
-* $args string names of variables to be assigned
+* **args** (string): names of variables to be assigned
 
 ### Example
 
@@ -180,6 +181,9 @@ checkBins <bin1> <bin2> ... <binN>
 
 
 
+
+
+
 # returnOnError()
 
 If the last command was not success, it will return the function with the last command exit code
@@ -194,8 +198,8 @@ If the last command was not success, it will exit the program with the last comm
 
 ### Arguments
 
-* $message string Message to be shown if the command failed
-* $code integer (optional) provide the exit code instead of use last command exit code
+* **message** (string): Message to be shown if the command failed
+* **code** (integer): (optional) provide the exit code instead of use last command exit code
 
 ### Exit codes
 
@@ -276,4 +280,13 @@ Show an error message, this will be printed to the `stderr`
 ### Arguments
 
 * **...** (string): Text to be printed
+
+# logToFile()
+
+Execute a command redirecting the output to a file
+
+### Arguments
+
+* **file** (path): Path to the output file
+* **...** (list): Command to be executed
 

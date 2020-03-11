@@ -10,7 +10,7 @@ Set a named timer to calculate future elapsed seconds
 
 ### Arguments
 
-* $name string Timer's name
+* **name** (string): Timer's name
 
 ### Example
 
@@ -24,7 +24,7 @@ Get the elapsed seconds from a named timer
 
 ### Arguments
 
-* $name string Timer's name
+* **name** (string): Timer's name
 
 ### Return value
 
@@ -42,7 +42,7 @@ Create a human timing description from seconds
 
 ### Arguments
 
-* $seconds int Seconds
+* **seconds** (int): Seconds
 
 ### Return value
 

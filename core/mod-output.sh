@@ -60,3 +60,12 @@ function echoWarn()  { _echo 1 "\e[1m\e[33mWARN:  \e[0m" "${@}"; }
 # @description Show an error message, this will be printed to the `stderr`
 # @arg $@ string Text to be printed
 function echoError() { _echo 2 "\e[1m\e[31mERROR: \e[0m" "${@}"; }
+
+# @description Execute a command redirecting the output to a file
+# @arg $file path Path to the output file
+# @arg $@ list Command to be executed
+function logToFile() {
+    getArgs "_file @_cmd" "${@}"
+    echo "INFO:  Executing '${_cmd[@]}'" >> "${_file}"
+    "${_cmd[@]}" >> "${_file}"
+}
