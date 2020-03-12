@@ -27,11 +27,12 @@ function __rework() {
         if [ "${lineFound}" ]; then
             local reworkedCode=""
             local has_default=false
+            local arg_index=1
 
             # Get each defined var
             local IFS=' '
             local var_name && for var_name in $(echo "${lineFound}" | cut -d '"' -f2); do
-                 local var_value="\${1}"
+                 local var_value="\${${arg_index}}"
                  local var_required=true
                  local var_rest=false
  
@@ -47,7 +48,7 @@ function __rework() {
                    if [[ "${var_rest}" == "true" ]]; then
                      var_value="(\${@:-${name_value[1]}})"
                    else
-                     var_value="\${1:-${name_value[1]}}"
+                     var_value="\${${arg_index}:-${name_value[1]}}"
                    fi
                    unset -v name_value
                    var_required=false
@@ -56,11 +57,17 @@ function __rework() {
                    echoWarn "Warning! REQUIRED variable found AFTER default!"
                  fi
  
-                 [[ "${var_required}" == "true" ]] && reworkedCode="${reworkedCode} [[ ! \"\${1}\" ]] && exitOnError \"Values for argument '${var_name}' not found!\" -1;"
+                 [[ "${var_required}" == "true" ]] && reworkedCode="${reworkedCode} [[ ! \"\${${arg_index}}\" ]] && exitOnError \"Values for argument '${var_name}' not found!\" -1;"
 
-                 reworkedCode="${reworkedCode} local ${var_name}=${var_value} && shift;"
+                 if [[ "${var_rest}" == "true" ]]; then
+                     ((arg_index-=1))
+                     reworkedCode="${reworkedCode} shift ${arg_index};"
+                 fi
+
+                 reworkedCode="${reworkedCode} local ${var_name}=${var_value};"
  
                  [[ "${var_rest}" == "true" ]] && break
+                 ((arg_index+=1))
              done
 
             # Update the code
