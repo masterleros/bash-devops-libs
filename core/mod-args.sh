@@ -15,11 +15,6 @@
 
 # Rework imported cde
 function __rework() {
-    ############## Header ##############
-    # Add to the function the lib context
-    _body="local SELF_LIB='${_lib}'; local SELF_LIB_DIR='${_libDir}'; ${_body}"
-    ############## Header ##############
-
     # For each instance found
     # TODO: allow getArgs in comments/strings
     local IFS='\n'
@@ -74,6 +69,11 @@ function __rework() {
             _body=${_body/"${lineFound}"/"${reworkedCode}"}
         fi
     done
+
+    ############## Header ##############
+    # Add to the function the lib context
+    _body="local SELF_LIB='${_lib}'; local SELF_LIB_DIR='${_libDir}';${_body}"
+    ############## Header ##############
 }
 
 # @description Execute a function within same library module
