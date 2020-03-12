@@ -8,7 +8,7 @@ function testFailed() {
 }
 
 function runModArgsTest() {
-  dolibReworkFunction ${1} "${1}_Reworked"
+  dolibReworkFunction "${1}" "${1}_Reworked"
   "${1}_Reworked" 1 2 3
 }
 

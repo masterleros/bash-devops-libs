@@ -31,7 +31,6 @@ function __rework() {
             local var_name
             for var_name in ${var_names[@]}; do
                 local var_value="\${${arg_index}}"
-                local var_required=true
                 local var_rest=false
 
                 # If it is a @Rest
@@ -51,7 +50,6 @@ function __rework() {
                         var_value="\"\${${arg_index}:-${name_value[1]}}\""
                     fi
                     unset -v name_value
-                    var_required=false
                     has_default=true
 
                 else
@@ -63,9 +61,6 @@ function __rework() {
                     fi
                 fi
  
-                # If not provided default value neither passed a value, give an error
-                #[[ "${var_required}" == "true" ]] && reworkedCode="${reworkedCode} [ \"\${${arg_index}}\" ] || exitOnError \"Values for argument '${var_name}' (index ${arg_index}) not found!\";"
-
                 # If it is the rest, shift the past values
                 if [[ "${var_rest}" == "true" ]]; then
                     ((arg_index-=1))
