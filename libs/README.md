@@ -41,11 +41,11 @@ When you develop a new library, some steps should be followed:
 
 ### Inside your functions:
 
-- Use the function `getArgs` to validate the passed arguments (Check documentation in `core.sh` file):
+- Use the function `getArgs` to validate get and assign to local values the passed arguments (Check documentation in `core.sh` file):
     ``` sh    
     # Validate and get the required arguments
     # Special chars: '=' = optional with default / '@' = get rest of arguments    
-    getArgs "arg1 arg2 @other_args="
+    getArgs "arg1 arg2 @other_args=[default_value]"
 
     echo ${arg1} # This will print first argume passed
     ```
@@ -163,7 +163,7 @@ function doOtherThing() {
 }
 
 function doSomething() {
-    getArgs "arg1 arg2 @other_args="
+    getArgs "arg1 arg2 @other_args=[default_value]"
     assign myLibDir=self doOtherThing
     echoInfo "Arg1 = ${arg1}"
     echoInfo "Arg2 = ${arg2}"
