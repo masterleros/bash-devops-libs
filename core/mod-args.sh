@@ -23,47 +23,64 @@ function __rework() {
             local reworkedCode=""
             local has_default=false
             local arg_index=1
+            local var_names=("$(echo "${lineFound}" | cut -d '"' -f2)")
+            local arg_expected=0
 
             # Get each defined var
             local IFS=' '
-            local var_name && for var_name in $(echo "${lineFound}" | cut -d '"' -f2); do
-                 local var_value="\${${arg_index}}"
-                 local var_required=true
-                 local var_rest=false
- 
-                 if [[ "${var_name}" == "@"* ]]; then # @Rest
-                   var_name=${var_name/@};
-                   var_rest=true
-                   var_value="(\${@})"
-                 fi
- 
-                 if [[ "${var_name}" == *"="* ]]; then # Default variables=default
-                   local name_value=(${var_name/=/ })
-                   var_name=${name_value[0]}
-                   if [[ "${var_rest}" == "true" ]]; then
-                     var_value="(\${@:-${name_value[1]}})"
-                   else
-                     var_value="\${${arg_index}:-${name_value[1]}}"
-                   fi
-                   unset -v name_value
-                   var_required=false
-                   has_default=true
-                 elif [[ "${has_default}" == "true" ]]; then
-                   echoWarn "Warning! REQUIRED variable found AFTER default!"
-                 fi
- 
-                 [[ "${var_required}" == "true" ]] && reworkedCode="${reworkedCode} [[ ! \"\${${arg_index}}\" ]] && exitOnError \"Values for argument '${var_name}' not found!\" -1;"
+            local var_name
+            for var_name in ${var_names[@]}; do
+                local var_value="\${${arg_index}}"
+                local var_required=true
+                local var_rest=false
 
-                 if [[ "${var_rest}" == "true" ]]; then
-                     ((arg_index-=1))
-                     reworkedCode="${reworkedCode} shift ${arg_index};"
-                 fi
+                # If it is a @Rest
+                if [[ "${var_name}" == "@"* ]]; then
+                    var_name=${var_name/@};
+                    var_rest=true
+                    var_value="(\"\${@}\")"
+                fi
 
-                 reworkedCode="${reworkedCode} local ${var_name}=${var_value};"
+                # If was assigned a default, e.g: variables=default
+                if [[ "${var_name}" == *"="* ]]; then 
+                    local name_value=(${var_name/=/ })
+                    var_name=${name_value[0]}
+                    if [[ "${var_rest}" == "true" ]]; then
+                        var_value="(\"\${@:-${name_value[1]}}\")"
+                    else
+                        var_value="\"\${${arg_index}:-${name_value[1]}}\""
+                    fi
+                    unset -v name_value
+                    var_required=false
+                    has_default=true
+
+                else
+                    ((arg_expected+=1))
+
+                    # If there was a default value before a required one
+                    if [[ "${has_default}" == "true" ]]; then
+                        echoWarn "REQUIRED variable found AFTER default! (${BASH_SOURCE[-1]}' - Line ${BASH_LINENO[-2]})"
+                    fi
+                fi
  
-                 [[ "${var_rest}" == "true" ]] && break
-                 ((arg_index+=1))
-             done
+                # If not provided default value neither passed a value, give an error
+                #[[ "${var_required}" == "true" ]] && reworkedCode="${reworkedCode} [ \"\${${arg_index}}\" ] || exitOnError \"Values for argument '${var_name}' (index ${arg_index}) not found!\";"
+
+                # If it is the rest, shift the past values
+                if [[ "${var_rest}" == "true" ]]; then
+                    ((arg_index-=1))
+                    reworkedCode="${reworkedCode} shift ${arg_index} && local ${var_name}=${var_value};"
+                    break
+                else
+                    reworkedCode="${reworkedCode} local ${var_name}=${var_value};"
+                fi
+
+                # Go to the next argument index
+                ((arg_index+=1))
+            done
+
+            # Add the validation
+            reworkedCode="[ \${#@} -ge ${arg_expected} ] || exitOnError \"Invalid arguments at '\${BASH_SOURCE[-1]}' (Line \${BASH_LINENO[-2]}), values expected: ${arg_expected} - received: \${#@}\nUsage: '${_newFunc} ${var_names[@]}'\"; ${reworkedCode}"
 
             # Update the code
             _body=${_body/"${lineFound}"/"${reworkedCode}"}
