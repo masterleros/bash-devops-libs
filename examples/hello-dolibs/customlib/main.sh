@@ -13,19 +13,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh -l ../.. -f /tmp/dolibs
+echoInfo "I am the '${SELF_LIB}' lib and I am being loading..."
 
-# Set the custom remote lib source
-do.addGitSource gitlib "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" libs
-exitOnError
-do.import gitlib.dummy
+function doSome() {
+    getArgs "var"
+    echoInfo "Hey! I have received the value: ${var}"
+    _return="Something done!"
+}
 
-# Set the custom lib source
-do.addLocalSource locallib $(dirname "${BASH_SOURCE[0]}")/../../libs
-exitOnError
-do.import locallib.dummy
-
-### YOUR CODE ###
-gitlib.dummy.doIt "External lib import test!"
-locallib.dummy.doIt "Local lib import test!"
-### YOUR CODE ###
+echoInfo "Nice! I was completely loaded"

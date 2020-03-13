@@ -20,6 +20,10 @@
 #   try <command>
 try() {
 
+    # Manage set -e
+    local _setE=${-//[^e]/}
+    set +"${_setE}"
+
     # If it is an assigment
     if [ "${1}" == "assign" ]; then            
         local _tmpFile="${DOLIBS_TMPDIR}/.try-${RANDOM}.tmp"
@@ -32,9 +36,9 @@ try() {
         [ -f "${_tmpFile}" ] && rm "${_tmpFile}"
 
         (
-        # Execute the actual function
-        ${_returnFunc} "${@}"
-        declare | egrep ^_return= | cut -d '=' -f2- > "${_tmpFile}"
+            # Execute the actual function
+            ${_returnFunc} "${@}"
+            declare | egrep ^_return= | cut -d '=' -f2- > "${_tmpFile}"
         )
         local _result=${?}
     
@@ -51,6 +55,9 @@ try() {
 
     # Show message
     [ "${_result}" == 0 ] || echoWarn "Caught exception At '${BASH_SOURCE[-1]}' (Line ${BASH_LINENO[-2]})"
+
+    # put back set -e in case it was set before
+    set -"${_setE}"
 
     return ${_result}
 }

@@ -122,7 +122,7 @@ function import() {
             fi
 
             # Create the libs and set as imported
-            assign funcCount=dolibImportLib "${_lib}" "${_libDir}"
+            assign funcCount=dolibImportLib "${_lib}" "${_libDir}/${DOLIBS_MAIN_FILE}"
 
             # Set as imported
             export DOLIBS_IMPORTED="${DOLIBS_IMPORTED};${_lib}"            

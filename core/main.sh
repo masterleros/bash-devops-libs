@@ -42,11 +42,12 @@ export DOLIBS_ROOTDIR=${DOLIBS_ROOTDIR}
 export DOLIBS_TMPDIR=${DOLIBS_TMPDIR}
 export DOLIBS_LIBS_DIR=${DOLIBS_DIR}/libs
 export DOLIBS_SOURCE_LIBS_DIR=${DOLIBS_SOURCE_DIR}/libs
+export DOLIBS_MAIN_FILE=${DOLIBS_MAIN_FILE}
 
 # Import main do functions (to manage libs)
 _dolibUpdate "do" "${DOLIBS_SOURCE_LIBS_DIR}/do" "${DOLIBS_LIBS_DIR}" "do"
 _dolibUpdated=${?}
-dolibImportLib "do" "${DOLIBS_LIBS_DIR}/do"
+dolibImportLib "do" "${DOLIBS_LIBS_DIR}/do/${DOLIBS_MAIN_FILE}"
 
 # Generate core and do documentation
 if [ "${_dolibUpdated}" != 0 ]; then

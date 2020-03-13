@@ -27,14 +27,18 @@ function myOwnFunction() {
     echoInfo "array values are '${array[@]}'"
 
     # This will return a value
-    _return="This is the function result and received var1='${1}'!"
+    _return="This is the function result and received var1='${var1}'!"
 
     # This will set the exit code
     return 0
 }
 
+# It is needed to use the dolibs rework function to enable its features
+# when used in an imported lib, it is not required
+dolibReworkFunction myOwnFunction
+
 # Execute my function with the required values
-assign myVar=myOwnFunction first second 3 fourth 5
+assign myVar=myOwnFunction first 2nd 3rd fourth 5th
 
 # Show the value and exit code that was returned
-echoInfo "myOwnFunction() exit code was: '${?}', value returned is: '${myVar}'"
+echoInfo "myOwnFunction() exit code was: '${?}', returned value is: '${myVar}'"
