@@ -96,7 +96,7 @@ function dolibImportLib() {
 
     # Check the lib entrypoint    
     [ -f "${_libEntryPoint}" ] || exitOnError "It was not posible to find '${_lib}' entrypoint at '${_libEntryPoint}'"
-    local _libDir=$(dirname ${_libEntryPoint})
+    local _libDir=$(dirname "${_libEntryPoint}")
 
     # Get current funcions
     local _currFuncts=$(typeset -F)
