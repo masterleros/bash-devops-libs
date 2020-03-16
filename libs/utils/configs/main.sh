@@ -1,4 +1,5 @@
- 
+#!/bin/bash
+
 #    Copyright 2020 Leonardo Andres Morales
 
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,6 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
-#!/bin/bash
 
 ### Set variables from file's values and set them into the given variable names ###
 # usage: setVariablesFromFile <file> <var1> <var2> ... <varN>
@@ -30,12 +29,12 @@ function setVariablesFromFile() {
      done
 }
 
-### Get arguments starting with placeholder "--" from a given file and assign the arguments as string to a given variable name ###
-# usage: getAllArgsFromFile <file>
+### Get arguments with an optional placeholder from a given file and assign the arguments as string to a given variable name. Use the function assign to get the return ###
+# usage: assign var=getAllArgsFromFile <file> <&placeholder>
+# where placeholder can be "--", "-"
 function getAllArgsFromFile() {
-    getArgs "file" "${@}"
+     getArgs "file &placeholder" "${@}"
 
-    [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
-
-    _return=($(cat ${file} | grep "\--"))
+     [ -f ${file} ] || exitOnError "File '${file}' was not found" -1
+     [ "${placeholder}" ] && _return=($(cat ${file} | grep "\\${placeholder}")) || _return=($(cat ${file}))
 }
