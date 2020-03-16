@@ -21,7 +21,7 @@ checkBins git || return ${?}
 # usage: sync <git_url>
 function sync() {
 
-    getArgs "url branch" "${@}"
+    getArgs "url branch"
 
     # Verify Dependencies
     checkBins git || return ${?}

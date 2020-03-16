@@ -61,7 +61,7 @@ waitAll <endCallbackFunc> <timeout>
 function myCallBack {
 # process.waitAll()
 
-    getArgs "_code _pid _cmd _logFile _elapsed" "${@}" 
+    getArgs "_code _pid _cmd _logFile _elapsed" 
 }
 ```
 

@@ -29,7 +29,7 @@ declare -a _LIBPROC_LOG_FILES
 #   execute <outfile> <command> <args>
 function execute() {
 
-    getArgs "_outfile @_command" "${@}"
+    getArgs "_outfile @_command"
 
     # Execute the command
     #eval time ${_command[@]} &>${_outfile} &
@@ -52,7 +52,7 @@ function execute() {
 # @example
 #   executeWithInfo <info> <outfile> <command> <args>
 function executeWithInfo() {
-    getArgs "_info _outfile @_command" "${@}"
+    getArgs "_info _outfile @_command"
     echoInfo "Executing '${_info}'"
     self execute "${_outfile}" "${_command[@]}"    
     _return=${_return}
@@ -70,11 +70,11 @@ function executeWithInfo() {
 #   
 #   # callback function example:
 #   function myCallBack {
-#       getArgs "_code _pid _cmd _logFile _elapsed" "${@}" 
+#       getArgs "_code _pid _cmd _logFile _elapsed" 
 #   }
 function waitAll() {
 
-    getArgs "_endCallbackFunc &_timeout" "${@}"
+    getArgs "_endCallbackFunc _timeout="
 
     local _result=0
 

@@ -21,7 +21,7 @@ checkBins gsutil
 # usage: validateBucket <project> <bucket>
 function validateBucket() {
 
-    getArgs "project bucket" "${@}"
+    getArgs "project bucket"
 
     # Get tha APP ID
     gsutil ls -p "${project}" | grep "${bucket}" > /dev/null
@@ -33,7 +33,7 @@ function validateBucket() {
 # type: regional or multiregional
 function createBucket() {
 
-    getArgs "project bucket class @region" "${@}"
+    getArgs "project bucket class @region"
 
     self validateBucket "${project}" "${bucket}"
     if [ $? -ne 0 ]; then
@@ -48,7 +48,7 @@ function createBucket() {
 # usage: enableVersioning <bucket>
 function enableVersioning() {
 
-    getArgs "bucket" "${@}"
+    getArgs "bucket"
 
     gsutil versioning set on gs://"${bucket}"
     exitOnError "Failed to enable versioning on bucket ${bucket}"
@@ -61,7 +61,7 @@ function enableVersioning() {
 #  O: OWNER
 function setUserACL() {
 
-    getArgs "bucket user access" "${@}"
+    getArgs "bucket user access"
 
     gsutil acl ch -u "${user}":"${access}" gs://"${bucket}"
     exitOnError "Failed to set ACL on bucket ${bucket}"

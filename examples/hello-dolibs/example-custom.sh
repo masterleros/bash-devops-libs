@@ -13,24 +13,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# @description Check if a value exists in an array
-# @arg $value value Value to look for
-# @arg $array array Array to look for the value
-# @return Found value position
-# @exitcode 0 Value was found
-# @exitcode 1 Value not found
-# @example 
-#   assign valPos=valueInArray <value> <array>
-function valueInArray() {
-    getArgs "_value @_values="
-    local _val
-    local _pos=0
-    for _val in "${_values[@]}"; do
-        if [[ "${_val}" == "${_value}" ]]; then 
-            _return=${_pos}
-            return 0;
-        fi
-        ((_pos+=1))
-    done
-    return 1
-}
+# Enable dolibs (offline)
+source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
+
+# Import the custom lib from its location
+# Check the ./customlib folder to look at this code
+dolibImportLib customlib $(dirname "${BASH_SOURCE[0]}")/customlib/main.sh
+
+# Use my custom function
+customlib.doSome "a value"

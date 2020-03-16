@@ -57,7 +57,7 @@ function dolibReworkFunction() {
 
     local _funct=${1}
     local _newFunc=${2}
-    local _file=${_libEntrypoint:-${BASH_SOURCE[-1]}}
+    local _file=${_libEntryPoint:-${BASH_SOURCE[-1]}}
 
     # If no new function name is given, use the current one
     [ "${_newFunc}" ] || _newFunc="${_funct}"
@@ -86,17 +86,17 @@ function dolibReworkFunction() {
 
 # @description Import a library (this function is not intended to be used manually, instead use do.use or do.import)
 # @arg $lib string Library namespace
-# @arg $libDir path Folder where the library files are hosted
+# @arg $libEntryPoint path Path to lib entrypoint sh file
 # @example
-#   dolibImportLib <lib> <libDir>
+#   dolibImportLib <lib> <libEntryPoint>
 function dolibImportLib() {
 
     local _lib=${1}
-    local _libDir=${2}
+    local _libEntryPoint=${2}
 
-    # Check the lib entrypoint
-    local _libEntrypoint=${_libDir}/${DOLIBS_MAIN_FILE}
-    [ -f "${_libEntrypoint}" ] || exitOnError "It was not posible to find '${_lib}' entrypoint at '${_libEntrypoint}'"
+    # Check the lib entrypoint    
+    [ -f "${_libEntryPoint}" ] || exitOnError "It was not posible to find '${_lib}' entrypoint at '${_libEntryPoint}'"
+    local _libDir=$(dirname "${_libEntryPoint}")
 
     # Get current funcions
     local _currFuncts=$(typeset -F)
@@ -104,8 +104,8 @@ function dolibImportLib() {
     # Import lib
     local SELF_LIB="${_lib}"
     local SELF_LIB_DIR="${_libDir}"
-    source "${_libEntrypoint}"
-    exitOnError "Error importing '${_libEntrypoint}'"
+    source "${_libEntryPoint}"
+    exitOnError "Error importing '${_libEntryPoint}'"
 
     # Get new functions
     local _libFuncts=($((typeset -F; echo "${_currFuncts}") | sort | uniq -u | awk '{print $NF}'))

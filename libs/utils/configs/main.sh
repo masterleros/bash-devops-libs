@@ -20,7 +20,7 @@
 # @example 
 #   setVariablesFromFile <file> <var1> <var2> ... <varN>
 function setVariablesFromFile() {
-     getArgs "file @vars" "${@}"
+     getArgs "file @vars"
 
      [ -f "${file}" ] || exitOnError "File '${file}' not found" -1
 

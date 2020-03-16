@@ -13,10 +13,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-export DOLIBS_MAIN_FILE="main.sh"
 DOLIBS_REPO="https://github.com/masterleros/bash-devops-libs.git"
 DOLIBS_VER="0.2"
 DOLIBS_TMPDIR="${DOLIBS_DIR}/.libtmp"
+DOLIBS_MAIN_FILE="main.sh"
 
 ### Temporary functions ###
 function _echo() { echo -e "${2} ${3}" >&"${1}"; }

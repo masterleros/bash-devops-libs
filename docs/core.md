@@ -95,17 +95,14 @@ echo ${var} # this will print 'value'
 
 Process the passed values in the required variables \
 - A variable starting with `@`<var> will take the rest of values \
-- A variable starting with `&`<var> is optional and script will not fail case there is no value for it
-
-### Arguments
-
-* **args** (string): names of variables to be assigned
+- A variable ending with <var>`=` is optional and script will not fail case there is no value for it
+- A variable having equal plus value, as <var>`=`<default-value> is optional and will use default value when argument is not provided
 
 ### Example
 
 ```bash
 # If any of the arguments is not provided, it will fail
-getArgs "var1 va2 ... varN>" "${@}"
+getArgs "var1 va2 ... <varN>"
 echo ${var1} # will print what was passed in ${1}
 echo ${var2} # will print what was passed in ${2}
 # Same for the rest of arguments
@@ -115,7 +112,7 @@ echo ${var2} # will print what was passed in ${2}
 
 ```bash
 # var2 will be an array and will take all the remaining arguments 
-getArgs "var1 @var2" "${@}"
+getArgs "var1 @var2"
 echo ${var1} # will print what was passed in ${1}
 echo ${var2[@]} # will print all the rest of passed values
 ```
@@ -124,9 +121,10 @@ echo ${var2[@]} # will print all the rest of passed values
 
 ```bash
 # var2 is optional and if not passed will print nothing
-getArgs "var1 $var2" "${@}"
+getArgs "var1 var2=[default] var3="
 echo ${var1} # will print what was passed in ${1}
-echo ${var2} # optional
+echo ${var2} # optional with a default value
+echo ${var3} # optional with defaults as empty
 ```
 
 
