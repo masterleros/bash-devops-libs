@@ -1,0 +1,7 @@
+--machine-type n1-standard-2
+--image-project ubuntu-os-cloud
+--image-family ubuntu-1804-lts
+--scopes cloud-platform
+--metadata
+FLYWAY_VM_HOSTNAME=flyway-vm,FLYWAY_VM_HOME=/home/ubuntu,FLYWAY_PATH=/home/ubuntu/flywaydb,FLYWAY_CONF_FILE=/home/ubuntu/flywaydb/flyway.conf,FLYWAY_SQL_REMOTE_FOLDER=/home/ubuntu/sql,FLYWAY_OUTPUT=/home/ubuntu/sql/flyway.out,FINISHED_STARTUP_FLAG=unknown
+--metadata-from-file startup-script=${ROOTDIR}/scripts/devops-libs/gcp/gce/flyway/startup-script.sh

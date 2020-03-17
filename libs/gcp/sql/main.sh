@@ -17,11 +17,11 @@
 # Verify Dependencies
 verifyDeps gcloud || return ${?}
 
-### Deploy Cloud Function ###
-# usage: deploy <function name> <aditional_parameters_array_list>
-function deploy() {
-    getArgs "cfName @parameters" "${@}"
+### Returns the value requested from the sql database instance. Use assign to get the result ###
+# usage: assign var=list <project id> <database instance name> <value>
+function getValueFromInstance() {
+     getArgs "projectId databaseInstanceName value" "${@}"
 
-    gcloud functions deploy ${cfName} ${parameters[*]} | grep -vi password
-    exitOnError "Failed to deploy GCP Function ${cfName}"
+     _return=$(gcloud --project ${projectId} sql instances list --filter="NAME=${databaseInstanceName}" --format="value(${value})")
+     exitOnError "Unable to retrieve the database '${DATABASE_INSTANCE_NAME}' '${value}'"
 }

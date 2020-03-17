@@ -65,7 +65,7 @@ function import() {
     local _result=0
     while [ "${1}" ]; do
         local _lib="${1}"
-        local _libDir=${_lib/./\/}
+        local _libDir=${_lib//./\/}
         local _libPath=${DOLIBS_DIR}/${_libDir}
         local _libMain=${_libPath}/${DOLIBS_MAIN_FILE}
         local _libTmpPath=${DOLIBS_TMP_DIR}/libs/${_libDir}
