@@ -18,7 +18,7 @@ export ROOTDIR="$(cd $(dirname ${BASH_SOURCE[0]})/../ >/dev/null 2>&1 && pwd)"
 
 ### DEVOPS LIBS BRANCH ###
 DOLIBS_DEFAULT_MODE="auto"
-DOLIBS_BRANCH="hotfix/process"
+DOLIBS_BRANCH="v0.1.2-alpha"
 DOLIBS_REPO="github.com/masterleros/bash-devops-libs.git"
 ### DEVOPS LIBS DEFINITIONS ###
 
