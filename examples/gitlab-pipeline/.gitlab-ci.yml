@@ -21,7 +21,8 @@ include:
     file: '/pipelines/gitlab/.base-template.yml'
 
 variables:
-  DEVOPS_LIBS_BRANCHES_DEFINITION: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
+  DOLIBS_BRANCHES_DEFINITION: "feature/*:DEV fix/*:DEV develop:INT release/*:UAT bugfix/*:UAT master:PRD hotfix/*:PRD"
+  DOLIBS_ENTRYPOINT: "${CI_PROJECT_DIR}/automation/dolibs.sh"
   GOOGLE_APPLICATION_CREDENTIALS: "${CI_PROJECT_DIR}/automation/credentials/credential.json"
 
 stages:
