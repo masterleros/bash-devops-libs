@@ -19,7 +19,7 @@
       # .base-template
 
       # Import DevOps Libs and convert environment variables
-      source ${CI_PROJECT_DIR}/automation/dolibs.sh
+      source ${DOLIBS_ENTRYPOINT}
       do.import gitlab
       do.gitlab.convertEnvVars ${CI_COMMIT_REF_NAME} ${DOLIBS_BRANCHES_DEFINITION}
 
