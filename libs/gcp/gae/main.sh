@@ -60,7 +60,7 @@ function stopOldVersions() {
     getArgs "projectId numberVersionsToKeep &service" "${@}"
 
     [ "${service}" ] || service="default"
-    versionIds=($(gcloud --project keane-docc-dev app versions list --filter="TRAFFIC_SPLIT=0 AND SERVICE=${service}" --sort-by="~LAST_DEPLOYED" --format="value(VERSION.ID)"))
+    versionIds=($(gcloud --project ${projectId} app versions list --filter="TRAFFIC_SPLIT=0 AND SERVICE=${service}" --sort-by="~last_deployed_time" --format="value(VERSION.ID)"))
 
     # If number of versions is greater than the number that we should keep, we continue, else we exit from here
     [ ${#versionIds[@]} -gt ${numberVersionsToKeep} ] || return 0

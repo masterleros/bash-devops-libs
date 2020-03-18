@@ -24,7 +24,7 @@ fi
 # Making sure the environment variables are all set, if not, we reload the .profile
 [[ ( -z ${FLYWAY_VM_HOME} ) && ( -f ${FLYWAY_HOME}/.profile ) ]] && source ${FLYWAY_HOME}/.profile
 
-source ${FLYWAY_VM_HOME}/scripts/devops-libs.sh
+source ${FLYWAY_VM_HOME}/scripts/dolibs.sh
 
 # Import required libs
 do.import gcp.gce.flyway

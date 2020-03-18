@@ -48,7 +48,7 @@ On the application side, a deploy script must be created containing the followin
 
 ```
 # Importing the main lib
-source $(dirname ${BASH_SOURCE[0]})/../devops-libs.sh
+source $(dirname ${BASH_SOURCE[0]})/../dolibs.sh
 
 # Declare the application's files
 FLYWAY_VM_TEMPLATE="${ROOTDIR}/flywaydb/flyway-vm.template"
