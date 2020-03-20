@@ -50,7 +50,8 @@ function purgeStoppedVersions() {
         [ "${operation}" ] && continue
 
         gcloud --project ${projectId} --quiet app versions delete --service="${service}" "${versionId}"
-        exitOnError
+        # Disabling the exitOnError as this should not be a reason to fail the pipeline if a version fails to be removed
+        #exitOnError
     done
 }
 
