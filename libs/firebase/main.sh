@@ -104,7 +104,7 @@ function getAppSdkConfig() {
     if [ ${?} -ne 0 ]; then echoError "Could not get '${type}' App '${app}' ID from ${project} project"; return 1; fi
 
     # Creating firebase firebase.config.ts key
-    firebase ${FIREBASE_OPTS} apps:sdkconfig ${type} ${app_id} --project ${project} -o ${file}
+    firebase ${FIREBASE_OPTS} apps:sdkconfig ${type} ${app_id} --project ${project} > ${file}
 
     # Removing lines starting with /
     sed -i '/^\//d' ${file}
