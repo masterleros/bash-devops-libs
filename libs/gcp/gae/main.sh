@@ -17,8 +17,14 @@
 # Import dependencies
 do.use utils.tokens
 
-### Function to deploy a gae app ###
-# usage: deploy <path> [version]
+
+# @description Deploys an Google AppEngine application
+# @arg $path to the description of the AppEngine application
+# @arg [$path] optional version idenfitier
+# @exitcode 0 GAE app deployed
+# @exitcode non-0 GAE app not deployed
+# @example
+#    deploy <path> [version]
 function deploy {
 
     getArgs "path version="

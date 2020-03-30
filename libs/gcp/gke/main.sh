@@ -17,8 +17,14 @@
 # Verify Dependencies
 checkBins gcloud || return ${?}
 
-### Set the requested project and then get credentials for the cluster ###
-# usage: loginCluster <cluster_name> <zone> <gcp_project_id>
+# @description Set the requested project and then get credentials for the cluster
+# @arg $cluster_name name of the cluster to login
+# @arg $zone zone of the cluster
+# @arg $project id of the GCP project
+# @exitcode 0 Successfuly logged in
+# @exitcode non-0 Unable to login
+# @example
+#   loginCluster <cluster_name> <zone> <project_id>
 function loginCluster() {
     getArgs "cluster_name zone project"
  
@@ -27,8 +33,13 @@ function loginCluster() {
     exitOnError "It is not possible to authenticate to the cluster"
 }
 
-### Describe cluster ###
-# usage describeCluster <cluster_name> <zone>
+# @description Describe a cluster
+# @arg $cluster_name name of the cluster to describe
+# @arg $zone zone of the cluster
+# @arg $project id of the GCP project
+# @return the description of the cluster
+# @example
+#   assign description=describeCluster <cluster_name> <zone> <project_id>
 function describeCluster() {
     getArgs "cluster_name zone project"
 

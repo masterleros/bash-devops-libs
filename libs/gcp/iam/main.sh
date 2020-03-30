@@ -14,11 +14,18 @@
 #    limitations under the License.
 
 
-### Validate a role of a email ###
-# usage: validateRole <domain> <domain_id> <role> <email>
-# domains: project folder billing
+# @description Validates if a email contains certain role
+# @arg $domain one of: project folder billing function
+# @arg $domain_id id into the domain
+# @arg $role name of the role to verify
+# @arg $email email to verify the role
+# @return exit code
+# @exitcode 0 Role is defined for email
+# @exitcode non-0 Role is not defined for email
+# @example
+#   validateRole <domain> <domain_id> <role> <email>
 function validateRole {
-    
+
     getArgs "domain domain_id role email"
 
     # Validate role format
@@ -45,9 +52,15 @@ function validateRole {
     return ${?}
 }
 
-### Bind Role to a list of emails ###
-# usage: bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
-# domains: project folder
+# @description Bind Role to a list of emails
+# @arg $domain one of: project folder function
+# @arg $domain_id id into the domain
+# @arg $role name of the role to verify
+# @arg @$emails list of emails
+# @exitcode 0 Successfuly bind roles
+# @exitcode non-0 Failed to bind roles
+# @example
+#   bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
 function bindRole {
 
     getArgs "domain domain_id role @emails"

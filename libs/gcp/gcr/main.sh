@@ -24,7 +24,11 @@ export DOCKER_CONFIG_PATH="${DOCKER_CONFIG_DIR}/docker.json"
 export DOCKER_LOCKFILE_PATH="${DOCKER_CONFIG_DIR}/.${GCLOUD_DOCKER_REGISTRY_HOST}.lock"
 export DOCKER_LOCKFILE_DESC=100
 
-### Login with current GOOGLE_APPLICATION_CREDENTIALS to GCloud registry
+# @description Login with current GOOGLE_APPLICATION_CREDENTIALS to GCloud registry
+# @exitcode 0 Logged in successfuly
+# @exitcode non-0 Logged in failed
+# @example
+#   dockerLogin()
 function dockerLogin() {
 
     do.import gcp
@@ -57,8 +61,9 @@ function dockerLogin() {
     < "${GOOGLE_APPLICATION_CREDENTIALS}" docker login -u _json_key --password-stdin https://"${GCLOUD_DOCKER_REGISTRY_HOST}"
 }
 
-
-### Logoff of current GCloud registry
+# @description Logoff of current GCloud registry
+# @example
+#   dockerLogoff()
 function dockerLogoff() {
 
     # Check if the lock is in place yet
@@ -75,8 +80,13 @@ function dockerLogoff() {
     flock -s -u ${DOCKER_LOCKFILE_DESC}
 }
 
-### Get the digest of a specific tagged image ###
-# usage: getImageDigest <project_id> <docker_image_name> <docker_image_tag>
+# @description Get the digest of a specific tagged image
+# @arg $project_id id of the GCP project
+# @arg $docker_image_name name of the docker image
+# @arg $docker_image_tag tag of the docker image
+# @return digest of an image
+# @example
+#   getImageDigest <project_id> <docker_image_name> <docker_image_tag>
 function getImageDigest() {
     # Get the arguments
     getArgs "_project_id _docker_image_name _docker_image_tag"
@@ -89,8 +99,13 @@ function getImageDigest() {
     return ${_result}
 }
 
-### Get the digest of a specific tagged image ###
-# usage: getFullDigestTag <project_id> <docker_image_name> <docker_image_tag>
+# @description Get the full digest path (with registry/project/image/digest) of a specific tagged image
+# @arg $project_id id of the GCP project
+# @arg $docker_image_name name of the docker image
+# @arg $docker_image_tag tag of the docker image
+# @return digest of an image
+# @example
+#   getFullDigestTag <project_id> <docker_image_name> <docker_image_tag>
 function getFullDigestTag() {
     # Get the arguments
     getArgs "_project_id _docker_image_name _docker_image_tag"
@@ -104,8 +119,15 @@ function getFullDigestTag() {
     return ${_result}
 }
 
-### Build a docker image and publish to the GCP Container Registry ###
-# usage: buildAndPublish <project_id> <docker_dir> <docker_file> <docker_image_name> <docker_build_args>
+# @description Build a docker image and publish to the GCP Container Registry
+# @arg $project_id id of the GCP project
+# @arg $docker_dir path to a directory containing an docker file
+# @arg $docker_file filename of the docker to be build
+# @arg $docker_image_name name of the resulting docker image
+# @arg @$docker_builder_args optional rest arguments for docker builder args
+# @return digest of an image
+# @example
+#   buildAndPublish <project_id> <docker_dir> <docker_file> <docker_image_name> <docker_build_args>
 function buildAndPublish() {
 
     # Get the arguments

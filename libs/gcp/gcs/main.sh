@@ -17,8 +17,12 @@
 # Verify Dependencies
 checkBins gsutil
 
-### Check bucket exists ###
-# usage: validateBucket <project> <bucket>
+# @description Check if a bucket exist
+# @arg $project id of the GCP project
+# @arg $bucket name of the bucket to check
+# @return 0 if bucket exist
+# @example
+#   validateBucket <project> <bucket>
 function validateBucket() {
 
     getArgs "project bucket"
@@ -28,9 +32,17 @@ function validateBucket() {
     return ${?}
 }
 
-### Create bucket if does not exist ###
-# usage: createBucket <project> <bucket> <class> [region]
-# type: regional or multiregional
+
+
+# @description Create a bucket if it does not exist
+# @arg $project id of the GCP project
+# @arg $bucket name of the bucket to create
+# @arg $class 'regional' or 'multiregional'
+# @arg [$region] optional region
+# @exitcode 0 Bucket created
+# @exitcode non-0 Bucket not created due to error
+# @example
+#   createBucket <project> <bucket> <class> [region]
 function createBucket() {
 
     getArgs "project bucket class @region"
@@ -44,8 +56,14 @@ function createBucket() {
     fi
 }
 
-### Create bucket if does not exist ###
-# usage: enableVersioning <bucket>
+
+
+# @description Enable versioning into a bucket
+# @arg $bucket name of the bucket to enable versioning
+# @exitcode 0 Bucket versioning enabled
+# @exitcode non-0 Bucket versioning not enabled
+# @example
+#   enableVersioning <bucket>
 function enableVersioning() {
 
     getArgs "bucket"
@@ -54,11 +72,18 @@ function enableVersioning() {
     exitOnError "Failed to enable versioning on bucket ${bucket}"
 }
 
-### Create bucket if does not exist ###
-# usage: setACL <bucket> <ACL>
-#  R: READ
-#  W: WRITE
-#  O: OWNER
+
+# @description Enable versioning into a bucket
+# @arg $bucket name of the bucket to enable versioning
+# @arg $user
+# @arg $ACL one of:
+#     R: READ
+#     W: WRITE
+#     O: OWNER
+# @exitcode 0 Bucket ACL set
+# @exitcode non-0 Bucket ACL not set
+# @example
+#   setACL <bucket> <user> <ACL>
 function setUserACL() {
 
     getArgs "bucket user access"
