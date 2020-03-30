@@ -39,12 +39,12 @@ Import a library (this function is not intended to be used manually, instead use
 ### Arguments
 
 * **lib** (string): Library namespace
-* **libDir** (path): Folder where the library files are hosted
+* **libEntryPoint** (path): Path to lib entrypoint sh file
 
 ### Example
 
 ```bash
-dolibImportLib <lib> <libDir>
+dolibImportLib <lib> <libEntryPoint>
 ```
 
 
@@ -179,9 +179,6 @@ checkBins <bin1> <bin2> ... <binN>
 
 
 
-
-
-
 # returnOnError()
 
 If the last command was not success, it will return the function with the last command exit code
@@ -208,6 +205,9 @@ If the last command was not success, it will exit the program with the last comm
 ```bash
 exitOnError <output_message> <exit_code>
 ```
+
+
+
 
 
 
