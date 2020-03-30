@@ -21,7 +21,7 @@
 # @exitcode non-0 Failed to enable API
 # @example
 #   enable <project> <api>
-function enable {
+function enable() {
 
     getArgs "project api"
 

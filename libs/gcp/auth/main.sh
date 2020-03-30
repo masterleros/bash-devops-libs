@@ -32,7 +32,7 @@ function getCurrentUser() {
 # @return Desired key value
 # @example
 #   assign key_value=getValueFromCredential <credential_file> <key>
-function getValueFromCredential {
+function getValueFromCredential() {
     getArgs "credential_path key"
 
     # Verify if SA credential file exist
@@ -45,12 +45,12 @@ function getValueFromCredential {
 # @description Create a service account with the given parameters
 # @arg $project id of the project
 # @arg $sa_id id of the service account
-# @arg [$description] optional description
+# @arg $[description] optional description
 # @exitcode 0 Successfuly created SA
 # @exitcode non-0 Failed to create SA
 # @example
 #   createSA <project> <sa_id> [description]
-function createSA {
+function createSA() {
 
     getArgs "project sa_id description="
 
@@ -73,7 +73,7 @@ function createSA {
 # @exitcode non-0 Failed to set SA
 # @example
 #   useSA <credential_file>
-function useSA {
+function useSA() {
 
     getArgs "credential_path"
 
@@ -92,7 +92,7 @@ function useSA {
 # @exitcode non-0 Failed to revoked SA
 # @example
 #   revokeSA <credential_file>
-function revokeSA {
+function revokeSA() {
 
     getArgs "credential_path"
 
@@ -113,7 +113,7 @@ function revokeSA {
 # @exitcode non-0 Failed to created SA
 # @example
 #   createCredential <project> <credential_path> <sa_mail>
-function createCredential {
+function createCredential() {
 
     getArgs "project credential_path sa_mail"
 
@@ -139,7 +139,7 @@ function createCredential {
 # @exitcode non-0 Failed to delete SA
 # @example
 #   deleteCredential <project> <credential_path> <sa_mail>
-function deleteCredential {
+function deleteCredential() {
 
     getArgs "project credential_path sa_mail"
 
