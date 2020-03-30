@@ -20,7 +20,7 @@
 # @return non-0 Failed to set project
 # @example
 #   enabledProject <project_id>
-function enabledProject {
+function enabledProject() {
     getArgs "project"
     gcloud --quiet --project="${project}" beta firestore operations list &> /dev/null
     return ${?}

@@ -24,7 +24,7 @@
 # @exitcode non-0 Role is not defined for email
 # @example
 #   validateRole <domain> <domain_id> <role> <email>
-function validateRole {
+function validateRole() {
 
     getArgs "domain domain_id role email"
 
@@ -61,7 +61,7 @@ function validateRole {
 # @exitcode non-0 Failed to bind roles
 # @example
 #   bindRole <domain> <domain_id> <role> <email1> <email2> ... <emailN>
-function bindRole {
+function bindRole() {
 
     getArgs "domain domain_id role @emails"
 

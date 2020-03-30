@@ -1,15 +1,13 @@
-* [gcp.api.function enable {](#gcpapifunction-enable-)
+* [gcp.api.enable()](#gcpapienable)
 * [gcp.auth.getCurrentUser()](#gcpauthgetcurrentuser)
-* [gcp.auth.function getValueFromCredential {](#gcpauthfunction-getvaluefromcredential-)
-* [gcp.auth.function createSA {](#gcpauthfunction-createsa-)
-* [gcp.auth.function useSA {](#gcpauthfunction-usesa-)
-* [gcp.auth.function revokeSA {](#gcpauthfunction-revokesa-)
-* [gcp.auth.function createCredential {](#gcpauthfunction-createcredential-)
-* [gcp.auth.function deleteCredential {](#gcpauthfunction-deletecredential-)
-* [$description] optional description
-* [gcp.firestore.function enabledProject {](#gcpfirestorefunction-enabledproject-)
-* [gcp.gae.function deploy {](#gcpgaefunction-deploy-)
-* [$path] optional version idenfitier
+* [gcp.auth.getValueFromCredential()](#gcpauthgetvaluefromcredential)
+* [gcp.auth.createSA()](#gcpauthcreatesa)
+* [gcp.auth.useSA()](#gcpauthusesa)
+* [gcp.auth.revokeSA()](#gcpauthrevokesa)
+* [gcp.auth.createCredential()](#gcpauthcreatecredential)
+* [gcp.auth.deleteCredential()](#gcpauthdeletecredential)
+* [gcp.firestore.enabledProject()](#gcpfirestoreenabledproject)
+* [gcp.gae.deploy()](#gcpgaedeploy)
 * [gcp.gcf.deploy()](#gcpgcfdeploy)
 * [gcp.gcr.dockerLogin()](#gcpgcrdockerlogin)
 * [gcp.gcr.dockerLogoff()](#gcpgcrdockerlogoff)
@@ -20,17 +18,16 @@
 * [gcp.gcs.createBucket()](#gcpgcscreatebucket)
 * [gcp.gcs.enableVersioning()](#gcpgcsenableversioning)
 * [gcp.gcs.setUserACL()](#gcpgcssetuseracl)
-* [$region] optional region
 * [gcp.gke.loginCluster()](#gcpgkelogincluster)
 * [gcp.gke.describeCluster()](#gcpgkedescribecluster)
-* [gcp.iam.function validateRole {](#gcpiamfunction-validaterole-)
-* [gcp.iam.function bindRole {](#gcpiamfunction-bindrole-)
+* [gcp.iam.validateRole()](#gcpiamvalidaterole)
+* [gcp.iam.bindRole()](#gcpiambindrole)
 * [gcp.useProject()](#gcpuseproject)
 * [gcp.setDefaultZone()](#gcpsetdefaultzone)
 
 
 
-# gcp.api.function enable {
+# gcp.api.enable()
 
 Enable a API domain into the GCP project
 
@@ -67,7 +64,7 @@ Get a value from the credential json file
 assign currentUserEmail=getCurrentUser()
 ```
 
-# gcp.auth.function getValueFromCredential {
+# gcp.auth.getValueFromCredential()
 
 Get a value from the credential json file
 
@@ -86,7 +83,7 @@ Get a value from the credential json file
 assign key_value=getValueFromCredential <credential_file> <key>
 ```
 
-# gcp.auth.function createSA {
+# gcp.auth.createSA()
 
 Create a service account with the given parameters
 
@@ -94,6 +91,7 @@ Create a service account with the given parameters
 
 * **project** (id): of the project
 * $sa_id id of the service account
+* $[description] optional description
 
 ### Exit codes
 
@@ -106,7 +104,7 @@ Create a service account with the given parameters
 createSA <project> <sa_id> [description]
 ```
 
-# gcp.auth.function useSA {
+# gcp.auth.useSA()
 
 Validates and use the service account from file
 
@@ -125,7 +123,7 @@ Validates and use the service account from file
 useSA <credential_file>
 ```
 
-# gcp.auth.function revokeSA {
+# gcp.auth.revokeSA()
 
 Remove the service account from system
 
@@ -144,7 +142,7 @@ Remove the service account from system
 revokeSA <credential_file>
 ```
 
-# gcp.auth.function createCredential {
+# gcp.auth.createCredential()
 
 Create a service account credential json file
 
@@ -165,7 +163,7 @@ Create a service account credential json file
 createCredential <project> <credential_path> <sa_mail>
 ```
 
-# gcp.auth.function deleteCredential {
+# gcp.auth.deleteCredential()
 
 Delete a SA credential of the project
 
@@ -189,7 +187,7 @@ deleteCredential <project> <credential_path> <sa_mail>
 
 
 
-# gcp.firestore.function enabledProject {
+# gcp.firestore.enabledProject()
 
 Validate if the project is firestore enabled
 
@@ -211,13 +209,14 @@ enabledProject <project_id>
 
 
 
-# gcp.gae.function deploy {
+# gcp.gae.deploy()
 
 Deploys an Google AppEngine application
 
 ### Arguments
 
 * **path** (to): the description of the AppEngine application
+* $[path] optional version idenfitier
 
 ### Exit codes
 
@@ -374,6 +373,7 @@ Create a bucket if it does not exist
 * **project** (id): of the GCP project
 * **bucket** (name): of the bucket to create
 * **class** ('regional'): or 'multiregional'
+* $[region] optional region
 
 ### Exit codes
 
@@ -473,7 +473,7 @@ assign description=describeCluster <cluster_name> <zone> <project_id>
 
 
 
-# gcp.iam.function validateRole {
+# gcp.iam.validateRole()
 
 Validates if a email contains certain role
 
@@ -499,7 +499,7 @@ Validates if a email contains certain role
 validateRole <domain> <domain_id> <role> <email>
 ```
 
-# gcp.iam.function bindRole {
+# gcp.iam.bindRole()
 
 Bind Role to a list of emails
 

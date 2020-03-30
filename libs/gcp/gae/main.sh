@@ -20,12 +20,12 @@ do.use utils.tokens
 
 # @description Deploys an Google AppEngine application
 # @arg $path to the description of the AppEngine application
-# @arg [$path] optional version idenfitier
+# @arg $[path] optional version idenfitier
 # @exitcode 0 GAE app deployed
 # @exitcode non-0 GAE app not deployed
 # @example
 #    deploy <path> [version]
-function deploy {
+function deploy() {
 
     getArgs "path version="
     

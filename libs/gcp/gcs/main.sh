@@ -38,7 +38,7 @@ function validateBucket() {
 # @arg $project id of the GCP project
 # @arg $bucket name of the bucket to create
 # @arg $class 'regional' or 'multiregional'
-# @arg [$region] optional region
+# @arg $[region] optional region
 # @exitcode 0 Bucket created
 # @exitcode non-0 Bucket not created due to error
 # @example
