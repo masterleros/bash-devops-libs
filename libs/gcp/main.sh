@@ -17,8 +17,12 @@
 # Verify Dependencies
 checkBins gcloud || return ${?}
 
-### Validate and set the requested project ###
-# usage: useProject <project_id>
+# @description Validate and set the requested project
+# @arg $project_id id of the project
+# @exitcode 0 Project set
+# @exitcode 1 Project not found
+# @example
+#   useProject <project_id>
 function useProject() {
 
     getArgs "project"
@@ -33,8 +37,10 @@ function useProject() {
     exitOnError "Failed to set working project '${project}'"
 }
 
-### Set default configuration for project and zone ###
-# usage: setDefaultZone <zone>
+# @description Set default configuration for project zone
+# @arg $zone desired GCP zone
+# @example
+#   setDefaultZone us-west1-a
 function setDefaultZone() {
     getArgs "zone"
 

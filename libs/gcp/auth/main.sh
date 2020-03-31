@@ -16,18 +16,23 @@
 # Verify Dependencies
 checkBins gcloud || return ${?}
 
-### Get a value from the credential json file ###
-# usage: getCurrentUser
-# returns: User e-mail
+# @description Get a value from the credential json file
+# @return User e-mail
+# @example
+#   assign currentUserEmail=getCurrentUser()
 function getCurrentUser() {
     _return=$(gcloud --quiet config list account --format "value(core.account)")
     [ "${_return}" ]
     return ${?}
 }
 
-### Get a value from the credential json file ###
-# usage: getValueFromCredential <credential_file> <key>
-function getValueFromCredential {
+# @description Get a value from the credential json file
+# @arg $credential_file path to a GCP credential file
+# @arg $key key inside the credential file json
+# @return Desired key value
+# @example
+#   assign key_value=getValueFromCredential <credential_file> <key>
+function getValueFromCredential() {
     getArgs "credential_path key"
 
     # Verify if SA credential file exist
@@ -37,9 +42,15 @@ function getValueFromCredential {
     return ${?}
 }
 
-### Use the service account from file ###
-# usage: createSA <project> <sa_id> [description]
-function createSA {
+# @description Create a service account with the given parameters
+# @arg $project id of the project
+# @arg $sa_id id of the service account
+# @arg $[description] optional description
+# @exitcode 0 Successfuly created SA
+# @exitcode non-0 Failed to create SA
+# @example
+#   createSA <project> <sa_id> [description]
+function createSA() {
 
     getArgs "project sa_id description="
 
@@ -56,9 +67,13 @@ function createSA {
     fi
 }
 
-### Use the service account from file ###
-# usage: useSA <credential_file>
-function useSA {
+# @description Validates and use the service account from file
+# @arg $credential_file path to a GCP credential file
+# @exitcode 0 Successfuly set SA
+# @exitcode non-0 Failed to set SA
+# @example
+#   useSA <credential_file>
+function useSA() {
 
     getArgs "credential_path"
 
@@ -71,10 +86,14 @@ function useSA {
     exitOnError "Could not activate '${_client_mail}' SA"
 }
 
-### Remove the service account from system ###
-# usage: revokeSA <credential_file>
-function revokeSA {
-    
+# @description Remove the service account from system
+# @arg $credential_file path to a GCP credential file
+# @exitcode 0 Successfuly revoked SA
+# @exitcode non-0 Failed to revoked SA
+# @example
+#   revokeSA <credential_file>
+function revokeSA() {
+
     getArgs "credential_path"
 
     # Get SA user email
@@ -86,9 +105,15 @@ function revokeSA {
     exitOnError "Could not revoke '${_client_mail}' SA"
 }
 
-### Create a service account credential json file
-# usage: createCredential <project> <credential_path> <sa_mail>
-function createCredential {
+# @description Create a service account credential json file
+# @arg $project id of the project
+# @arg $credential_path path to create a GCP credential file
+# @arg $sa_mail email of the SA
+# @exitcode 0 Successfuly created SA
+# @exitcode non-0 Failed to created SA
+# @example
+#   createCredential <project> <credential_path> <sa_mail>
+function createCredential() {
 
     getArgs "project credential_path sa_mail"
 
@@ -106,9 +131,15 @@ function createCredential {
     fi
 }
 
-### Create a service account credential json file
-# usage: createCredential <project> <credential_path> <sa_mail>
-function deleteCredential {
+# @description Delete a SA credential of the project
+# @arg $project id of the project
+# @arg $credential_path path to delete a GCP credential file
+# @arg $sa_mail email of the SA
+# @exitcode 0 Successfuly delete SA
+# @exitcode non-0 Failed to delete SA
+# @example
+#   deleteCredential <project> <credential_path> <sa_mail>
+function deleteCredential() {
 
     getArgs "project credential_path sa_mail"
 

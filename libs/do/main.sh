@@ -23,7 +23,7 @@
 # @return Value of the key
 # @exitcode 0 Key found
 # @exitcode 1 Key not found
-# @example 
+# @example
 #   assign myVar=configInFile <file> <key>
 function configInFile() {
     getArgs "_file _key"

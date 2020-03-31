@@ -17,8 +17,13 @@
 # Verify Dependencies
 checkBins gcloud || return ${?}
 
-### Deploy Cloud Function ###
-# usage: deploy <function name> <aditional_parameters_array_list>
+# @description Deploy a Cloud Function
+# @arg $cfName name of the cloud functions
+# @arg @$parameters the cloud function parameters
+# @exitcode 0 Cloud Function deployed successfuly
+# @exitcode non-0 Cloud Function failed to deploy
+# @example
+#   deploy <function name> <aditional_parameters_array_list>
 function deploy() {
     getArgs "cfName @parameters"
 

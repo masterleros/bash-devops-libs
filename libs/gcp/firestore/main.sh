@@ -14,9 +14,13 @@
 #    limitations under the License.
 
 
-### Validate if the project is firestore enabled ###
-# usage: enabledProject <project>
-function enabledProject {
+# @description Validate if the project is firestore enabled
+# @arg $project id of the project
+# @return 0 Project set
+# @return non-0 Failed to set project
+# @example
+#   enabledProject <project_id>
+function enabledProject() {
     getArgs "project"
     gcloud --quiet --project="${project}" beta firestore operations list &> /dev/null
     return ${?}

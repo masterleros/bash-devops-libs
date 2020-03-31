@@ -14,9 +14,14 @@
 #    limitations under the License.
 
 
-### Validate a role of current user ###
-# usage: enable <api_domain>
-function enable {
+# @description Enable a API domain into the GCP project
+# @arg $project id of the GCP project
+# @arg $api id of the API to enable
+# @exitcode 0 API successfuly enabled
+# @exitcode non-0 Failed to enable API
+# @example
+#   enable <project> <api>
+function enable() {
 
     getArgs "project api"
 
