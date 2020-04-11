@@ -55,7 +55,6 @@ function askValue() {
     ;;
   esac
   eval "${var_name}=\"${value}\""
-  exit 0
 }
 
 # @description Create a configuration dialog containing a selection of variables to update
@@ -108,7 +107,7 @@ function showConfigurationDialog() {
       [ "${selection}" != "${parts[1]}" ] && continue
       # Property layout item found, update it
       self askValue ${parts[0]} ${parts[1]} "${title}"
-      found=1
+      [ $? = "0" ] && found=1
     done
     [ "${found}" = "0" ] && break
   done
