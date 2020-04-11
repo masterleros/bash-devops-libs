@@ -19,23 +19,28 @@ source $(dirname "${BASH_SOURCE[0]}")/../../dolibs.sh --offline
 do.use dialogs
 
 function show_dialog_example() {
-  local my_id=baroni
-  local my_age=27
-  local my_password=
   dialogs.showConfigurationDialog "Please configure id and age" "
     string my_id
     number my_age
     password my_password
   "
+}
+
+function show_askValue_example() {
+  dialogs.askValue string my_name "Please set Id"
+}
+
+function run_examples() {
+  local my_id=${USER}
+  local my_age=27
+  local my_password=
+  local my_name=baroni
+  show_dialog_example
+  show_askValue_example
+  clear
   echoInfo "my_id: ${my_id}"
   echoInfo "my_age: ${my_age}"
   echoInfo "my_password: ${my_password}"
+  echoInfo "my_name: ${my_name}"
 }
-show_dialog_example
-
-function show_askValue_example() {
-  local my_id=baroni
-  dialogs.askValue string my_id "Please set Id"
-  echoInfo "my_id: ${my_id}"
-}
-show_askValue_example
+run_examples
