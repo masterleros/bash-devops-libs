@@ -31,7 +31,7 @@ function askValue() {
   checkBins dialog
   exitOnError "Bash 'dialog' util not found"
 
-  local subtitle="Please type the \"${var_name}\" value:"
+  local subtitle="Please type \"${var_name}\" value:"
 
   local value=
   case ${type} in
