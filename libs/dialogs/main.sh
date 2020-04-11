@@ -31,16 +31,16 @@ function askValue() {
   checkBins dialog
   exitOnError "Bash 'dialog' util not found"
 
-  local subtitle="Please type the ${var_name} value:""Please type the ${var_name} value:"
+  local subtitle="Please type the ${var_name} value:"
 
   local value=
   case ${type} in
     string)
-      value=$(dialog --stdout --title "${title}" --inputbox "${subtitle}" 0 0 ${!var_name})
+      value=$(dialog --stdout --title "${title}" --inputbox "${subtitle}" 0 0 "${!var_name}")
       ;;
     number)
       while : ; do
-        value=$(dialog --stdout --title "${title}" --inputbox "${subtitle}" 0 0 ${!var_name})
+        value=$(dialog --stdout --title "${title}" --inputbox "${subtitle}" 0 0 "${!var_name}")
         if [[ "$value" =~ ^[0-9]+$ ]]; then
           break
         fi
@@ -91,7 +91,7 @@ function showConfigurationDialog() {
       # Hide password fields
       [ "${parts[0]}" = "password" ] && value='######'
       # Build dialog_cmd
-      [ -n "${parts[1]}" ] && dialog_cmd="${dialog_cmd} ${parts[1]} '${value}'"
+      [ -n "${parts[1]}" ] && dialog_cmd="${dialog_cmd} ${parts[1]} \"${value}\""
     done
     dialog_cmd="${dialog_cmd} finish ''"
     # Run dialog and get return
