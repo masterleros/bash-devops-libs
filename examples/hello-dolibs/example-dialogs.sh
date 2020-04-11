@@ -22,12 +22,11 @@ function show_dialog_example() {
   local my_id=baroni
   local my_age=27
   local my_password=
-  do.dialogs.showConfigurationDialog "Please configure id and age" "
+  dialogs.showConfigurationDialog "Please configure id and age" "
     string my_id
     number my_age
     password my_password
   "
-  clear
   echoInfo "my_id: ${my_id}"
   echoInfo "my_age: ${my_age}"
   echoInfo "my_password: ${my_password}"
@@ -36,8 +35,7 @@ show_dialog_example
 
 function show_askValue_example() {
   local my_id=baroni
-  askValue string my_id "Please set Id"
-  clear
+  dialogs.askValue string my_id "Please set Id"
   echoInfo "my_id: ${my_id}"
 }
 show_askValue_example
