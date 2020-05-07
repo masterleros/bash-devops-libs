@@ -38,7 +38,7 @@ function dockerLogin() {
     exitOnError "Required credentials not found"
 
     # Get credential user
-    assign _saUser=do.gcp.auth.getValueFromCredential "${GOOGLE_APPLICATION_CREDENTIALS}" client_email
+    assign _saUser=gcp.auth.getValueFromCredential "${GOOGLE_APPLICATION_CREDENTIALS}" client_email
     exitOnError "It was not possible to get the credential user email"
 
     # Create docker config folder if does not exist
