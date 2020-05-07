@@ -18,7 +18,7 @@
 checkBins gcloud docker || return ${?}
 
 # Define the GCloud registry host
-export GCLOUD_DOCKER_REGISTRY_HOST="us.gcr.io"
+export GCLOUD_DOCKER_REGISTRY_HOST="gcr.io"
 export DOCKER_CONFIG_DIR="${HOME}/.docker"
 export DOCKER_CONFIG_PATH="${DOCKER_CONFIG_DIR}/docker.json"
 export DOCKER_LOCKFILE_PATH="${DOCKER_CONFIG_DIR}/.${GCLOUD_DOCKER_REGISTRY_HOST}.lock"
