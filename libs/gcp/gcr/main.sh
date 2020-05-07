@@ -46,8 +46,8 @@ function dockerLogin() {
     [ -d "${DOCKER_LOCKFILE_DIR}" ] || mkdir -p "${DOCKER_LOCKFILE_DIR}"
 
     # Create the lock descriptor    
-    #exec "{DOCKER_LOCKFILE_DESC}">"${DOCKER_LOCKFILE_PATH}"
-    #exitOnError "It was not possible to aquire the lock"    
+    exec "{DOCKER_LOCKFILE_DESC}">"${DOCKER_LOCKFILE_PATH}"
+    exitOnError "It was not possible to aquire the lock"    
     # Aquire the soft lock for this process
     flock -s ${DOCKER_LOCKFILE_DESC}
 
