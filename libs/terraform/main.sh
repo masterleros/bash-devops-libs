@@ -21,19 +21,12 @@ checkBins terraform || return ${?}
 # usage: init <terraform path>
 function init() {
 
-    getArgs "terraform_path bucket= prefix="
-    
+    getArgs "terraform_path"
+
     cd "${terraform_path}"
-    if [[ ${bucket} ]] && [[ ${prefix} ]]; then
-      # Passing backEnd config on the fly
-      echoInfo "Initializing GCP backEnd from given config."
-      terraform init -backend-config="bucket=${bucket}" -backend-config="prefix=${prefix}"
-      exitOnError "Failed to initialize terraform"
-    else
-      terraform init
-      exitOnError "Failed to initialize terraform"
-    fi
-    
+
+    terraform init
+    exitOnError "Failed to initialize terraform"
 }
 
 ### Apply terraform plan
@@ -77,4 +70,16 @@ terraform {
 EOF
 exitOnError "It was not possible to create the backend.tf file"
 
+}
+
+### Init terraform plan with backEnd pre configured
+# usage: init_gcp <terraform path> <bucket> <prefix>
+function init_gcp() {
+
+    getArgs "terraform_path bucket prefix"
+    
+    cd "${terraform_path}"
+    
+    terraform init -backend-config="bucket=${bucket}" -backend-config="prefix=${prefix}"
+    exitOnError "Failed to initialize terraform"
 }
