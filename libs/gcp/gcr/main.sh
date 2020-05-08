@@ -31,14 +31,14 @@ export DOCKER_LOCKFILE_DESC=100
 #   dockerLogin()
 function dockerLogin() {
 
-    do.import gcp
+    do.import gcp.auth
 
     # Check if credential definition is present
     checkVars GOOGLE_APPLICATION_CREDENTIALS
     exitOnError "Required credentials not found"
 
     # Get credential user
-    assign _saUser=do.gcp.getValueFromCredential "${GOOGLE_APPLICATION_CREDENTIALS}" client_email
+    assign _saUser=gcp.auth.getValueFromCredential "${GOOGLE_APPLICATION_CREDENTIALS}" client_email
     exitOnError "It was not possible to get the credential user email"
 
     # Create docker config folder if does not exist
