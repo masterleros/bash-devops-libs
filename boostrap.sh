@@ -249,7 +249,7 @@ if [ ! "${DOLIBS_LOADED}" ]; then
         DOLIBS_SOURCE_CORE_DIR=${DOLIBS_SOURCE_DIR}/core        
 
         # Update lib if required
-        _dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}"
+        _dolibUpdate "core" "${DOLIBS_SOURCE_CORE_DIR}" "${DOLIBS_CORE_DIR}" "" "${DOLIBS_GIT_DIR}" "${DOLIBS_REPO}" "${DOLIBS_BRANCH}" && true
 
         # If lib was updated, update others required
         if [ ${?} != 0 ]; then
