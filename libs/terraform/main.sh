@@ -71,3 +71,15 @@ EOF
 exitOnError "It was not possible to create the backend.tf file"
 
 }
+
+### Init terraform plan with backEnd pre configured
+# usage: init_gcp <terraform path> <bucket> <prefix>
+function init_gcp() {
+
+    getArgs "terraform_path bucket prefix"
+    
+    cd "${terraform_path}"
+    
+    terraform init -backend-config="bucket=${bucket}" -backend-config="prefix=${prefix}"
+    exitOnError "Failed to initialize terraform"
+}
